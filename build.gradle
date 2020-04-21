@@ -1,0 +1,73 @@
+plugins {
+    id "com.jfrog.bintray" version "1.8.4"
+}
+
+allprojects {
+    group = 'io.emeraldpay.pjc'
+    version = "0.1.0-SNAPSHOT"
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven { url 'https://oss.jfrog.org/artifactory/repo' }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'groovy'
+    apply plugin: 'jacoco'
+
+    targetCompatibility = '11'
+    sourceCompatibility = '11'
+
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+    compileJava.options.compilerArgs \
+        << '-Xlint:unchecked' << '-Xlint:deprecation'
+
+    dependencies {
+        testImplementation 'org.objenesis:objenesis:3.1'
+        testImplementation 'org.spockframework:spock-core:2.0-M2-groovy-3.0'
+        testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.1.13'
+        testImplementation 'org.codehaus.groovy:groovy-all:3.0.3'
+    }
+
+    test {
+        jvmArgs '-ea'
+
+        testLogging.showStandardStreams = true
+        testLogging.exceptionFormat = 'full'
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+        }
+    }
+
+    test.finalizedBy jacocoTestReport
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+
+    jacoco {
+        toolVersion = "0.8.4"
+    }
+
+}
+

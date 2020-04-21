@@ -1,0 +1,6 @@
+== Polkadot Java Client
+
+Java client library to access Polkadot based networks.
+
+WARNING: UNDER DEVELOPMENT
+
