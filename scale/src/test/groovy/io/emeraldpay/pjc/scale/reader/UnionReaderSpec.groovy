@@ -15,15 +15,17 @@ class UnionReaderSpec extends Specification {
         def codec = new ScaleCodecReader(Hex.decodeHex("002a"))
         def act = codec.read(reader)
         then:
-        act instanceof Integer
-        act == 42
+        act.index == 0
+        act.value instanceof Integer
+        act.value == 42
 
         when:
         codec = new ScaleCodecReader(Hex.decodeHex("0101"))
         act = codec.read(reader)
         then:
-        act instanceof Boolean
-        act == true
+        act.index == 1
+        act.value instanceof Boolean
+        act.value == true
     }
 
     def "Error for invalid enum"() {
@@ -39,6 +41,9 @@ class UnionReaderSpec extends Specification {
         def codec = new ScaleCodecReader(Hex.decodeHex("01002a"))
         def act = codec.readOptional(reader)
         then:
-        act == Optional.of(42)
+        with(act.get()) {
+            index == 0
+            value == 42
+        }
     }
 }

@@ -1,12 +1,12 @@
 package io.emeraldpay.pjc.scale.reader;
 
 import io.emeraldpay.pjc.scale.CompactMode;
-import io.emeraldpay.pjc.scale.ItemReader;
+import io.emeraldpay.pjc.scale.ScaleReader;
 import io.emeraldpay.pjc.scale.ScaleCodecReader;
 
 import java.math.BigInteger;
 
-public class CompactBigIntReader implements ItemReader<BigInteger> {
+public class CompactBigIntReader implements ScaleReader<BigInteger> {
 
     private static final CompactUIntReader intReader = new CompactUIntReader();
 

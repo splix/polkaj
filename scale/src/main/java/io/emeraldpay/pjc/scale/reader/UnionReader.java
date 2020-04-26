@@ -1,30 +1,32 @@
 package io.emeraldpay.pjc.scale.reader;
 
-import io.emeraldpay.pjc.scale.ItemReader;
+import io.emeraldpay.pjc.scale.ScaleReader;
 import io.emeraldpay.pjc.scale.ScaleCodecReader;
+import io.emeraldpay.pjc.scale.UnionValue;
 
 import java.util.*;
 
-public class UnionReader<T> implements ItemReader<T> {
+public class UnionReader<T> implements ScaleReader<UnionValue<T>> {
 
-    private List<ItemReader<Object>> mapping;
+    private List<ScaleReader<Object>> mapping;
 
-    public UnionReader(List<ItemReader<Object>> mapping) {
+    public UnionReader(List<ScaleReader<Object>> mapping) {
         this.mapping = mapping;
     }
 
     @SuppressWarnings("unchecked")
-    public UnionReader(ItemReader<Object>... mapping) {
+    public UnionReader(ScaleReader<Object>... mapping) {
         this(Arrays.asList(mapping));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public T read(ScaleCodecReader rdr) {
+    public UnionValue<T> read(ScaleCodecReader rdr) {
         int index = rdr.readUByte();
         if (mapping.size() <= index) {
             throw new IllegalStateException("Unknown type index: " + index);
         }
-        return (T) mapping.get(index).read(rdr);
+        T value = (T) mapping.get(index).read(rdr);
+        return new UnionValue<>(index, value);
     }
 }

@@ -1,9 +1,9 @@
 package io.emeraldpay.pjc.scale.reader;
 
-import io.emeraldpay.pjc.scale.ItemReader;
+import io.emeraldpay.pjc.scale.ScaleReader;
 import io.emeraldpay.pjc.scale.ScaleCodecReader;
 
-public class UInt32Reader implements ItemReader<Long> {
+public class UInt32Reader implements ScaleReader<Long> {
     @Override
     public Long read(ScaleCodecReader rdr) {
         long result = 0;

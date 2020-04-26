@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 class ScaleCodecReaderSpec extends Specification {
 
-    def "Reads signed 8-bit integer"() {
+    def "Reads unsigned 8-bit integer"() {
         when:
         def codec = new ScaleCodecReader(Hex.decodeHex("45"))
         then:
@@ -14,7 +14,7 @@ class ScaleCodecReaderSpec extends Specification {
         !codec.hasNext()
     }
 
-    def "Reads signed 16-bit integer"() {
+    def "Reads unsigned 16-bit integer"() {
         when:
         def codec = new ScaleCodecReader(Hex.decodeHex("2a00"))
         then:
@@ -96,12 +96,12 @@ class ScaleCodecReaderSpec extends Specification {
         act == 381
 
         when:
-        act = rdr.readByteArray(32) // best hash
+        act = rdr.readUint256() // best hash
         then:
         Hex.encodeHexString(act) == "bb931fd17f85fb26e8209eb7af5747258163df29a7dd8f87fa7617963fcfa1aa"
 
         when:
-        act = rdr.readByteArray(32) // genesis hash
+        act = rdr.readUint256() // genesis hash
         then:
         Hex.encodeHexString(act) == "b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
     }

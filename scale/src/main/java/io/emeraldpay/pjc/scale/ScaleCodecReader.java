@@ -65,15 +65,15 @@ public class ScaleCodecReader {
 
     /**
      * Read complex value from the reader
-     * @param itemReader reader implementation
+     * @param scaleReader reader implementation
      * @param <T> resulting type
      * @return read value
      */
-    public <T> T read(ItemReader<T> itemReader) {
-        if (itemReader == null) {
+    public <T> T read(ScaleReader<T> scaleReader) {
+        if (scaleReader == null) {
             throw new NullPointerException("ItemReader cannot be null");
         }
-        return itemReader.read(this);
+        return scaleReader.read(this);
     }
 
     public int readUByte() {
@@ -98,21 +98,25 @@ public class ScaleCodecReader {
 
     /**
      * Read optional value from the reader
-     * @param itemReader reader implementation
+     * @param scaleReader reader implementation
      * @param <T> resulting type
      * @return optional read value
      */
     @SuppressWarnings("unchecked")
-    public <T> Optional<T> readOptional(ItemReader<T> itemReader) {
-        if (itemReader instanceof BoolReader || itemReader instanceof BoolOptionalReader) {
+    public <T> Optional<T> readOptional(ScaleReader<T> scaleReader) {
+        if (scaleReader instanceof BoolReader || scaleReader instanceof BoolOptionalReader) {
             return (Optional<T>) BOOL_OPTIONAL.read(this);
         }
         boolean some = readBoolean();
         if (some) {
-            return Optional.of(read(itemReader));
+            return Optional.of(read(scaleReader));
         } else {
             return Optional.empty();
         }
+    }
+
+    public byte[] readUint256() {
+        return readByteArray(32);
     }
 
     public byte[] readByteArray() {

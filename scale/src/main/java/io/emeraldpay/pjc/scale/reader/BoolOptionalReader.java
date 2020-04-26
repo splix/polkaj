@@ -1,11 +1,11 @@
 package io.emeraldpay.pjc.scale.reader;
 
-import io.emeraldpay.pjc.scale.ItemReader;
+import io.emeraldpay.pjc.scale.ScaleReader;
 import io.emeraldpay.pjc.scale.ScaleCodecReader;
 
 import java.util.Optional;
 
-public class BoolOptionalReader implements ItemReader<Optional<Boolean>> {
+public class BoolOptionalReader implements ScaleReader<Optional<Boolean>> {
     @Override
     public Optional<Boolean> read(ScaleCodecReader rdr) {
         byte b = rdr.readByte();

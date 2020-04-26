@@ -1,9 +1,9 @@
 package io.emeraldpay.pjc.scale.reader;
 
-import io.emeraldpay.pjc.scale.ItemReader;
+import io.emeraldpay.pjc.scale.ScaleReader;
 import io.emeraldpay.pjc.scale.ScaleCodecReader;
 
-public class BoolReader implements ItemReader<Boolean> {
+public class BoolReader implements ScaleReader<Boolean> {
     @Override
     public Boolean read(ScaleCodecReader rdr) {
         byte b = rdr.readByte();

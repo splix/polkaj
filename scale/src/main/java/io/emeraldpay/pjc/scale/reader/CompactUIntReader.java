@@ -1,10 +1,10 @@
 package io.emeraldpay.pjc.scale.reader;
 
 import io.emeraldpay.pjc.scale.CompactMode;
-import io.emeraldpay.pjc.scale.ItemReader;
+import io.emeraldpay.pjc.scale.ScaleReader;
 import io.emeraldpay.pjc.scale.ScaleCodecReader;
 
-public class CompactUIntReader implements ItemReader<Integer> {
+public class CompactUIntReader implements ScaleReader<Integer> {
 
     /**
      *

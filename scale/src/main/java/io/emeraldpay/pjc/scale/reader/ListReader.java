@@ -1,17 +1,17 @@
 package io.emeraldpay.pjc.scale.reader;
 
-import io.emeraldpay.pjc.scale.ItemReader;
+import io.emeraldpay.pjc.scale.ScaleReader;
 import io.emeraldpay.pjc.scale.ScaleCodecReader;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListReader<T> implements ItemReader<List<T>> {
+public class ListReader<T> implements ScaleReader<List<T>> {
 
-    private ItemReader<T> itemReader;
+    private ScaleReader<T> scaleReader;
 
-    public ListReader(ItemReader<T> itemReader) {
-        this.itemReader = itemReader;
+    public ListReader(ScaleReader<T> scaleReader) {
+        this.scaleReader = scaleReader;
     }
 
     @Override
@@ -19,7 +19,7 @@ public class ListReader<T> implements ItemReader<List<T>> {
         int size = rdr.readCompactInt();
         List<T> result = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            result.add(rdr.read(itemReader));
+            result.add(rdr.read(scaleReader));
         }
         return result;
     }
