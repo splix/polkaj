@@ -1,4 +1,4 @@
 rootProject.name = 'polkadot-java-client'
 
-include "ss58", "scale"
+include "ss58", "scale", "types"
 

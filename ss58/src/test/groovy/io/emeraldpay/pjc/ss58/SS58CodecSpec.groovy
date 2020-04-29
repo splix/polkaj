@@ -18,35 +18,35 @@ class SS58CodecSpec extends Specification {
 
     def "Doesn't encode null pubkey"() {
         when:
-        SS58Codec.instance.encode(AddressType.Network.SUBSTRATE, null)
+        SS58Codec.instance.encode(SS58Type.Network.SUBSTRATE, null)
         then:
         thrown(IllegalArgumentException)
     }
 
     def "Doesn't decode null"() {
         when:
-        SS58Codec.instance.decodePubkey(null)
+        SS58Codec.instance.decode(null)
         then:
         thrown(IllegalArgumentException)
     }
 
     def "Doesn't decode empty"() {
         when:
-        SS58Codec.instance.decodePubkey("")
+        SS58Codec.instance.decode("")
         then:
         thrown(IllegalArgumentException)
     }
 
     def "Doesn't encode short pubkey"() {
         when:
-        SS58Codec.instance.encode(AddressType.Network.SUBSTRATE, Hex.decodeHex('9053cc32597892cc2cd43ea6e3c0db7a3b4c52e5fe6052762080dbc3e3222c'))
+        SS58Codec.instance.encode(SS58Type.Network.SUBSTRATE, Hex.decodeHex('9053cc32597892cc2cd43ea6e3c0db7a3b4c52e5fe6052762080dbc3e3222c'))
         then:
         thrown(IllegalArgumentException)
     }
 
     def "Doesn't decode just base struct"() {
         when:
-        SS58Codec.instance.decodePubkey(Base58.encode([42, 1, 2] as byte[]))
+        SS58Codec.instance.decode(Base58.encode([42, 1, 2] as byte[]))
         then:
         def t = thrown(IllegalArgumentException)
         t.message == "Input value is too short"
@@ -54,7 +54,7 @@ class SS58CodecSpec extends Specification {
 
     def "Doesn't encode long pubkey"() {
         when:
-        SS58Codec.instance.encode(AddressType.Network.SUBSTRATE, Hex.decodeHex('9053cc32597892cc2cd43ea6e3c0db7a3b4c52e5fe6052762080dbc3e3222c0000'))
+        SS58Codec.instance.encode(SS58Type.Network.SUBSTRATE, Hex.decodeHex('9053cc32597892cc2cd43ea6e3c0db7a3b4c52e5fe6052762080dbc3e3222c0000'))
         then:
         thrown(IllegalArgumentException)
     }
@@ -63,7 +63,7 @@ class SS58CodecSpec extends Specification {
         setup:
         def encoder = SS58Codec.instance
         expect:
-        encoder.encode(AddressType.Network.CANARY, Hex.decodeHex(pubkey)) == addr
+        encoder.encode(SS58Type.Network.CANARY, Hex.decodeHex(pubkey)) == addr
         where:
         pubkey                                                             | addr
         '9053cc32597892cc2cd43ea6e3c0db7a3b4c52e5fe6052762080dbc3e3222c0b' | 'FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy'
@@ -77,7 +77,7 @@ class SS58CodecSpec extends Specification {
         setup:
         def encoder = SS58Codec.instance
         expect:
-        encoder.encode(AddressType.Network.EDGEWARE_BERLIN, Hex.decodeHex(pubkey)) == addr
+        encoder.encode(SS58Type.Network.EDGEWARE_BERLIN, Hex.decodeHex(pubkey)) == addr
         where:
         pubkey                                                             | addr
         '80abdc9bc1541a8357bddd866ae7700fa26ecdfcebb02dc858c16350db16fb64' | 'kRKzYtM2KGB9DgonEbuRYdooSDbkyyR8TixhUbvKqsA24mA'
@@ -89,7 +89,7 @@ class SS58CodecSpec extends Specification {
         setup:
         def encoder = SS58Codec.instance
         expect:
-        encoder.encode(AddressType.Network.SUBSTRATE, Hex.decodeHex(pubkey)) == addr
+        encoder.encode(SS58Type.Network.SUBSTRATE, Hex.decodeHex(pubkey)) == addr
         where:
         pubkey                                                             | addr
         'f8c2c616e5d5d805ae14f810da895ed9fe98511c201dc4d4719624a41fb9772c' | '5HgsbKKAqD82bDv25MakEihbS4DXKCdyM76HQFRZYmMdYLcJ'
@@ -101,7 +101,7 @@ class SS58CodecSpec extends Specification {
         setup:
         def encoder = SS58Codec.instance
         expect:
-        Hex.encodeHexString(encoder.decodePubkey(addr)) == pubkey
+        Hex.encodeHexString(encoder.decode(addr).getValue()) == pubkey
         where:
         pubkey                                                             | addr
         'f8c2c616e5d5d805ae14f810da895ed9fe98511c201dc4d4719624a41fb9772c' | '5HgsbKKAqD82bDv25MakEihbS4DXKCdyM76HQFRZYmMdYLcJ'
@@ -113,7 +113,7 @@ class SS58CodecSpec extends Specification {
         setup:
         def encoder = SS58Codec.instance
         expect:
-        Hex.encodeHexString(encoder.decodePubkey(addr)) == pubkey
+        Hex.encodeHexString(encoder.decode(addr).getValue()) == pubkey
         where:
         pubkey                                                             | addr
         '9053cc32597892cc2cd43ea6e3c0db7a3b4c52e5fe6052762080dbc3e3222c0b' | 'FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy'
@@ -127,7 +127,7 @@ class SS58CodecSpec extends Specification {
         setup:
         def encoder = SS58Codec.instance
         expect:
-        Hex.encodeHexString(encoder.decodePubkey(addr)) == pubkey
+        Hex.encodeHexString(encoder.decode(addr).getValue()) == pubkey
         where:
         pubkey                                                             | addr
         '80abdc9bc1541a8357bddd866ae7700fa26ecdfcebb02dc858c16350db16fb64' | 'kRKzYtM2KGB9DgonEbuRYdooSDbkyyR8TixhUbvKqsA24mA'
@@ -139,7 +139,7 @@ class SS58CodecSpec extends Specification {
         setup:
         def encoder = SS58Codec.instance
         when:
-        encoder.decodePubkey('kRKzYtM2KGB9DgonEbuRYdooSDbkyyR8TixhUbvKqsA24mB')
+        encoder.decode('kRKzYtM2KGB9DgonEbuRYdooSDbkyyR8TixhUbvKqsA24mB')
         then:
         def t = thrown(IllegalArgumentException)
         t.message == 'Incorrect checksum'

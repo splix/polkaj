@@ -11,6 +11,8 @@ allprojects {
         mavenCentral()
         jcenter()
         maven { url 'https://oss.jfrog.org/artifactory/repo' }
+        //for java-multibase
+        maven { url 'https://jitpack.io' }
     }
 }
 
