@@ -215,4 +215,122 @@ class DotAmountSpec extends Specification {
         act[2].value == 2
         act[3].value == 4
     }
+
+    def "Get minimal"() {
+        expect:
+        DotAmount.fromPlanks(amount).minimalUnit.name == unit
+        where:
+        amount      | unit
+        1           | "Planck"
+        5           | "Planck"
+        50          | "Planck"
+        100         | "Planck"
+        500         | "Planck"
+        999         | "Planck"
+
+        1000        | "Point"
+        5000        | "Point"
+        10000       | "Point"
+        50000       | "Point"
+        999_999     | "Point"
+
+        1_000_000    | "Microdot"
+        5_000_000    | "Microdot"
+
+        1_000_000_000    | "Millidot"
+        5_000_000_000    | "Millidot"
+
+        1_000_000_000_000   | "Dot"
+        5_000_000_000_000   | "Dot"
+        10_000_000_000_000  | "Dot"
+    }
+
+    def "Get minimal with limit"() {
+        when:
+        def act = DotAmount
+                .fromPlanks(1_000_000) //ideal is micro
+                .getMinimalUnit(Units.Millidot) //but should stop at milli
+        then:
+        act == Units.Millidot
+    }
+
+    def "Get value in planks"() {
+        expect:
+        DotAmount.fromPlanks(amount)
+                .getValue(Units.Planck)
+                .toString() == result
+        where:
+        amount              | result
+        10_000_000_000_000  | "10000000000000"
+        12_345_678_123_456  | "12345678123456"
+        10_000_000_000      | "10000000000"
+        10_000_000          | "10000000"
+        10_000              | "10000"
+        10                  | "10"
+        0                   | "0"
+    }
+
+    def "Get value in points"() {
+        expect:
+        DotAmount.fromPlanks(amount)
+                .getValue(Units.Point)
+                .toString() == result
+        where:
+        amount              | result
+        10_000_000_000_000  | "10000000000"
+        12_345_678_123_456  | "12345678123.456"
+            20_900_800_700  |    "20900800.7"
+                30_900_800  |       "30900.8"
+                    40_900  |          "40.9"
+                        50  |           "0.05"
+                        00  |           "0"
+    }
+
+    def "Get value in micro"() {
+        expect:
+        DotAmount.fromPlanks(amount)
+                .getValue(Units.Microdot)
+                .toString() == result
+        where:
+        amount              | result
+        10_000_000_000_000  | "10000000"
+        12_345_678_123_456  | "12345678.123456"
+            20_900_800_700  |    "20900.8007"
+                30_900_800  |       "30.9008"
+                    40_900  |        "0.0409"
+                        50  |        "0.00005"
+                        00  |        "0"
+    }
+
+    def "Get value in milli"() {
+        expect:
+        DotAmount.fromPlanks(amount)
+                .getValue(Units.Millidot)
+                .toPlainString() == result
+        where:
+        amount              | result
+        10_000_000_000_000  | "10000"
+        12_345_678_123_456  | "12345.678123456"
+            20_900_800_700  |    "20.9008007"
+                30_900_800  |     "0.0309008"
+                    40_900  |     "0.0000409"
+                        50  |     "0.00000005"
+                        00  |     "0"
+    }
+
+    def "Get value in dot"() {
+        expect:
+        DotAmount.fromPlanks(amount)
+                .getValue(Units.Dot)
+                .toPlainString() == result
+        where:
+        amount              | result
+        10_000_000_000_000  | "10"
+        12_345_678_123_456  | "12.345678123456"
+            20_900_800_700  |  "0.0209008007"
+                30_900_800  |  "0.0000309008"
+                    40_900  |  "0.0000000409"
+                        50  |  "0.00000000005"
+                        00  |  "0"
+    }
 }

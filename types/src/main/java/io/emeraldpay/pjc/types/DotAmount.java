@@ -4,6 +4,7 @@ import io.emeraldpay.pjc.types.Units.Unit;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.util.Objects;
 
 /**
@@ -19,11 +20,11 @@ public class DotAmount implements Comparable<DotAmount>{
      * Planck -> Point -> Microdot -> Millidot -> Dot
      */
     public static final Units Polkadots = new Units(
-            new Unit("Planck", 0),
-            new Unit("Point", 3),
-            new Unit("Microdot", "uDOT", 6),
-            new Unit("Millidot", "mDOT", 9),
-            new Unit("Dot", "DOT", 12)
+            Units.Planck,
+            Units.Point,
+            Units.Microdot,
+            Units.Millidot,
+            Units.Dot
     );
 
     /**
@@ -43,8 +44,8 @@ public class DotAmount implements Comparable<DotAmount>{
     private static final BigInteger DOT_MULTIPLIER = DOT_UNIT.getMultiplier();
     private static final BigDecimal DOT_MULTIPLIER_DECIMAL = new BigDecimal(DOT_MULTIPLIER);
 
-    private BigInteger value;
-    private Units units;
+    private final BigInteger value;
+    private final Units units;
 
     /**
      * Create a standard DOT amount for the specified amount
@@ -120,8 +121,47 @@ public class DotAmount implements Comparable<DotAmount>{
         return value;
     }
 
+    public BigDecimal getValue(Unit unit) {
+        if (unit.getDecimals() == 0) {
+            return new BigDecimal(value);
+        }
+        return new BigDecimal(value)
+                .divide(new BigDecimal(unit.getMultiplier()), MathContext.DECIMAL64);
+    }
+
     public Units getUnits() {
         return units;
+    }
+
+    /**
+     * Finds a minimal unit for which a value represented in that unit has a whole part.
+     * For example for 0.100 Dots the unit is Millidot (100 Millidots), for 0.000075 its Microdot (75 Microdots), and so on.
+     *
+     * @return a minimal unit
+     */
+    public Unit getMinimalUnit() {
+        return getMinimalUnit(getUnits().getUnits()[0]);
+    }
+
+    /**
+     * Finds a minimal unit, down to specified limit, for which a value represented in that unit has a whole part.
+     * For example for 0.100 Dots the unit is Millidot (100 Millidots), for 0.000075 its Microdot (75 Microdots), and so on.
+     *
+     * @param limit the limit that stop further decrease of the unit
+     * @return a minimal unit
+     */
+    public Unit getMinimalUnit(Unit limit) {
+        Unit[] units = getUnits().getUnits();
+        for (int i = units.length-1; i > 0; i--) {
+            Unit unit = units[i];
+            if (unit == limit) {
+                return unit;
+            }
+            if (value.compareTo(unit.getMultiplier()) >= 0) {
+                return unit;
+            }
+        }
+        return units[0];
     }
 
     @Override

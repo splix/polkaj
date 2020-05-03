@@ -13,7 +13,14 @@ import java.util.Objects;
  * @see Units.Unit
  */
 public class Units {
-    private Unit[] units;
+
+    public static final Unit Planck = new Unit("Planck", 0);
+    public static final Unit Point = new Unit("Point", 3);
+    public static final Unit Microdot = new Unit("Microdot", "uDOT", 6);
+    public static final Unit Millidot = new Unit("Millidot", "mDOT", 9);
+    public static final Unit Dot = new Unit("Dot", "DOT", 12);
+
+    private final Unit[] units;
 
     /**
      * Create a new list of units, the provided list must be sorted by decimals, from smallest to largest
@@ -39,8 +46,21 @@ public class Units {
         return units;
     }
 
+    /**
+     * Get the main largest unit from the list.
+     *
+     * @return main unit
+     */
     public Unit getMain() {
         return units[units.length - 1];
+    }
+
+    /**
+     * Get the base smallest unit from the list.
+     * @return base unit
+     */
+    public Unit getBase() {
+        return units[0];
     }
 
     @Override
@@ -64,9 +84,9 @@ public class Units {
      * A single unit, with it's own name and decimals. May have a short name, if exists (i.e., Microdot is the full name, and uDOT is the short name)
      */
     public static class Unit {
-        private int decimals;
-        private String name;
-        private String shortName;
+        private final int decimals;
+        private final String name;
+        private final String shortName;
 
         public Unit(String name, String shortName, int decimals) {
             this.decimals = decimals;
