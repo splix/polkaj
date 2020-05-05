@@ -1,23 +1,23 @@
 package io.emeraldpay.pjc.types;
 
 /**
- * A 256 bit value, commonly used as a hash
+ * A 512 bit value, commonly used as a hash
  */
-public class Hash256 extends FixedBytes implements Comparable<Hash256> {
+public class Hash512 extends FixedBytes implements Comparable<Hash512> {
 
     /**
-     * Length in bytes (32 byte)
+     * Length in bytes (64 byte)
      */
-    public static final int SIZE_BYTES = 32;
+    public static final int SIZE_BYTES = 64;
 
     /**
      * Create a new value. Makes sure the input is correct, if not throws an exception
      *
-     * @param value 32 byte value
+     * @param value 64 byte value
      * @throws NullPointerException if value is null
-     * @throws IllegalArgumentException is size is not 32 bytes
+     * @throws IllegalArgumentException is size is not 64 bytes
      */
-    public Hash256(byte[] value) {
+    public Hash512(byte[] value) {
         super(value, SIZE_BYTES);
     }
 
@@ -26,8 +26,8 @@ public class Hash256 extends FixedBytes implements Comparable<Hash256> {
      *
      * @return empty hash
      */
-    public static Hash256 empty() {
-        return new Hash256(new byte[SIZE_BYTES]);
+    public static Hash512 empty() {
+        return new Hash512(new byte[SIZE_BYTES]);
     }
 
     /**
@@ -38,13 +38,13 @@ public class Hash256 extends FixedBytes implements Comparable<Hash256> {
      * @throws IllegalArgumentException if value has invalid length
      * @throws NumberFormatException if value has invalid format (non-hex characters, etc)
      */
-    public static Hash256 from(String hex) {
+    public static Hash512 from(String hex) {
         byte[] parsed = parseHex(hex, SIZE_BYTES);
-        return new Hash256(parsed);
+        return new Hash512(parsed);
     }
 
     @Override
-    public int compareTo(Hash256 o) {
+    public int compareTo(Hash512 o) {
         return super.compareTo(o);
     }
 }
