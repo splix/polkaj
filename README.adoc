@@ -1,6 +1,48 @@
-== Polkadot Java Client
+= Polkadot Java Client
+:lib-version: 0.1.0-SNAPSHOT
+:lib-version-dev: 0.1.0-SNAPSHOT
 
 Java client library to access Polkadot based networks.
 
 WARNING: UNDER DEVELOPMENT
 
+
+- Latest Stable Version: NONE
+- Latest Snapshot Version: {lib-version-dev}
+
+
+== Modules
+
+- `io.emeraldpay.pjc:scale:{lib-version}` - SCALE codec implementation
+- `io.emeraldpay.pjc:ss58:{lib-version}` - SS58 codec to encode/decode addresses and pubkeys
+- `io.emeraldpay.pjc:types:{lib-version}` - common types (Address, DotAmount, Hash256, etc)
+
+== Usage
+
+NOTE: The library is not uploaded to any public Maven repository yet
+
+To use development version you need to install into local Maven.
+
+.Install into local Maven
+----
+gradle install
+----
+
+.Using with Gradle
+[source,groovy,subs="attributes"]
+----
+repositories {
+   // for locally installed packages only
+   mavenLocal()
+}
+
+dependencies {
+    implementation 'io.emeraldpay.pjc:type:{lib-version}'
+}
+----
+
+== License
+
+The core project code is released under Apache 2.0 license.
+
+Examples and docs are published under CC0 license + additionally Apache 2.0 for code parts in the examples.
