@@ -1,6 +1,19 @@
+buildscript {
+    repositories {
+        maven { url "https://dl.bintray.com/nebula/gradle-plugins" }
+    }
+
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'
+    }
+}
+
 plugins {
     id "com.jfrog.bintray" version "1.8.4"
 }
+
+// gradle aggregateJavadoc
+apply plugin: 'nebula-aggregate-javadocs'
 
 allprojects {
     group = 'io.emeraldpay.pjc'
@@ -19,6 +32,8 @@ allprojects {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'java-library'
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
     apply plugin: 'groovy'
     apply plugin: 'jacoco'
 
@@ -75,5 +90,32 @@ subprojects {
         toolVersion = "0.8.4"
     }
 
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = 'polkadot-java-client'
+                from components.java
+                versionMapping {
+                    usage('java-api') {
+                        fromResolutionOf('runtimeClasspath')
+                    }
+                    usage('java-runtime') {
+                        fromResolutionResult()
+                    }
+                }
+                pom {
+                    name = 'Polkadot Java Client'
+                    description = 'Java client library to access Polkadot based networks'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
+
 

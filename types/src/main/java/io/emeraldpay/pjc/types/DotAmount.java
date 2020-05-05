@@ -10,14 +10,14 @@ import java.util.Objects;
 /**
  * Amount value, in DOTs
  *
- * @link https://wiki.polkadot.network/docs/en/learn-DOT
+ * @see <a href="https://wiki.polkadot.network/docs/en/learn-DOT">https://wiki.polkadot.network/docs/en/learn-DOT</a>
  */
 public class DotAmount implements Comparable<DotAmount>{
 
     /**
      * Standard units for DOT token
      *
-     * Planck -> Point -> Microdot -> Millidot -> Dot
+     * Planck -&gt; Point -&gt; Microdot -&gt; Millidot -&gt; Dot
      */
     public static final Units Polkadots = new Units(
             Units.Planck,
@@ -30,7 +30,7 @@ public class DotAmount implements Comparable<DotAmount>{
     /**
      * Kusama testnet units
      *
-     * Planck ->  Point -> MicroKSM -> MilliKSM -> KSM
+     * Planck -&gt;  Point -&gt; MicroKSM -&gt; MilliKSM -&gt; KSM
      */
     public static final Units Kusamas = new Units(
             new Unit("Planck", 0),

@@ -7,21 +7,21 @@ import java.util.List;
 
 /**
  * DotAmount formatter, to represent amounts in human friendly way.
- * <br/>
+ * <br>
  * Usage:
- * <code><pre>
+ * <pre><code>
  * DotAmountFormatter fmt = DotAmountFormatter.newBuilder()
  *                 .usingMinimalUnit() // specify to display in minimal unit that covers whole part of the amount
  *                 .fullNumber("#,##0.00") // put number, using format of the decimal number
  *                 .exactString(" ") // add space
- *                 .shortUnit() // short name of the unit (Millidot -> mDOT)
+ *                 .shortUnit() // short name of the unit (Millidot as mDOT)
  *                 .build();
  *
  * // prints "56.79 uDOT"
  * System.out.println(
  *    fmt.format(DotAmount.fromPlanks(56_789_000))
  * );
- * </pre></code>
+ * </code></pre>
  *
  * The formatter built above is standard and can be build from <code>DotAmountFormatter.autoShortFormatter</code>
  *
@@ -194,6 +194,8 @@ public class DotAmountFormatter {
 
         /**
          * Appends the whole number as string, with specified format which should be supported by DecimalFormat
+         *
+         * @param pattern pattern supported by DecimalFormat
          * @return this builder
          * @see DecimalFormat
          */
@@ -203,6 +205,8 @@ public class DotAmountFormatter {
 
         /**
          * Specify which unit should be used for formatting. The amount will be converted.
+         *
+         * @param unit unit to use
          * @return this builder
          */
         public Builder usingUnit(Units.Unit unit) {
@@ -211,6 +215,8 @@ public class DotAmountFormatter {
 
         /**
          * Configure to find an optimal unit for formatting, limiting to the specified one as the smalles acceptable.
+         *
+         * @param unit minimal unit
          * @return this builder
          */
         public Builder usingMinimalUnit(Units.Unit unit) {

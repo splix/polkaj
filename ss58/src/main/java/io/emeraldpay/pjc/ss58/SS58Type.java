@@ -1,7 +1,7 @@
 package io.emeraldpay.pjc.ss58;
 
 /**
- * @link https://github.com/paritytech/substrate/wiki/External-Address-Format-(SS58)
+ * @see <a href="https://github.com/paritytech/substrate/wiki/External-Address-Format-(SS58)">https://github.com/paritytech/substrate/wiki/External-Address-Format-(SS58)</a>
  */
 public abstract class SS58Type {
 

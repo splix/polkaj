@@ -10,7 +10,7 @@ public class HexNumberFormat {
     /**
      * Clean and verify hex formatted number
      *
-     * "0x1f" -> "1f"
+     * "0x1f" -&gt; "1f"
      *
      * @param hex a hex formatted number with 0x prefix
      * @return hex string convenient for standard hex parsing
