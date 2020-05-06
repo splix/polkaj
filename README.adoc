@@ -3,8 +3,9 @@
 :lib-version-dev: 0.1.0-SNAPSHOT
 
 image:https://github.com/emeraldpay/polkadot-java-client/workflows/Tests/badge.svg["Unit Tests"]
+image:https://codecov.io/gh/emeraldpay/polkadot-java-client/branch/master/graph/badge.svg["Coverage",link="https://codecov.io/gh/emeraldpay/polkadot-java-client"]
 image:https://img.shields.io/github/license/emeraldpay/polkadot-java-client.svg?style=flat-square&maxAge=2592000["License",link="https://github.com/emeraldpay/polkadot-java-client/blob/master/LICENSE"]
-image:https://badges.gitter.im/emeraldpay/community.svg[link="https://gitter.im/emeraldpay/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge]
+image:https://badges.gitter.im/emeraldpay/community.svg["Gitter",link="https://gitter.im/emeraldpay/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge"]
 
 Java client library to access Polkadot based networks.
 
