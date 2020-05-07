@@ -89,6 +89,6 @@ public class SS58Codec {
         byte[] pubkey = new byte[pubKeyLength];
         System.arraycopy(decoded, TYPE_LEN, pubkey, 0, pubKeyLength);
 
-        return new SS58(decoded[0], pubkey, checksum);
+        return new SS58(SS58Type.Network.from(decoded[0]), pubkey, checksum);
     }
 }

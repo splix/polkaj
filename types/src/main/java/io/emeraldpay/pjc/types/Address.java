@@ -14,8 +14,8 @@ public class Address implements Comparable<Address> {
 
     public static final int SIZE_BYTES = 32;
 
-    private byte[] pubkey;
-    private SS58Type.Network network;
+    private final byte[] pubkey;
+    private final SS58Type.Network network;
     private transient String encoded;
 
     public Address(SS58Type.Network network, byte[] pubkey) {
@@ -43,7 +43,7 @@ public class Address implements Comparable<Address> {
 
     public static Address from(String address) {
         SS58 decoded = SS58Codec.getInstance().decode(address);
-        SS58Type.Network type = SS58Type.Network.from(decoded.getType());
+        SS58Type.Network type = SS58Type.Network.from(decoded.getType().getValue());
         return new Address(type, decoded.getValue());
     }
 
