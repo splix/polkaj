@@ -70,7 +70,7 @@ public class DotAmount implements Comparable<DotAmount>{
         this.units = units;
     }
 
-    public static DotAmount fromPlanks(long amount) {
+    public static DotAmount fromPlancks(long amount) {
         return new DotAmount(BigInteger.valueOf(amount), Polkadots);
     }
 

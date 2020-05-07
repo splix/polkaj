@@ -19,7 +19,7 @@ import java.util.List;
  *
  * // prints "56.79 uDOT"
  * System.out.println(
- *    fmt.format(DotAmount.fromPlanks(56_789_000))
+ *    fmt.format(DotAmount.fromPlancks(56_789_000))
  * );
  * </code></pre>
  *

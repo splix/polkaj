@@ -15,7 +15,7 @@ class DotAmountSpec extends Specification {
 
     def "Create from planck"() {
         when:
-        def act = DotAmount.fromPlanks(123456789)
+        def act = DotAmount.fromPlancks(123456789)
         then:
         act.value == 123456789
         act.units.main.name == "Dot"
@@ -218,7 +218,7 @@ class DotAmountSpec extends Specification {
 
     def "Get minimal"() {
         expect:
-        DotAmount.fromPlanks(amount).minimalUnit.name == unit
+        DotAmount.fromPlancks(amount).minimalUnit.name == unit
         where:
         amount      | unit
         1           | "Planck"
@@ -248,7 +248,7 @@ class DotAmountSpec extends Specification {
     def "Get minimal with limit"() {
         when:
         def act = DotAmount
-                .fromPlanks(1_000_000) //ideal is micro
+                .fromPlancks(1_000_000) //ideal is micro
                 .getMinimalUnit(Units.Millidot) //but should stop at milli
         then:
         act == Units.Millidot
@@ -256,7 +256,7 @@ class DotAmountSpec extends Specification {
 
     def "Get value in planks"() {
         expect:
-        DotAmount.fromPlanks(amount)
+        DotAmount.fromPlancks(amount)
                 .getValue(Units.Planck)
                 .toString() == result
         where:
@@ -272,7 +272,7 @@ class DotAmountSpec extends Specification {
 
     def "Get value in points"() {
         expect:
-        DotAmount.fromPlanks(amount)
+        DotAmount.fromPlancks(amount)
                 .getValue(Units.Point)
                 .toString() == result
         where:
@@ -288,7 +288,7 @@ class DotAmountSpec extends Specification {
 
     def "Get value in micro"() {
         expect:
-        DotAmount.fromPlanks(amount)
+        DotAmount.fromPlancks(amount)
                 .getValue(Units.Microdot)
                 .toString() == result
         where:
@@ -304,7 +304,7 @@ class DotAmountSpec extends Specification {
 
     def "Get value in milli"() {
         expect:
-        DotAmount.fromPlanks(amount)
+        DotAmount.fromPlancks(amount)
                 .getValue(Units.Millidot)
                 .toPlainString() == result
         where:
@@ -320,7 +320,7 @@ class DotAmountSpec extends Specification {
 
     def "Get value in dot"() {
         expect:
-        DotAmount.fromPlanks(amount)
+        DotAmount.fromPlancks(amount)
                 .getValue(Units.Dot)
                 .toPlainString() == result
         where:

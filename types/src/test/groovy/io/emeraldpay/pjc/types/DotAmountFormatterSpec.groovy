@@ -4,15 +4,15 @@ import spock.lang.Specification
 
 class DotAmountFormatterSpec extends Specification {
 
-    DotAmount amount1 = DotAmount.fromPlanks(5_123_456_789_000) // 5 dot
-    DotAmount amount2 = DotAmount.fromPlanks(  123_456_789_000) // 123 Milli
-    DotAmount amount3 = DotAmount.fromPlanks(   23_456_789_000)
-    DotAmount amount4 = DotAmount.fromPlanks(    3_456_789_000)
-    DotAmount amount5 = DotAmount.fromPlanks(      456_789_000) // 456 Micro
-    DotAmount amount6 = DotAmount.fromPlanks(       56_789_000)
-    DotAmount amount7 = DotAmount.fromPlanks(        6_789_000)
-    DotAmount amount8 = DotAmount.fromPlanks(          789_000) // 789 Point
-    DotAmount amount9 = DotAmount.fromPlanks(           89_000)
+    DotAmount amount1 = DotAmount.fromPlancks(5_123_456_789_000) // 5 dot
+    DotAmount amount2 = DotAmount.fromPlancks(  123_456_789_000) // 123 Milli
+    DotAmount amount3 = DotAmount.fromPlancks(   23_456_789_000)
+    DotAmount amount4 = DotAmount.fromPlancks(    3_456_789_000)
+    DotAmount amount5 = DotAmount.fromPlancks(      456_789_000) // 456 Micro
+    DotAmount amount6 = DotAmount.fromPlancks(       56_789_000)
+    DotAmount amount7 = DotAmount.fromPlancks(        6_789_000)
+    DotAmount amount8 = DotAmount.fromPlancks(          789_000) // 789 Point
+    DotAmount amount9 = DotAmount.fromPlancks(           89_000)
 
     def "Simple"() {
         setup:
@@ -29,7 +29,7 @@ class DotAmountFormatterSpec extends Specification {
 
     def "Standard full"() {
         expect:
-        DotAmount value = DotAmount.fromPlanks(amount)
+        DotAmount value = DotAmount.fromPlancks(amount)
         DotAmountFormatter.fullFormatter().format(value) == exp
         where:
         amount              | exp
@@ -39,7 +39,7 @@ class DotAmountFormatterSpec extends Specification {
 
     def "Standard auto"() {
         expect:
-        DotAmount value = DotAmount.fromPlanks(amount)
+        DotAmount value = DotAmount.fromPlancks(amount)
         DotAmountFormatter.autoFormatter().format(value) == exp
         where:
         amount              | exp
@@ -49,7 +49,7 @@ class DotAmountFormatterSpec extends Specification {
 
     def "Standard short"() {
         expect:
-        DotAmount value = DotAmount.fromPlanks(amount)
+        DotAmount value = DotAmount.fromPlancks(amount)
         DotAmountFormatter.autoShortFormatter().format(value) == exp
         where:
         amount              | exp
