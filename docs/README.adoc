@@ -1,0 +1,5 @@
+= Polkadot Java Client Documentation
+
+== Table of Content
+
+. link:02-encoding.adoc[Encoding and Decoding (SCALE, SS58)]

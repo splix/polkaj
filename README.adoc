@@ -39,12 +39,19 @@ gradle install
 repositories {
    // for locally installed packages only
    mavenLocal()
+
+   // required for fetching com.github.multiformats:java-multibase library
+   maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     implementation 'io.emeraldpay.pjc:type:{lib-version}'
 }
 ----
+
+== Documentation
+
+See link:docs/README.adoc[Documentation] in `./docs` directory, and a demonstration in `./examples`.
 
 == License
 

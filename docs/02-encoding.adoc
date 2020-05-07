@@ -1,0 +1,115 @@
+= Encoding & Decoding
+:examples-dir: ../examples
+:examples-encoding: {examples-dir}/encoding/src/main/java
+
+== SCALE codec
+
+The SCALE (Simple Concatenated Aggregate Little-Endian) Codec is a lightweight, efficient, binary serialization and deserialization codec.
+
+It is designed for high-performance, copy-free encoding and decoding of data in resource-constrained execution contexts, like the Substrate runtime.
+It is not self-describing in any way and assumes the decoding context has all type knowledge about the encoded data.
+
+See specification at: https://substrate.dev/docs/en/conceptual/core/codec
+
+=== Reading values
+
+[source, java, indent=0]
+----
+include::{examples-encoding}/scale/Examples.java[lines=26..58]
+----
+
+.The full list of predefined readers is:
+- `BoolOptionalReader` -> `Optional<Boolean>`
+- `BoolReader` -> `Boolean`
+- `CompactBigIntReader` -> unsigned `BigInteger` encoded as _Compact Integer_
+- `CompactUintReader` -> unsigned `Integer` encoded as _Compact Integer_
+- `ListReader<T>` -> `List<T>`, where you should also specify reader for actual items of the list
+- `UByteReader` -> unsigned `Integer` encoded as a single byte (i.e., 0..255)
+- `UInt16Reader` -> unsigned `Integer` encoded as 16 bits
+- `UInt32Reader` -> unsigned `Long` encoded as 32 bits
+- `UnionReader` -> a enumeration, where individual readers are tagged
+
+==== Using custom reader
+
+But what if we have a class that we want to read (or write) as a whole, without manual reading each time.
+For example class Status below (getter and setter are omitted for simplicity)
+
+[source, java, indent=0]
+----
+include::{examples-encoding}/scale/StatusMessage.java[lines=54..61]
+----
+
+Now you can implement a reader, which implements `ScaleReader<Status>` interface.
+Inside the methods `read` you specify all the readings, and build a resulting object.
+
+[source, java, indent=0]
+----
+include::{examples-encoding}/scale/StatusMessage.java[lines=66..80]
+----
+
+Now you can package it even as a separate library, and other people can read Status without bothering about internal structure.
+To read `Status` instance they just pass the reader `StatusReader`.
+Of course, it can be used together with `ListReader`, `UnionReader`, read as `Optional<Status>` by `` and other structures
+
+[source, java, indent=0]
+----
+include::{examples-encoding}/scale/StatusMessage.java[lines=17..25]
+----
+
+Which would print something like this:
+----
+Status: height=381, hash=bb931fd17f85fb26e8209eb7af5747258163df29a7dd8f87fa7617963fcfa1aa
+----
+
+=== Writing values
+
+Writing is pretty similar to reading, you have to create `ScaleCodecWriter` with an `OutputStream`, and either use shorthand methods, or `ScaleWriter` writers.
+
+[source, java, indent=0]
+----
+include::{examples-encoding}/scale/Examples.java[lines=62..93]
+----
+
+==== Using custom writer
+
+In the same way, you can implement a writer for your `Status` class
+
+[source, java, indent=0]
+----
+include::{examples-encoding}/scale/StatusMessage.java[lines=83..95]
+----
+
+And then use it to write a value
+
+[source, java, indent=0]
+----
+include::{examples-encoding}/scale/StatusMessage.java[lines=27..34]
+----
+
+== SS58
+
+=== Encode pubkey as Address
+
+[source, java, indent=0]
+----
+include::{examples-encoding}/ss58/Examples.java[lines=17..27]
+----
+
+Which would print:
+
+----
+Address: FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy
+----
+
+=== Decode pubkey
+
+[source, java, indent=0]
+----
+include::{examples-encoding}/ss58/Examples.java[lines=31..39]
+----
+
+Which would print:
+
+----
+Pub key: 9053cc32597892cc2cd43ea6e3c0db7a3b4c52e5fe6052762080dbc3e3222c0b
+----
