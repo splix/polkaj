@@ -15,7 +15,39 @@ See specification at: https://substrate.dev/docs/en/conceptual/core/codec
 
 [source, java, indent=0]
 ----
-include::{examples-encoding}/scale/Examples.java[lines=26..58]
+byte[] msg = readSomeData();
+ScaleCodecReader rdr = new ScaleCodecReader(msg);
+
+// there are few shorthand methods for common types
+
+// to read a single byte, and convert it to int
+int a = rdr.readUByte();
+// to read a number encoded as Compact Int
+int b = rdr.readCompactInt();
+
+// otherwise you should use a ScaleReader<T> readers
+
+// UInt32Reader reads longs that are encoded as 32 bit values
+long c = rdr.read(new UInt32Reader());
+// CompactBigIntReader reads a BigInteger encoded as CompactInt, i.e. values up to 2^536-1
+BigInteger d = rdr.read(new CompactBigIntReader());
+
+// of, if a value is optional:
+Optional<Long> optionalC = rdr.readOptional(new UInt32Reader());
+
+// to read a list of, say, booleans you should use ListReader<T> with reader for items
+List<Boolean> e = rdr.read(new ListReader<>(new BoolReader()));
+
+// read an enumerated union, depending on tag in the encoded message, it will use different readers
+UnionValue<Number> f = rdr.read(new UnionReader<>(
+        // value with tag 0 is read as unsigned long
+        new UInt32Reader(),
+        // value with tag 1 is read as unsigned long
+        new UInt32Reader(),
+        // value with tag 2 is read as compact integer
+        new CompactUIntReader()
+));
+System.out.println("Union read #" + f.getIndex() + " = " + f.getValue());
 ----
 
 .The full list of predefined readers is:
@@ -34,17 +66,38 @@ include::{examples-encoding}/scale/Examples.java[lines=26..58]
 But what if we have a class that we want to read (or write) as a whole, without manual reading each time.
 For example class Status below (getter and setter are omitted for simplicity)
 
-[source, java, indent=0]
+[source, java]
 ----
-include::{examples-encoding}/scale/StatusMessage.java[lines=54..61]
+class Status {
+    private long version;
+    private long minVersion;
+    private byte roles;
+    private long height;
+    private Hash256 bestHash;
+    private Hash256 genesis;
+}
 ----
 
 Now you can implement a reader, which implements `ScaleReader<Status>` interface.
 Inside the methods `read` you specify all the readings, and build a resulting object.
 
-[source, java, indent=0]
+[source, java]
 ----
-include::{examples-encoding}/scale/StatusMessage.java[lines=66..80]
+class StatusReader implements ScaleReader<Status> {
+
+    @Override
+    public Status read(ScaleCodecReader rdr) {
+        Status status = new Status();
+        status.version = rdr.readUint32();
+        status.minVersion = rdr.readUint32();
+        status.roles = rdr.readByte();
+        rdr.skip(1);
+        status.height = rdr.readUint32();
+        status.bestHash = new Hash256(rdr.readUint256());
+        status.genesis = new Hash256(rdr.readUint256());
+        return status;
+    }
+}
 ----
 
 Now you can package it even as a separate library, and other people can read Status without bothering about internal structure.
@@ -53,7 +106,15 @@ Of course, it can be used together with `ListReader`, `UnionReader`, read as `Op
 
 [source, java, indent=0]
 ----
-include::{examples-encoding}/scale/StatusMessage.java[lines=17..25]
+// Read Status message encoded with SCALE codec
+byte[] msg = readMessage();
+// Initialize SCALE Reader
+ScaleCodecReader rdr = new ScaleCodecReader(msg);
+// Call it providing a custom reader for the expected class
+Status status = rdr.read(new StatusReader());
+
+// All read
+System.out.println("Decoded Status: height=" + status.height + ", hash=" + status.bestHash.toString());
 ----
 
 Which would print something like this:
@@ -67,7 +128,38 @@ Writing is pretty similar to reading, you have to create `ScaleCodecWriter` with
 
 [source, java, indent=0]
 ----
-include::{examples-encoding}/scale/Examples.java[lines=62..93]
+ByteArrayOutputStream buf = new ByteArrayOutputStream();
+// first, open writer as try-with-resources
+try(ScaleCodecWriter wrt = new ScaleCodecWriter(buf)) {
+    // same as for reading, there are few shorthand methods for common types
+
+    // write a single byte
+    wrt.writeByte(1);
+
+    // write a compact integer
+    wrt.writeCompact(2);
+
+    // and same as for reader, use ScaleWriter<T> for writing more complex types
+
+    // write unsigned int as 32 bits
+    wrt.write(new UInt32Writer(), 3);
+    // write big integer as compact integer
+    wrt.write(new CompactBigIntWriter(), new BigInteger("112233445566778899", 16));
+
+    // to write an enumerated union you have to define it's structure first
+    UnionWriter<Number> union = new UnionWriter<>(
+            // value with tag 0 is read as unsigned long
+            new UInt32Writer(),
+            // value with tag 1 is read as unsigned long
+            new UInt32Writer(),
+            // value with tag 2 is read as compact integer
+            new CompactUIntWriter()
+    );
+    // then write pass it, with actual value
+    // at this case we write under tag 2, which will write actual value 101 as Compact Integer
+    wrt.write(union, new UnionValue<>(2, 101));
+}
+System.out.println("Encoded: " + Hex.encodeHexString(buf.toByteArray()));
 ----
 
 ==== Using custom writer
@@ -76,14 +168,33 @@ In the same way, you can implement a writer for your `Status` class
 
 [source, java, indent=0]
 ----
-include::{examples-encoding}/scale/StatusMessage.java[lines=83..95]
+class StatusWriter implements ScaleWriter<Status> {
+
+    @Override
+    public void write(ScaleCodecWriter wrt, Status value) throws IOException {
+        wrt.writeUint32(value.version);
+        wrt.writeUint32(value.minVersion);
+        wrt.writeByte(value.roles);
+        wrt.writeByte(0);
+        wrt.writeUint32(value.height);
+        wrt.writeUint256(value.bestHash.getBytes());
+        wrt.writeUint256(value.genesis.getBytes());
+    }
+}
 ----
 
 And then use it to write a value
 
 [source, java, indent=0]
 ----
-include::{examples-encoding}/scale/StatusMessage.java[lines=27..34]
+// Write status as bytes
+ByteArrayOutputStream buf = new ByteArrayOutputStream();
+ScaleCodecWriter writer = new ScaleCodecWriter(buf);
+writer.write(new StatusWriter(), status);
+// don't forget to close writer
+writer.close();
+
+System.out.println("Encoded Status: " + Hex.encodeHexString(buf.toByteArray()));
 ----
 
 == SS58
@@ -92,7 +203,17 @@ include::{examples-encoding}/scale/StatusMessage.java[lines=27..34]
 
 [source, java, indent=0]
 ----
-include::{examples-encoding}/ss58/Examples.java[lines=17..27]
+byte[] pubkey = Hex.decodeHex(
+        // a pubkey is 32 byte value, for this example it's hardcoded as hex
+        "9053cc32597892cc2cd43ea6e3c0db7a3b4c52e5fe6052762080dbc3e3222c0b"
+);
+String address = SS58Codec.getInstance().encode(
+        // using Kusama here. but for Polkadot mainnet use SS58Type.Network.LIVE
+        SS58Type.Network.CANARY,
+        // pubkey as bytes
+        pubkey
+);
+System.out.println("Address: " + address);
 ----
 
 Which would print:
@@ -105,7 +226,15 @@ Address: FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy
 
 [source, java, indent=0]
 ----
-include::{examples-encoding}/ss58/Examples.java[lines=31..39]
+SS58 address = SS58Codec.getInstance().decode("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy");
+
+if (address.getType() != SS58Type.Network.CANARY) {
+    throw new IllegalStateException("Not Kusama address");
+}
+
+System.out.println(
+        "Pub key: " + Hex.encodeHexString(address.getValue())
+);
 ----
 
 Which would print:
