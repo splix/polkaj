@@ -9,9 +9,9 @@ public class BoolWriter implements ScaleWriter<Boolean> {
     @Override
     public void write(ScaleCodecWriter wrt, Boolean value) throws IOException {
         if (value) {
-            wrt.write(1);
+            wrt.directWrite(1);
         } else {
-            wrt.write(0);
+            wrt.directWrite(0);
         }
     }
 }

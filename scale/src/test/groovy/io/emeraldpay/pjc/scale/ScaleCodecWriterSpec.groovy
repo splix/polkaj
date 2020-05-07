@@ -30,7 +30,7 @@ class ScaleCodecWriterSpec extends Specification {
 
     def "Write unsigned 8-bit integer"() {
         when:
-        codec.write(0)
+        codec.directWrite(0)
         def act = buf.toByteArray()
         then:
         Hex.encodeHexString(act) == "00"
@@ -38,7 +38,7 @@ class ScaleCodecWriterSpec extends Specification {
 
     def "Write java-negative integer"() {
         when:
-        codec.write(240)
+        codec.directWrite(240)
         def act = buf.toByteArray()
         then:
         Hex.encodeHexString(act) == "f0"
@@ -93,20 +93,12 @@ class ScaleCodecWriterSpec extends Specification {
         thrown(IllegalArgumentException)
     }
 
-    def "Read fixed byte array"() {
-        expect:
-        codec.write(Hex.decodeHex(hex))
-        Hex.encodeHexString(buf.toByteArray()) == hex
-        where:
-        hex << ["bb931fd17f85fb26e8209eb7af5747258163df29a7dd8f87fa7617963fcfa1aa"]
-    }
-
     def "Write status message"() {
         when:
         codec.writeUint32(1536) // version
         codec.writeUint32(768) // min version
-        codec.write(0) // roles
-        codec.write(1) //?
+        codec.directWrite(0) // roles
+        codec.directWrite(1) //?
         codec.writeUint32(381) // height
         codec.writeUint256(Hex.decodeHex("bb931fd17f85fb26e8209eb7af5747258163df29a7dd8f87fa7617963fcfa1aa")) // best hash
         codec.writeUint256(Hex.decodeHex("b0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe")) // genesis

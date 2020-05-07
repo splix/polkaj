@@ -14,7 +14,7 @@ public class CompactUIntWriter implements ScaleWriter<Integer> {
         int compact;
         int bytes;
         if (mode == CompactMode.BIGINT) {
-            wrt.write(mode.getValue());
+            wrt.directWrite(mode.getValue());
             compact = value;
             bytes = 4;
         } else {
@@ -28,7 +28,7 @@ public class CompactUIntWriter implements ScaleWriter<Integer> {
             }
         }
         while (bytes > 0) {
-            wrt.write(compact & 0xff);
+            wrt.directWrite(compact & 0xff);
             compact >>= 8;
             bytes--;
         }

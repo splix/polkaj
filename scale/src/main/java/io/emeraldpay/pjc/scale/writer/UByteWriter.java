@@ -12,6 +12,6 @@ public class UByteWriter implements ScaleWriter<Integer> {
         if (value < 0 || value > 0xff) {
             throw new IllegalArgumentException("Only values in range 0..255 are supported: " + value);
         }
-        wrt.write(value);
+        wrt.directWrite(value);
     }
 }

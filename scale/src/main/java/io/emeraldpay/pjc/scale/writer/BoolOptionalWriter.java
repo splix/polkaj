@@ -11,11 +11,11 @@ public class BoolOptionalWriter implements ScaleWriter<Optional<Boolean>> {
     @Override
     public void write(ScaleCodecWriter wrt, Optional<Boolean> value) throws IOException {
         if (value.isEmpty()) {
-            wrt.write(0);
+            wrt.directWrite(0);
         } else if (value.get()) {
-            wrt.write(2);
+            wrt.directWrite(2);
         } else {
-            wrt.write(1);
+            wrt.directWrite(1);
         }
     }
 }

@@ -24,9 +24,9 @@ public class CompactBigIntWriter implements ScaleWriter<BigInteger> {
             return;
         }
 
-        wrt.write(((data.length - 4) << 2) + mode.getValue());
+        wrt.directWrite(((data.length - 4) << 2) + mode.getValue());
         while (pos >= 0) {
-            wrt.write(data[pos]);
+            wrt.directWrite(data[pos]);
             pos--;
         }
     }

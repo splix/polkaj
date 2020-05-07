@@ -11,9 +11,9 @@ public class UInt32Writer implements ScaleWriter<Integer> {
         if (value < 0) {
             throw new IllegalArgumentException("Negative values are not supported: " + value);
         }
-        wrt.write(value & 0xff);
-        wrt.write((value >> 8) & 0xff);
-        wrt.write((value >> 16) & 0xff);
-        wrt.write((value >> 24) & 0xff);
+        wrt.directWrite(value & 0xff);
+        wrt.directWrite((value >> 8) & 0xff);
+        wrt.directWrite((value >> 16) & 0xff);
+        wrt.directWrite((value >> 24) & 0xff);
     }
 }

@@ -14,9 +14,9 @@ public class ULong32Writer implements ScaleWriter<Long> {
         if (value > 0xff_ff_ff_ffL) {
             throw new IllegalArgumentException("Value is too high: " + value);
         }
-        wrt.write((int)(value & 0xff));
-        wrt.write((int)((value >> 8) & 0xff));
-        wrt.write((int)((value >> 16) & 0xff));
-        wrt.write((int)((value >> 24) & 0xff));
+        wrt.directWrite((int)(value & 0xff));
+        wrt.directWrite((int)((value >> 8) & 0xff));
+        wrt.directWrite((int)((value >> 16) & 0xff));
+        wrt.directWrite((int)((value >> 24) & 0xff));
     }
 }

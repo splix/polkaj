@@ -23,7 +23,7 @@ public class UnionWriter<T> implements ScaleWriter<UnionValue<T>> {
 
     @Override
     public void write(ScaleCodecWriter wrt, UnionValue<T> value) throws IOException {
-        wrt.write(value.getIndex());
+        wrt.directWrite(value.getIndex());
         mapping.get(value.getIndex()).write(wrt, value.getValue());
     }
 

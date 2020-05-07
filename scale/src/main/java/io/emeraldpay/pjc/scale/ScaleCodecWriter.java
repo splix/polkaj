@@ -2,11 +2,12 @@ package io.emeraldpay.pjc.scale;
 
 import io.emeraldpay.pjc.scale.writer.*;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Optional;
 
-public class ScaleCodecWriter extends OutputStream {
+public class ScaleCodecWriter implements Closeable {
 
     public static final CompactUIntWriter COMPACT_UINT = new CompactUIntWriter();
     public static final UInt16Writer UINT16 = new UInt16Writer();
@@ -15,35 +16,46 @@ public class ScaleCodecWriter extends OutputStream {
     public static final BoolWriter BOOL = new BoolWriter();
     public static final BoolOptionalWriter BOOL_OPT = new BoolOptionalWriter();
 
-    private OutputStream out;
+    private final OutputStream out;
 
     public ScaleCodecWriter(OutputStream out) {
         this.out = out;
-    }
-
-    @Override
-    public void write(int b) throws IOException {
-        out.write(b);
-    }
-
-    @Override
-    public void write(byte[] b, int off, int len) throws IOException {
-        out.write(b, off, len);
     }
 
     public void writeUint256(byte[] value) throws IOException {
         if (value.length != 32) {
             throw new IllegalArgumentException("Value must be 32 byte array");
         }
-        this.write(value, 0, value.length);
+        out.write(value, 0, value.length);
     }
 
     public void writeByteArray(byte[] value) throws IOException {
         writeCompact(value.length);
-        this.write(value, 0, value.length);
+        out.write(value, 0, value.length);
     }
 
-    @Override
+    /**
+     * Write the byte into output stream as-is directly, the input is supposed to be already encoded
+     *
+     * @param b byte to write
+     * @throws IOException if failed to write
+     */
+    public void directWrite(int b) throws IOException {
+        out.write(b);
+    }
+
+    /**
+     * Write the bytes into output stream as-is directly, the input is supposed to be already encoded
+     *
+     * @param b bytes to write
+     * @param off offset
+     * @param len length
+     * @throws IOException if failed to write
+     */
+    public void directWrite(byte[] b, int off, int len) throws IOException {
+        out.write(b, off, len);
+    }
+
     public void flush() throws IOException {
         out.flush();
     }
@@ -55,6 +67,14 @@ public class ScaleCodecWriter extends OutputStream {
 
     public <T> void write(ScaleWriter<T> writer, T value) throws IOException {
         writer.write(this, value);
+    }
+
+    public void writeByte(int value) throws IOException {
+        directWrite(value);
+    }
+
+    public void writeByte(byte value) throws IOException {
+        directWrite(value);
     }
 
     public void writeUint16(int value) throws IOException {

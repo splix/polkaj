@@ -30,7 +30,7 @@ public class CompactULongWriter implements ScaleWriter<Long> {
             }
         }
         while (bytes > 0) {
-            wrt.write((int)compact & 0xff);
+            wrt.directWrite((int)compact & 0xff);
             compact >>= 8;
             bytes--;
         }
