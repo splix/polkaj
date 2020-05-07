@@ -2,4 +2,5 @@
 
 == Table of Content
 
+. link:01-common-types.adoc[Common Types]
 . link:02-encoding.adoc[Encoding and Decoding (SCALE, SS58)]

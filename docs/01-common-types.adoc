@@ -1,0 +1,184 @@
+= Common Types
+
+== Address
+
+Address is a simple structure to hold public key and target network.
+You can parse an existing address encoded with SS58 codec:
+
+[source, java]
+----
+Address address = Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy");
+----
+
+Or create a new from public key:
+
+[source, java]
+----
+address = new Address(SS58Type.Network.LIVE, getPubKey());
+----
+
+== DotAmount
+
+`DotAmount` is a wrapper around DOT token amount, which also provides several methods for standard math operations and formatting.
+
+.Create an amount:
+[source, java]
+----
+// create amount of 100,000 Plancks
+DotAmount amount = DotAmount.fromPlancks(100_000);
+
+// create 4.25 Dots, which is 4.25 * 10^12 == 4250000000000 Plancks
+amount = DotAmount.fromDots(4.25);
+----
+
+To print as a nice human readable value you can use DotAmountFormatter instance.
+The automatic formatter (`DotAmountFormatter.autoFormatter()`) finds the best unit, which gives the whole value, at this case it's Dots.
+
+[source, java]
+----
+System.out.println(
+        DotAmountFormatter.autoFormatter().format(amount)
+);
+----
+
+.Prints:
+----
+4.25 Dot
+----
+
+Now let's divide it by 1000, which makes 4.25 Millidot, and then add 0.00112 Dot (or 1.12 Millidot).
+Then print the result with auto formatter again.
+Not the auto formatter chooses Millidots as the optimal unit to display the value.
+
+[source, java]
+----
+amount = amount
+        .divide(1000)
+        .add(DotAmount.fromDots(0.0012));
+
+System.out.println(
+        DotAmountFormatter.autoFormatter().format(amount)
+);
+----
+
+.Prints
+----
+5.37 Millidot
+----
+
+There're few standard formatters:
+
+- `DotAmountFormatter.fullFormatter()` - always print the whole value in plancks
+- `DotAmountFormatter.autoFormatter()` - finds optimal unit, and prints with 2 digits after decimal point
+- `DotAmountFormatter.autoShortFormatter()` - same as autoFormatter but gives a short name for the unit (Millidot becomes mDOT)
+
+For example if you use a standard full formatter:
+
+[source, java]
+----
+DotAmountFormatter formatter = DotAmountFormatter.fullFormatter();
+System.out.println(
+        formatter.format(DotAmount.fromDots(0.0123456))
+);
+----
+
+It would print:
+
+----
+12345600000 Planck
+----
+
+If you don't want to see such large values in Plancks, you can use `autoFormatter` which will find an optimal size for the passed value:
+
+[source, java]
+----
+formatter = DotAmountFormatter.autoFormatter();
+System.out.println(
+        formatter.format(DotAmount.fromDots(0.0123456))
+);
+----
+
+It would print:
+
+----
+12.35 Millidot
+----
+
+You may also want to shorten _Millidot_ to _mDot_.
+At this case choose `autoShortFormatter`.
+
+[source, java]
+----
+formatter = DotAmountFormatter.autoShortFormatter();
+System.out.println(
+        formatter.format(DotAmount.fromDots(0.0123456))
+);
+----
+
+It would print:
+
+----
+12.35 mDOT
+----
+
+If you need something more specific for you application, you can construct your own customized formatter:
+
+[source, java]
+----
+formatter = DotAmountFormatter.newBuilder()
+    // use 4 digits after decimal point, and comma (",") as a delimiter for groups
+    .fullNumber("#,##0.0000")
+    // display with Microdot unit
+    .usingUnit(Units.Microdot)
+    // then append "(of " string
+    .exactString(" (of ")
+    // display unit's short name
+    .shortUnit()
+    // and append string ")"
+    .exactString(")")
+    // finalize the formatter
+    .build();
+----
+
+Now apply that formatter:
+
+[source, java]
+----
+System.out.println(
+        formatter.format(DotAmount.fromDots(0.000123456))
+);
+----
+
+Which would print:
+
+----
+12,345,600,000.0000 (of uDOT)
+----
+
+== Hash256 and Hash512
+
+`Hash256`, `Hash512`, and their base class `FixedBytes`, are standardized containers for a byte array value.
+The can hold 256 bits (32 bytes) or 512 bits (64 bytes), as it clear from the name.
+And `FixedBytes` is a base abstract class.
+
+Instance can be created from bytes value:
+
+[source, java]
+----
+Hash256 hash256 = new Hash256(hashBytes);
+System.out.println(hash256);
+----
+
+Or from hex string:
+
+[source, java]
+----
+Hash256.from(hash256String);
+----
+
+The `toString` methods gives a hex representation.
+
+[source, java]
+----
+String hash256String = hash256.toString();
+----
