@@ -8,14 +8,14 @@ import java.util.*;
 
 public class UnionReader<T> implements ScaleReader<UnionValue<T>> {
 
-    private List<ScaleReader<Object>> mapping;
+    private final List<ScaleReader<? extends T>> mapping;
 
-    public UnionReader(List<ScaleReader<Object>> mapping) {
+    public UnionReader(List<ScaleReader<? extends T>> mapping) {
         this.mapping = mapping;
     }
 
     @SuppressWarnings("unchecked")
-    public UnionReader(ScaleReader<Object>... mapping) {
+    public UnionReader(ScaleReader<? extends T>... mapping) {
         this(Arrays.asList(mapping));
     }
 
