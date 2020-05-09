@@ -36,10 +36,9 @@ gradle install
 [source,groovy,subs="attributes"]
 ----
 repositories {
-   // for locally installed packages only
-   mavenLocal()
-
-   // required for fetching com.github.multiformats:java-multibase library
+   // polkaj public repo
+   maven { url  "https://dl.bintray.com/emerald/polkaj" }
+   // required for com.github.multiformats:java-multibase library
    maven { url 'https://jitpack.io' }
 }
 
