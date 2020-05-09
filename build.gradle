@@ -17,7 +17,7 @@ apply plugin: 'nebula-aggregate-javadocs'
 apply plugin: 'jacoco'
 
 allprojects {
-    group = 'io.emeraldpay.pjc'
+    group = 'io.emeraldpay.polkaj'
     version = "0.1.0-SNAPSHOT"
 
     repositories {
@@ -94,7 +94,10 @@ subprojects {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                artifactId = 'polkadot-java-client'
+                groupId project.group
+                artifactId project.name
+                version project.version
+
                 from components.java
                 versionMapping {
                     usage('java-api') {
@@ -135,5 +138,3 @@ task coverageReport(type: JacocoReport) {
         html.enabled true
     }
 }
-
-

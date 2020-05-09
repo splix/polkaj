@@ -1,4 +1,4 @@
-= Polkadot Java Client Documentation
+= PolkaJ (Polkadot Java Client) Documentation
 
 == Table of Content
 
