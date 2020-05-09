@@ -16,5 +16,5 @@ dependencies {
 }
 
 application {
-    mainClassName = 'ScaleStatusMessage'
+    mainClassName = 'scale.StatusMessage'
 }

@@ -1,0 +1,21 @@
+= Examples for Polkadot Java Client
+
+Code examples used in the link:../docs/[Documentation]
+
+== Encoding
+
+Examples for SCALE add SS58
+
+.Run
+----
+gradle run
+----
+
+== Types
+
+Examples for DotAmount, formatting, hashes and Address
+
+.Run
+----
+gradle run
+----

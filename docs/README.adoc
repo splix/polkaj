@@ -4,3 +4,7 @@
 
 . link:01-common-types.adoc[Common Types]
 . link:02-encoding.adoc[Encoding and Decoding (SCALE, SS58)]
+
+== Examples
+
+See code used in the documentation in the link:../examples[Examples]
