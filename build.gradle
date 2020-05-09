@@ -138,3 +138,10 @@ task coverageReport(type: JacocoReport) {
         html.enabled true
     }
 }
+
+task syncJars(type: Sync) {
+    allprojects { p ->
+        from p.tasks.withType(Jar)
+    }
+    into "${buildDir}/libs/"
+}
