@@ -9,9 +9,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.emeraldpay.pjc:scale:0.1.0-SNAPSHOT'
-    implementation 'io.emeraldpay.pjc:types:0.1.0-SNAPSHOT'
-    implementation 'io.emeraldpay.pjc:ss58:0.1.0-SNAPSHOT'
+    implementation 'io.emeraldpay.pjc:scale:0.1.0'
+    implementation 'io.emeraldpay.pjc:types:0.1.0'
+    implementation 'io.emeraldpay.pjc:ss58:0.1.0'
     implementation 'commons-codec:commons-codec:1.14'
 }
 
