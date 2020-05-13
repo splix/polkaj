@@ -49,7 +49,10 @@ public class ScaleCodecReader {
     public void seek(int pos) {
         if (pos < 0) {
             throw new IllegalArgumentException("Position cannot be negative: " + pos);
+        } else if (pos >= source.length) {
+            throw new IllegalArgumentException("Position " + pos + " must be strictly smaller than source length: " + source.length);
         }
+
         this.pos = pos;
     }
 
