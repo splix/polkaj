@@ -43,6 +43,30 @@ class ScaleCodecReaderSpec extends Specification {
         thrown(IllegalArgumentException)
     }
 
+    def "Cannot seek over"() {
+        setup:
+        def codec = new ScaleCodecReader(Hex.decodeHex("2a00"))
+
+        when:
+        codec.seek(5)
+        then:
+        thrown(IllegalArgumentException)
+
+        when:
+        codec.seek(2)
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    def "Can skip backwards"() {
+        when:
+        def codec = new ScaleCodecReader(Hex.decodeHex("2a00"))
+        codec.readUint16() == 42
+        codec.skip(-2)
+        then:
+        codec.readUint16() == 42
+    }
+
     def "Cannot skip bellow"() {
         when:
         def codec = new ScaleCodecReader(Hex.decodeHex("2a00"))
