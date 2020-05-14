@@ -30,6 +30,7 @@ jobs:
 
   env-test:
     name: Test on ${{ matrix.os }} using Java ${{ matrix.java }}
+    continue-on-error: ${{ matrix.java != "11" }}
     strategy:
       matrix:
         java: ["11", "12", "13", "14", "15-ea"]
