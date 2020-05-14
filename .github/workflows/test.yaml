@@ -55,7 +55,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        locale: ["ru_RU.UTF-8", "de_DE.UTF-8"]
+        locale: ["ru_RU.UTF-8", "de_DE.UTF-8", "de_CH.UTF-8"]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -74,3 +74,5 @@ jobs:
         uses: eskatos/gradle-command-action@v1
         with:
           arguments: check
+        env:
+          LANG=${{ matrix.locale }}
