@@ -75,4 +75,4 @@ jobs:
         with:
           arguments: check
         env:
-          LANG=${{ matrix.locale }}
+          LANG: ${{ matrix.locale }}
