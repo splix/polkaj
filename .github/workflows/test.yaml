@@ -1,9 +1,11 @@
 name: Tests
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
+  # Run unit tests and submit Coverage Report
   unit-test:
+    name: Standard Unit Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,3 +29,53 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           file: ./build/reports/jacoco/coverageReport/coverageReport.xml
+
+  # Make sure it works with all standard JVMs on main OSes
+  platform-test:
+    name: Java ${{ matrix.java }} on ${{ matrix.os }}
+    continue-on-error: ${{ matrix.java != '11' }}
+    strategy:
+      matrix:
+        java: ["11", "12", "13", "14", "15-ea"]
+        os: ["windows-latest", "macos-latest", "ubuntu-latest"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+
+      - name: Check
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: check
+
+  # Formatter may behave differently on different locales, makes sure tests are not failing
+  locale-test:
+    name: Locale ${{ matrix.locale }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        locale: ["ru_RU.UTF-8", "de_DE.UTF-8", "de_CH.UTF-8", "zh_CN.UTF-8"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Locale
+        run: |
+          sudo locale-gen ${{ matrix.locale }}
+          sudo update-locale LANG=${{ matrix.locale }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Check
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: check
+        env:
+          LANG: ${{ matrix.locale }}
