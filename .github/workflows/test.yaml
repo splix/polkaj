@@ -3,6 +3,7 @@ name: Tests
 on: [push, pull_request]
 
 jobs:
+  # Run unit tests and submit Coverage Report
   unit-test:
     name: Standard Unit Test
     runs-on: ubuntu-latest
@@ -29,6 +30,7 @@ jobs:
         with:
           file: ./build/reports/jacoco/coverageReport/coverageReport.xml
 
+  # Make sure it works with all standard JVMs on main OSes
   platform-test:
     name: Java ${{ matrix.java }} on ${{ matrix.os }}
     continue-on-error: ${{ matrix.java != '11' }}
@@ -50,6 +52,7 @@ jobs:
         with:
           arguments: check
 
+  # Formatter may behave differently on different locales, makes sure tests are not failing
   locale-test:
     name: Locale ${{ matrix.locale }}
     continue-on-error: true
