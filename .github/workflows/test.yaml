@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   unit-test:
+    name: Standard Unit Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,8 +29,8 @@ jobs:
         with:
           file: ./build/reports/jacoco/coverageReport/coverageReport.xml
 
-  env-test:
-    name: Test on ${{ matrix.os }} using Java ${{ matrix.java }}
+  platform-test:
+    name: Java ${{ matrix.java }} on ${{ matrix.os }}
     continue-on-error: ${{ matrix.java != '11' }}
     strategy:
       matrix:
@@ -43,6 +44,31 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
+
+      - name: Check
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: check
+
+  locale-test:
+    name: Locale ${{ matrix.locale }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        locale: ["ru_RU.UTF-8", "de_DE.UTF-8"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Locale
+        run: |
+          sudo locale-gen ${{ matrix.locale }}
+          sudo update-locale LANG=${{ matrix.locale }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
 
       - name: Check
         uses: eskatos/gradle-command-action@v1
