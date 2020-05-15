@@ -2,7 +2,13 @@ package io.emeraldpay.pjc.types
 
 import spock.lang.Specification
 
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+
 class DotAmountFormatterSpec extends Specification {
+
+    static DecimalFormat localeFormat = new DecimalFormat()
+    static DecimalFormatSymbols localeSymbols = localeFormat.decimalFormatSymbols
 
     DotAmount amount1 = DotAmount.fromPlancks(5_123_456_789_000) // 5 dot
     DotAmount amount2 = DotAmount.fromPlancks(  123_456_789_000) // 123 Milli
@@ -13,6 +19,20 @@ class DotAmountFormatterSpec extends Specification {
     DotAmount amount7 = DotAmount.fromPlancks(        6_789_000)
     DotAmount amount8 = DotAmount.fromPlancks(          789_000) // 789 Point
     DotAmount amount9 = DotAmount.fromPlancks(           89_000)
+
+    // update test data to conform the current local.
+    // the test data is using EN standard for format, like "1,000.00", but on other locales it may be "1 000,00"
+    static String forLocale(String exp) {
+        exp.toCharArray().collect { c ->
+            if (c == ".") {
+                return localeSymbols.decimalSeparator
+            } else if (c == ",") {
+                return localeSymbols.groupingSeparator
+            } else {
+                return c
+            }
+        }.join("")
+    }
 
     def "Simple"() {
         setup:
@@ -43,8 +63,8 @@ class DotAmountFormatterSpec extends Specification {
         DotAmountFormatter.autoFormatter().format(value) == exp
         where:
         amount              | exp
-        5_123_456_789_000   | "5.12 Dot"
-               56_789_000   | "56.79 Microdot"
+        5_123_456_789_000   | forLocale("5.12 Dot")
+               56_789_000   | forLocale("56.79 Microdot")
     }
 
     def "Standard short"() {
@@ -53,8 +73,8 @@ class DotAmountFormatterSpec extends Specification {
         DotAmountFormatter.autoShortFormatter().format(value) == exp
         where:
         amount              | exp
-        5_123_456_789_000   | "5.12 DOT"
-               56_789_000   | "56.79 uDOT"
+        5_123_456_789_000   | forLocale("5.12 DOT")
+               56_789_000   | forLocale("56.79 uDOT")
     }
 
     def "With group separator"() {
@@ -67,7 +87,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount1)
         then:
-        act == "5,123,456,789,000 Planck"
+        act == forLocale("5,123,456,789,000 Planck")
     }
 
     def "With decimal part"() {
@@ -81,7 +101,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount1)
         then:
-        act == "5.12 Dot"
+        act == forLocale("5.12 Dot")
     }
 
     def "Converted with decimal part"() {
@@ -95,7 +115,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount2)
         then:
-        act == "123.46 Millidot"
+        act == forLocale("123.46 Millidot")
     }
 
     def "Converted large with decimal part"() {
@@ -109,7 +129,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount1)
         then:
-        act == "5,123,456,789.00 Point"
+        act == forLocale("5,123,456,789.00 Point")
     }
 
     def "Using short unit"() {
@@ -123,7 +143,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount2)
         then:
-        act == "123.457 mDOT"
+        act == forLocale("123.457 mDOT")
     }
 
     def "Using auto unit"() {
@@ -137,7 +157,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount5)
         then:
-        act == "456.79 uDOT"
+        act == forLocale("456.79 uDOT")
     }
 
     def "Using auto with limit unit"() {
@@ -151,6 +171,6 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount8)
         then:
-        act == "0.000789 mDOT"
+        act == forLocale("0.000789 mDOT")
     }
 }
