@@ -40,7 +40,7 @@ public class Examples {
         // CompactBigIntReader reads a BigInteger encoded as CompactInt, i.e. values up to 2^536-1
         BigInteger d = rdr.read(new CompactBigIntReader());
 
-        // of, if a value is optional:
+        // or, if eh value is optional:
         Optional<Long> optionalC = rdr.readOptional(new UInt32Reader());
 
         // to read a list of, say, booleans you should use ListReader<T> with reader for items
