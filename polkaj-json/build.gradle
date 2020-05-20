@@ -1,0 +1,7 @@
+dependencies {
+    api project(":polkaj-types")
+    api project(":polkaj-ss58")
+
+    api 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
+
+}
