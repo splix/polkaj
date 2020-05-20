@@ -1,0 +1,12 @@
+{
+  "extrinsics": [],
+  "header": {
+    "digest": {
+      "logs": []
+    },
+    "extrinsicsRoot": "0x03170a2e7597b7b7e3d84c05391d139a62b157e78786d8c082f29dcf4c111314",
+    "number": "0x0",
+    "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "stateRoot": "0xb0006203c3a6e6bd2c6a17b1d4ae8ca49a31da0f4579da950b127774b44aef6b"
+  }
+}

@@ -76,28 +76,28 @@ class Hash512Spec extends Specification {
         when:
         def act = Hash512.from("000003339ffc68ceadfaa7331cca3328e834102cdf9bb1dd64f684660cba1ace000003339ffc68ceadfaa7331cca3328e834102cdf9bb1dd64f684660cba1ace")
         then:
-        act.toString() == "000003339ffc68ceadfaa7331cca3328e834102cdf9bb1dd64f684660cba1ace000003339ffc68ceadfaa7331cca3328e834102cdf9bb1dd64f684660cba1ace"
+        act.toString() == "0x000003339ffc68ceadfaa7331cca3328e834102cdf9bb1dd64f684660cba1ace000003339ffc68ceadfaa7331cca3328e834102cdf9bb1dd64f684660cba1ace"
     }
 
     def "Creates from hex with zero suffix"() {
         when:
         def act = Hash512.from("ad883a34521b676f0e66d32cf6391fbbdaa5c67f60b43de89f3fc669f6d4e000ad883a34521b676f0e66d32cf6391fbbdaa5c67f60b43de89f3fc669f6d4e000")
         then:
-        act.toString() == "ad883a34521b676f0e66d32cf6391fbbdaa5c67f60b43de89f3fc669f6d4e000ad883a34521b676f0e66d32cf6391fbbdaa5c67f60b43de89f3fc669f6d4e000"
+        act.toString() == "0xad883a34521b676f0e66d32cf6391fbbdaa5c67f60b43de89f3fc669f6d4e000ad883a34521b676f0e66d32cf6391fbbdaa5c67f60b43de89f3fc669f6d4e000"
     }
 
     def "Creates max value"() {
         when:
         def act = Hash512.from("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
         then:
-        act.toString() == "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        act.toString() == "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
     }
 
     def "Creates min value"() {
         when:
         def act = Hash512.from("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
         then:
-        act.toString() == "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        act.toString() == "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
     }
 
     def "Cannot creates from invalid hex"() {
@@ -139,7 +139,7 @@ class Hash512Spec extends Specification {
         when:
         def act = Hash512.from("63c2499de640b43c924bc2bfc9ea89730e7c4790e24d126906e7af6c99cb506b63c2499de640b43c924bc2bfc9ea89730e7c4790e24d126906e7af6c99cb506b")
         then:
-        act.toString() == "63c2499de640b43c924bc2bfc9ea89730e7c4790e24d126906e7af6c99cb506b63c2499de640b43c924bc2bfc9ea89730e7c4790e24d126906e7af6c99cb506b"
+        act.toString() == "0x63c2499de640b43c924bc2bfc9ea89730e7c4790e24d126906e7af6c99cb506b63c2499de640b43c924bc2bfc9ea89730e7c4790e24d126906e7af6c99cb506b"
     }
 
     def "Same hashes are equal"() {
