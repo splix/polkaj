@@ -8,10 +8,12 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+apply from: '../common.gradle'
+
 dependencies {
-    implementation 'io.emeraldpay.pjc:scale:0.1.0'
-    implementation 'io.emeraldpay.pjc:types:0.1.0'
-    implementation 'io.emeraldpay.pjc:ss58:0.1.0'
+    implementation "io.emeraldpay.polkaj:polkaj-scale:$polkajVersion"
+    implementation "io.emeraldpay.polkaj:polkaj-types:$polkajVersion"
+    implementation "io.emeraldpay.polkaj:polkaj-ss58:$polkajVersion"
     implementation 'commons-codec:commons-codec:1.14'
 }
 

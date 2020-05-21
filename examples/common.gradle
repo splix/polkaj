@@ -1,0 +1,6 @@
+//
+// Common config for Polkaj Examples
+//
+ext {
+   polkajVersion = "0.2.0-SNAPSHOT"
+}
