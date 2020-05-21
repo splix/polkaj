@@ -1,0 +1,210 @@
+= RPC Client
+:examples-dir: ../examples
+:examples-encoding: {examples-dir}/rpc/src/main/java
+
+Polkadot node provides a convenient RPC API to access most of the functions through HTTP and WebSockets.
+The API is based on JSON-RPC 2.0 protocol, see https://www.jsonrpc.org/ for the specification.
+
+Polkaj provides several modules to access such APIs, and to encode/decode JSON data to Java classes.
+Please note, that Polkaj tries, where it's possible, to map Polkadot specific data types to Java native types.
+
+== JSON Mapping
+
+JSON mapping is based on https://github.com/FasterXML/jackson[Jackson JSON] library.
+
+.Gradle dependency:
+----
+dependencies {
+    implementation 'io.emeraldpay.polkaj:polkaj-json:VERSION'
+}
+----
+
+The library implements serialization and deserialization for the following common types:
+
+- Hash256
+- Bytes
+- Long as hexadecimal
+
+Plus mapping for standard JSON RPC types:
+
+- Block
+
+To configure the JSON mapping you need to registed Polkadot Module in Jackson ObjectMapper:
+
+[source, java]
+----
+ObjectMapper objectMapper;
+objectMapper.registerModule(new PolkadotModule());
+----
+
+If you need to map a custom object, with you can define all standard Polkadot as usual:
+
+[source,java]
+----
+public class Something {
+    // When converted to JSON it will be serialized as a hexadecimal string with 0x prefix
+    // And can be read from the same format automatically
+    private Hash256 hash;
+
+    public Hash256 getHash() {
+        return hash;
+    }
+
+    public void setHash(Hash256 hash) {
+        this.hash = hash;
+    }
+}
+----
+
+If you also want to map Java `Long` as Polkadot hex numbers, you need to specify serializer and deserializer.
+So Jackson would encode it as hex, instead of plain number.
+
+[source,java]
+----
+public class Something {
+    // Configure Jackson to read and write number in hex format with 0x prefix
+    @JsonDeserialize(using = HexLongDeserializer.class)
+    @JsonSerialize(using = HexLongSerializer.class)
+    private Long number;
+}
+----
+
+If you encode such object as JSON:
+
+[source, java]
+----
+Something x = new Something();
+x.setNumber(123L);
+
+System.out.println(objectMapper.writeValueAsString(x));
+----
+
+You'll get `0x7b` hex value, instead of plain 123:
+
+[source, json]
+----
+{"number":"0x7b"}
+----
+
+The same logic works when you read the JSON into the `Something` instance.
+
+== HTTP Client
+
+Polkaj provides a standardized client to access JSON RPC protocol via HTTP.
+It's based on the standard `HttpClient` provided by Java 11.
+
+.Gradle dependency:
+----
+dependencies {
+    implementation 'io.emeraldpay.polkaj:polkaj-client-rpc:VERSION'
+}
+----
+
+=== Setup new client
+
+To create a new client:
+[source, java]
+----
+import io.emeraldpay.pjc.clientrpc.PolkadotRpcClient;
+
+PolkadotRpcClient client = PolkadotRpcClient.newBuilder().build();
+----
+
+The default configuration is going to connect to `http://127.0.0.1:9933`, which is a default configuration of Polkadot node.
+If you need to configure the client follow builder methods:
+
+[source, java]
+----
+PolkadotRpcClient client = PolkadotRpcClient.newBuilder()
+        .objectMapper(objectMapper) // <1>
+        .connectTo("http://10.0.1.20:9333") // <2>
+        .basicAuth("alice", "secret") // <3>
+        .build();
+----
+<1> Specify an existing ObjectMapper instance to use by the client
+<2> Connect to a node at `http://10.0.1.20:9333`
+<3> Using Basic Authorization with username `alice` and password `secret`
+
+=== Make calls
+
+The `PolkadotRpcClient` has the method `execute` that makes actual call and returns `Future` of the result of the call.
+
+[source, java]
+----
+class PolkadotRpcClient {
+    public <T> CompletableFuture<T> execute(
+            Class<T> clazz, // <1>
+            String method, // <2>
+            Object... params // <3>
+    )
+}
+----
+<1> expected type of the result
+<2> method name
+<3> (optional) parameters
+
+So if you call it as:
+[source, java]
+----
+Future<String> result = client.execute(String.class, "hello_world")
+----
+
+It should generate JSON RPC call like:
+[source, json]
+----
+{
+  "jsonrpc": "2.0",
+  "id": 0,
+  "method": "hello_world",
+  "params": []
+}
+----
+
+And if the server respond with:
+[source, json]
+----
+{
+  "jsonrpc": "2.0",
+  "id": 0,
+  "result": "Hello World!"
+}
+----
+
+Then you'll get that `"Hello World!"` as the result of future (`result.get()`).
+
+NOTE: A uniq numeric `id` for each request is automatically set by the PolkadotRpcClient, which keeps a sequence for ids and increment if for each request.
+
+In case of JSON response with error field, a `RpcException` is thrown during Future `.get()`.
+The exception contains the code and the message from the original JSON.
+
+=== Make Polkadot calls
+
+Calling most of the Polkadot API methods is straightforward, you just need to specify right result class.
+Though the class is needed only for convenience, and you can always execute it requiring, say, `Map.class` for flexibility.
+
+To get current _head_ of the chain call `chain_getFinalisedHead` which returns `Hash256`:
+
+[source, java]
+----
+Future<Hash256> hash = client.execute(
+        Hash256.class,
+        "chain_getFinalisedHead"
+);
+
+Hash256 hash = hashFuture.get();
+System.out.println("Current head: " + hash);
+----
+
+And to get a block for a hash call `chain_getBlock` with hash a parameter.
+It returns `BlockResponseJson` class, with `block` (use `.getBlock()` getter) and `justification` fields:
+
+[source, java]
+----
+Hash256 hash = ...;
+Future<BlockResponseJson> blockFuture = client.execute(
+        BlockResponseJson.class,
+        "chain_getBlock", hash
+);
+BlockResponseJson block = blockFuture.get();
+System.out.println("Block number: " + block.getBlock().getHeader().getNumber());
+----

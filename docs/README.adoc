@@ -4,6 +4,7 @@
 
 . link:01-common-types.adoc[Common Types]
 . link:02-encoding.adoc[Encoding and Decoding (SCALE, SS58)]
+. link:03-rpc-client.adoc[RPC Client]
 
 == Examples
 

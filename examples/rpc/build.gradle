@@ -1,0 +1,21 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+apply from: '../common.gradle'
+
+dependencies {
+    implementation "io.emeraldpay.polkaj:polkaj-client-rpc:$polkajVersion"
+    implementation "io.emeraldpay.polkaj:polkaj-json:$polkajVersion"
+    implementation 'commons-codec:commons-codec:1.14'
+}
+
+application {
+    mainClassName = 'ShowState'
+}

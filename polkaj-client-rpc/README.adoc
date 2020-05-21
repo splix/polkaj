@@ -13,6 +13,6 @@ PolkadotRpcClient client = PolkadotRpcClient.newBuilder().build();
 Future<Hash256> hash = client.execute(Hash256.class, "chain_getFinalisedHead");
 System.out.println("Current head: " + hash.get());
 
-Future<BlockResponseJson> block = client.execute(BlockResponseJson.class, "chain_getBlock", hash);
+Future<BlockResponseJson> block = client.execute(BlockResponseJson.class, "chain_getBlock", hash.get());
 System.out.println("Current height: " + block.get().getBlock().getHeader().getNumber());
 ----
