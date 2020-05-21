@@ -116,7 +116,8 @@ public class PolkadotRpcClient implements AutoCloseable {
                     new RpcException(-32000, "Server returned error status: " + response.statusCode())
             );
         }
-        if (!APPLICATION_JSON.equals(response.headers().firstValue("content-type").orElse(APPLICATION_JSON))) {
+        //response shouldn't contain non-ascii so charset can be ignored
+        if (!response.headers().firstValue("content-type").orElse(APPLICATION_JSON).startsWith(APPLICATION_JSON)) {
             throw new CompletionException(
                     new RpcException(-32000, "Server returned invalid content-type: " + response.headers().firstValue("content-type"))
             );

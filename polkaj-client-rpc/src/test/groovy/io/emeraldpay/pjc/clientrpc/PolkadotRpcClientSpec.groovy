@@ -10,6 +10,7 @@ import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
 import spock.lang.Specification
 
+import java.nio.charset.Charset
 import java.util.concurrent.CompletionException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
@@ -210,7 +211,7 @@ class PolkadotRpcClientSpec extends Specification {
         mockServer.when(
                 HttpRequest.request()
         ).respond(
-                HttpResponse.response(response).withContentType(MediaType.APPLICATION_JSON)
+                HttpResponse.response(response).withContentType(MediaType.APPLICATION_JSON.withCharset(Charset.forName("UTF-8")))
         )
         when:
         def act = client.execute(BlockResponseJson, "chain_getBlock", Hash256.from("0x9130103f8fbca52a79042211383946b39e6269b6ab49bc08035c9893d782c1bb")).get()
