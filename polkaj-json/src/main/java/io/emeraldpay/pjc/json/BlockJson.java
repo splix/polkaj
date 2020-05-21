@@ -31,7 +31,7 @@ public class BlockJson {
         this.header = header;
     }
 
-    static class Header {
+    public static class Header {
         private Digest digest;
         private Hash256 extrinsicsRoot;
         @JsonDeserialize(using = HexLongDeserializer.class)
@@ -80,7 +80,7 @@ public class BlockJson {
             this.stateRoot = stateRoot;
         }
 
-        static class Digest {
+        public static class Digest {
             private List<ByteData> logs = Collections.emptyList();
 
             public List<ByteData> getLogs() {
