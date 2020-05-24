@@ -47,8 +47,8 @@ class PolkadotWsClientSpec extends Specification {
         setup:
         List<Map<String, Object>> received = []
         when:
-        def f = client.subscribe(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead")
         server.onNextReply('{"jsonrpc":"2.0","result":101,"id":0}')
+        def f = client.subscribe(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead")
         def sub = f.get(TIMEOUT, TimeUnit.SECONDS)
         sub.handler({ event ->
             received.add([
