@@ -1,4 +1,10 @@
 rootProject.name = 'polkaj-root'
 
-include "polkaj-ss58", "polkaj-scale", "polkaj-types", "polkaj-json", "polkaj-client-rpc"
+include "polkaj-ss58",
+        "polkaj-scale",
+        "polkaj-types",
+        "polkaj-json",
+        "polkaj-client",
+        "polkaj-client-rpc",
+        "polkaj-client-ws"
 

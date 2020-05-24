@@ -1,7 +1,7 @@
 package io.emeraldpay.pjc.clientrpc
 
-import com.fasterxml.jackson.databind.JavaType
-import io.emeraldpay.pjc.json.BlockJson
+
+import io.emeraldpay.pjc.client.RpcException
 import io.emeraldpay.pjc.json.BlockResponseJson
 import io.emeraldpay.pjc.types.Hash256
 import org.mockserver.integration.ClientAndServer
@@ -13,7 +13,6 @@ import spock.lang.Specification
 import java.nio.charset.Charset
 import java.util.concurrent.CompletionException
 import java.util.concurrent.ExecutionException
-import java.util.concurrent.ExecutorService
 
 class PolkadotRpcClientSpec extends Specification {
 

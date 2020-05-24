@@ -20,6 +20,7 @@ public class ShowState {
         BlockResponseJson block = blockFuture.get();
         System.out.println("Current height: " + block.getBlock().getHeader().getNumber());
         System.out.println("State hash: " + block.getBlock().getHeader().getStateRoot());
+        client.close();
     }
 
     PolkadotRpcClient client() throws URISyntaxException {
