@@ -1,11 +1,10 @@
 package io.emeraldpay.pjc.clientrpc;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.emeraldpay.pjc.client.AbstractPolkadotClient;
+import io.emeraldpay.pjc.client.RpcException;
 import io.emeraldpay.pjc.json.jackson.PolkadotModule;
 
 import java.net.URI;
@@ -19,7 +18,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Default JSON RPC HTTP client for Polkadot API. It uses Java 11 HttpClient implementation for requests.
@@ -36,21 +34,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  * System.out.println("Current head: " + hash.get());
  * </code></pre>
  */
-public class PolkadotRpcClient implements AutoCloseable {
+public class PolkadotRpcClient extends AbstractPolkadotClient implements AutoCloseable {
 
     private static final String APPLICATION_JSON = "application/json";
 
     private final HttpClient httpClient;
     private final Runnable onClose;
-    private final AtomicInteger id = new AtomicInteger(0);
-    private final ObjectMapper objectMapper;
     private final HttpRequest.Builder request;
     private boolean closed = false;
 
     private PolkadotRpcClient(URI target, HttpClient httpClient, String basicAuth, Runnable onClose, ObjectMapper objectMapper) {
+        super(objectMapper);
         this.httpClient = httpClient;
         this.onClose = onClose;
-        this.objectMapper = objectMapper;
 
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(target)
@@ -63,10 +59,6 @@ public class PolkadotRpcClient implements AutoCloseable {
         }
 
         this.request = request;
-    }
-
-    public JavaType responseType(Class clazz) {
-        return objectMapper.getTypeFactory().constructType(clazz);
     }
 
     /**
@@ -85,7 +77,7 @@ public class PolkadotRpcClient implements AutoCloseable {
                     new IllegalStateException("Client is already closed")
             );
         }
-        int id = this.id.getAndIncrement();
+        int id = nextId();
         JavaType type = responseType(clazz);
         try {
             HttpRequest.Builder request = this.request.copy()
@@ -125,53 +117,6 @@ public class PolkadotRpcClient implements AutoCloseable {
         return response;
     }
 
-    /**
-     * Decode JSON RPC response
-     *
-     * @param id expected id
-     * @param content full JSON content
-     * @param clazz expected JavaType for the result field
-     * @param <T> returning type
-     * @return The decoded result
-     * @throws CompletionException with RpcException details to let executor know that the response is invalid
-     */
-    public <T> T decode(int id, String content, JavaType clazz) {
-        JavaType type = objectMapper.getTypeFactory().constructParametricType(RpcResponse.class, clazz);
-        RpcResponse<T> response;
-        try {
-            response = objectMapper.readerFor(type).readValue(content);
-        } catch (JsonProcessingException e) {
-            throw new CompletionException(
-                    new RpcException(-32603, "Server returned invalid JSON", e)
-            );
-        }
-        if (id != response.getId()) {
-            throw new CompletionException(
-                    new RpcException(-32603, "Server returned invalid id: " + id + " != " + response.id)
-            );
-        }
-        if (response.error != null) {
-            throw new CompletionException(
-                    new RpcException(response.error.code, response.error.message)
-            );
-        }
-        return response.getResult();
-    }
-
-    /**
-     * Encode RPC request as JSON
-     *
-     * @param id id of the request
-     * @param method method name
-     * @param params params
-     * @return full JSON of the request
-     * @throws JsonProcessingException if cannod encode some of the params into JSON
-     */
-    public byte[] encode(int id, String method, Object[] params) throws JsonProcessingException {
-        RpcRequest request = new RpcRequest(id, method, params);
-        return objectMapper.writeValueAsBytes(request);
-    }
-
     public static Builder newBuilder() {
         return new Builder();
     }
@@ -185,71 +130,6 @@ public class PolkadotRpcClient implements AutoCloseable {
             onClose.run();
         }
         closed = true;
-    }
-
-    @JsonSerialize
-    private static class RpcRequest {
-        private final String jsonrpc = "2.0";
-        private final int id;
-        private final String method;
-        private final Object[] params;
-
-        public RpcRequest(int id, String method, Object[] params) {
-            this.id = id;
-            this.method = method;
-            this.params = params;
-        }
-
-        public String getJsonrpc() {
-            return jsonrpc;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public String getMethod() {
-            return method;
-        }
-
-        public Object[] getParams() {
-            return params;
-        }
-    }
-
-    @JsonDeserialize
-    @JsonIgnoreProperties("jsonrpc")
-    private static class RpcResponse<T> {
-        private int id;
-        private T result;
-        private RpcResponseError error;
-
-        public int getId() {
-            return id;
-        }
-
-        public T getResult() {
-            return result;
-        }
-
-        public RpcResponseError getError() {
-            return error;
-        }
-    }
-
-    @JsonDeserialize
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    private static class RpcResponseError {
-        private int code;
-        private String message;
-
-        public int getCode() {
-            return code;
-        }
-
-        public String getMessage() {
-            return message;
-        }
     }
 
     /**

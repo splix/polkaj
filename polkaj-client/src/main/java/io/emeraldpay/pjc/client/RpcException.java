@@ -1,4 +1,4 @@
-package io.emeraldpay.pjc.clientrpc;
+package io.emeraldpay.pjc.client;
 
 public class RpcException extends RuntimeException {
 
