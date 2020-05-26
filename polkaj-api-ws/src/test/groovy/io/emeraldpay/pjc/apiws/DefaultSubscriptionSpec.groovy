@@ -1,15 +1,15 @@
 package io.emeraldpay.pjc.apiws
 
-
+import io.emeraldpay.pjc.api.Subscription
 import spock.lang.Specification
 
 import java.util.concurrent.CompletableFuture
 
-class SubscriptionSpec extends Specification {
+class DefaultSubscriptionSpec extends Specification {
 
     def "Id is immutable"() {
         when:
-        def s = new Subscription(null, "test", null)
+        def s = new DefaultSubscription(null, "test", null)
         s.setId(101)
         then:
         s.getId() == 101
@@ -22,7 +22,7 @@ class SubscriptionSpec extends Specification {
 
     def "Accept is silent when no handler"() {
         when:
-        def s = new Subscription(null, "test", null)
+        def s = new DefaultSubscription(null, "test", null)
         s.accept(new Subscription.Event("test", "test"))
         then:
         notThrown(NullPointerException)
@@ -30,7 +30,7 @@ class SubscriptionSpec extends Specification {
 
     def "Accept calls handler handler"() {
         when:
-        def s = new Subscription(null, "test", null)
+        def s = new DefaultSubscription(null, "test", null)
         Subscription.Event handled = null
         s.handler({
             handled = it
@@ -44,7 +44,7 @@ class SubscriptionSpec extends Specification {
         setup:
         def client = Mock(PolkadotWsApi)
         when:
-        def s = new Subscription(null, "untest", client)
+        def s = new DefaultSubscription(null, "untest", client)
         s.setId(10)
         s.close()
         then:
@@ -56,7 +56,7 @@ class SubscriptionSpec extends Specification {
         setup:
         def client = Mock(PolkadotWsApi)
         when:
-        def s = new Subscription(null, "untest", client)
+        def s = new DefaultSubscription(null, "untest", client)
         s.close()
         then:
         0 * client.execute(_, _, _) >> CompletableFuture.completedFuture(false)

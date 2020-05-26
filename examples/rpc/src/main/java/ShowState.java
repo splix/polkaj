@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.emeraldpay.pjc.api.PolkadotApi;
 import io.emeraldpay.pjc.apihttp.PolkadotHttpApi;
 import io.emeraldpay.pjc.json.BlockResponseJson;
 import io.emeraldpay.pjc.json.jackson.PolkadotModule;
@@ -23,7 +24,7 @@ public class ShowState {
         client.close();
     }
 
-    PolkadotHttpApi client() throws URISyntaxException {
+    PolkadotApi client() throws URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new PolkadotModule());
 

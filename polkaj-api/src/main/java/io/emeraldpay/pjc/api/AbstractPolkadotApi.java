@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class AbstractPolkadotApi {
+public abstract class AbstractPolkadotApi implements PolkadotApi {
 
     protected final AtomicInteger id = new AtomicInteger(0);
     protected final ObjectMapper objectMapper;

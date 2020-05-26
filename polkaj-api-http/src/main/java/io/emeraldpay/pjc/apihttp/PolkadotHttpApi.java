@@ -22,14 +22,14 @@ import java.util.concurrent.Executors;
 /**
  * Default JSON RPC HTTP client for Polkadot API. It uses Java 11 HttpClient implementation for requests.
  * Each request made from that client has a uniq id, from a monotone sequence starting on 0. A new instance is
- * supposed to be create through <code>PolkadotRpcClient.newBuilder()</code>:
+ * supposed to be create through {@link PolkadotHttpApi#newBuilder()}:
  * <br>
- * The class is AutoCloseable, with <code>.close()</code> methods, which shutdown a thread (or threads) used for http requests.
+ * The class is AutoCloseable, with {@link PolkadotHttpApi#close()} methods, which shutdown a thread (or threads) used for http requests.
  *
  * <br>
  * Example:
  * <pre><code>
- * PolkadotRpcClient client = PolkadotRpcClient.newBuilder().build();
+ * PolkadotHttpApi client = PolkadotHttpApi.newBuilder().build();
  * Future&lt;Hash256&gt; hash = client.execute(Hash256.class, "chain_getFinalisedHead");
  * System.out.println("Current head: " + hash.get());
  * </code></pre>
@@ -71,6 +71,7 @@ public class PolkadotHttpApi extends AbstractPolkadotApi implements AutoCloseabl
      * @return CompletableFuture for the result. Note that the Future may throw RpcException when it get
      * @see RpcException
      */
+    @Override
     public <T> CompletableFuture<T> execute(Class<T> clazz, String method, Object... params) {
         if (closed) {
             return CompletableFuture.failedFuture(
