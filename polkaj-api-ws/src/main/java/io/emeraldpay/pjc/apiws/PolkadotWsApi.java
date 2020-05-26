@@ -3,9 +3,7 @@ package io.emeraldpay.pjc.apiws;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.emeraldpay.pjc.api.AbstractPolkadotApi;
-import io.emeraldpay.pjc.api.RpcException;
-import io.emeraldpay.pjc.api.RpcResponse;
+import io.emeraldpay.pjc.api.*;
 import io.emeraldpay.pjc.json.jackson.PolkadotModule;
 
 import java.net.URI;
@@ -22,13 +20,15 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * WebSocket based client to Polkadot API. In addition to standard RPC calls it supports subscription to events, i.e.
  * when a call provides multiple responses.
+ * <br>
+ * Before making calls, a {@link PolkadotWsApi#connect()} must be called to establish a connection.
  */
-public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable {
+public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable, PolkadotSubscriptionApi {
 
     private final AtomicInteger id = new AtomicInteger(0);
     private final AtomicReference<WebSocket> webSocket = new AtomicReference<>(null);
     private final ConcurrentHashMap<Integer, RequestExpectation<?>> execution = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, Subscription<?>> subscriptions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, DefaultSubscription<?>> subscriptions = new ConcurrentHashMap<>();
     private final URI target;
     private final DecodeResponse decodeResponse;
     private final HttpClient httpClient;
@@ -69,6 +69,11 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable 
         return new Builder();
     }
 
+    /**
+     * Connect to the server. MUST BE CALLED FIRST
+     *
+     * @return a future for the connection. It always completed with <code>true</code> or and exception if failed to connect
+     */
     public CompletableFuture<Boolean> connect() {
         CompletableFuture<Boolean> whenConnected = new CompletableFuture<>();
         WebSocket.Listener listener = newListener(whenConnected);
@@ -137,6 +142,7 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable 
         };
     }
 
+    @Override
     public <T> CompletableFuture<T> execute(Class<T> clazz, String method, Object... params) {
         int id = this.id.getAndIncrement();
         byte[] payload;
@@ -152,8 +158,9 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable 
                 .thenCombine(whenResponseReceived, (a, b) -> b);
     }
 
+    @Override
     public <T> CompletableFuture<Subscription<T>> subscribe(Class<T> clazz, String method, String unsubscribe, Object... params) {
-        var subscription = new Subscription<T>(responseType(clazz), unsubscribe, this);
+        var subscription = new DefaultSubscription<T>(responseType(clazz), unsubscribe, this);
         var start = this.execute(Integer.class, method, params);
         return start.thenApply(id -> {
             subscriptions.put(id, subscription);
@@ -183,7 +190,7 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable 
 
     @SuppressWarnings("unchecked")
     public <T> void accept(SubscriptionResponse<T> response) {
-        Subscription<T> s = (Subscription<T>) subscriptions.get(response.id);
+        DefaultSubscription<T> s = (DefaultSubscription<T>) subscriptions.get(response.id);
         if (s == null) {
             return;
         }

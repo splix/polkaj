@@ -6,6 +6,7 @@ import io.emeraldpay.pjc.json.jackson.PolkadotModule
 import io.emeraldpay.pjc.types.Hash256
 import spock.lang.Specification
 
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
 
 class AbstractPolkadotApiSpec extends Specification {
@@ -124,6 +125,11 @@ class AbstractPolkadotApiSpec extends Specification {
     class TestingPolkadotApi extends AbstractPolkadotApi {
         TestingPolkadotApi(ObjectMapper objectMapper) {
             super(objectMapper)
+        }
+
+        @Override
+        def <T> CompletableFuture<T> execute(Class<T> clazz, String method, Object... params) {
+            throw new UnsupportedOperationException("Execute is not implemented for the test")
         }
     }
 }
