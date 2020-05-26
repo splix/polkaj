@@ -131,13 +131,25 @@ The `PolkadotHttpApi` has the method `execute` that makes actual call and return
 
 [source, java]
 ----
-class PolkadotHttpApi {
+interface PolkadotApi {
     public <T> CompletableFuture<T> execute(
+            RpcCall<T> call
             Class<T> clazz, // <1>
             String method, // <2>
             Object... params // <3>
-    )
+    );
 }
+----
+
+where RpcCall can be created as
+
+[source, java]
+----
+RpcCall.create(
+        Class<T> clazz, // <1>
+        String method, // <2>
+        Object... params // <3>
+);
 ----
 <1> expected type of the result
 <2> method name
@@ -146,7 +158,7 @@ class PolkadotHttpApi {
 So if you call it as:
 [source, java]
 ----
-Future<String> result = client.execute(String.class, "hello_world")
+Future<String> result = client.execute(RpcCall.create(String.class, "hello_world"))
 ----
 
 It should generate JSON RPC call like:
@@ -186,9 +198,12 @@ To get current _head_ of the chain call `chain_getFinalisedHead` which returns `
 
 [source, java]
 ----
-Future<Hash256> hash = client.execute(
-        Hash256.class,
-        "chain_getFinalisedHead"
+Future<Hash256> hashFuture = client.execute(
+        // use RpcCall.create to define the request
+        // the first parameter is Class / JavaType of the expected result
+        // second is the method name
+        // and optionally a list of parameters for the call
+        RpcCall.create(Hash256.class, "chain_getFinalisedHead")
 );
 
 Hash256 hash = hashFuture.get();
@@ -201,10 +216,15 @@ It returns `BlockResponseJson` class, with `block` (use `.getBlock()` getter) an
 [source, java]
 ----
 Hash256 hash = ...;
+
 Future<BlockResponseJson> blockFuture = client.execute(
-        BlockResponseJson.class,
-        "chain_getBlock", hash
+        // Another way to prepare a call, instead of manually constructing RpcCall instances
+        // is to use standard commands provided by PolkadotApi.commands()
+        // the following line is same as calling it with
+        // RpcCall.create(BlockResponseJson.class, "chain_getBlock", hash)
+        PolkadotApi.commands().getBlock(hash)
 );
+
 BlockResponseJson block = blockFuture.get();
 System.out.println("Block number: " + block.getBlock().getHeader().getNumber());
 ----

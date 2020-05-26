@@ -16,8 +16,12 @@ public abstract class AbstractPolkadotApi implements PolkadotApi {
         this.objectMapper = objectMapper;
     }
 
-    public JavaType responseType(Class clazz) {
-        return objectMapper.getTypeFactory().constructType(clazz);
+    public JavaType responseType(JavaType resultType) {
+        return objectMapper.getTypeFactory().constructType(resultType);
+    }
+
+    public JavaType responseType(Class<?> resultClazz) {
+        return objectMapper.getTypeFactory().constructType(resultClazz);
     }
 
     public int nextId() {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.emeraldpay.pjc.api.AbstractPolkadotApi;
+import io.emeraldpay.pjc.api.RpcCall;
 import io.emeraldpay.pjc.api.RpcException;
 import io.emeraldpay.pjc.json.jackson.PolkadotModule;
 
@@ -64,25 +65,23 @@ public class PolkadotHttpApi extends AbstractPolkadotApi implements AutoCloseabl
     /**
      * Execute JSON RPC request
      *
-     * @param clazz expected resulting class, i.e. will be used by Jackson to parse JSON value of <code>result</code> field
-     * @param method method name
-     * @param params params to the method
+     * @param call RPC call to execute
      * @param <T> type of the result
      * @return CompletableFuture for the result. Note that the Future may throw RpcException when it get
      * @see RpcException
      */
     @Override
-    public <T> CompletableFuture<T> execute(Class<T> clazz, String method, Object... params) {
+    public <T> CompletableFuture<T> execute(RpcCall<T> call) {
         if (closed) {
             return CompletableFuture.failedFuture(
                     new IllegalStateException("Client is already closed")
             );
         }
         int id = nextId();
-        JavaType type = responseType(clazz);
+        JavaType type = call.getResultType(objectMapper.getTypeFactory());
         try {
             HttpRequest.Builder request = this.request.copy()
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(encode(id, method, params)));
+                    .POST(HttpRequest.BodyPublishers.ofByteArray(encode(id, call.getMethod(), call.getParams())));
             return httpClient.sendAsync(request.build(), HttpResponse.BodyHandlers.ofString())
                     .thenApply(this::verify)
                     .thenApply(HttpResponse::body)

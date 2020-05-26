@@ -143,25 +143,25 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
     }
 
     @Override
-    public <T> CompletableFuture<T> execute(Class<T> clazz, String method, Object... params) {
+    public <T> CompletableFuture<T> execute(RpcCall<T> call) {
         int id = this.id.getAndIncrement();
         byte[] payload;
         try {
-            payload = encode(id, method, params);
+            payload = encode(id, call.getMethod(), call.getParams());
         } catch (JsonProcessingException e) {
             return CompletableFuture.failedFuture(e);
         }
         CompletableFuture<T> whenResponseReceived = new CompletableFuture<>();
-        execution.put(id, new RequestExpectation<T>(responseType(clazz), whenResponseReceived));
+        execution.put(id, new RequestExpectation<T>(responseType(call.getResultType(objectMapper.getTypeFactory())), whenResponseReceived));
         return webSocket.get()
                 .sendText(new String(payload), true)
                 .thenCombine(whenResponseReceived, (a, b) -> b);
     }
 
     @Override
-    public <T> CompletableFuture<Subscription<T>> subscribe(Class<T> clazz, String method, String unsubscribe, Object... params) {
-        var subscription = new DefaultSubscription<T>(responseType(clazz), unsubscribe, this);
-        var start = this.execute(Integer.class, method, params);
+    public <T> CompletableFuture<Subscription<T>> subscribe(SubscribeCall<T> call) {
+        var subscription = new DefaultSubscription<T>(call.getResultType(objectMapper.getTypeFactory()), call.getUnsubscribe(), this);
+        var start = this.execute(RpcCall.create(Integer.class, call.getMethod(), call.getParams()));
         return start.thenApply(id -> {
             subscriptions.put(id, subscription);
             subscription.setId(id);

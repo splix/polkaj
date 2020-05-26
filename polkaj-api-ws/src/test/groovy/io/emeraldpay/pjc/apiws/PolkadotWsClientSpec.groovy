@@ -1,7 +1,9 @@
 package io.emeraldpay.pjc.apiws
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.emeraldpay.pjc.api.RpcCall
 import io.emeraldpay.pjc.api.RpcException
+import io.emeraldpay.pjc.api.SubscribeCall
 import io.emeraldpay.pjc.json.BlockJson
 import io.emeraldpay.pjc.types.Hash256
 import spock.lang.Shared
@@ -48,7 +50,7 @@ class PolkadotWsClientSpec extends Specification {
         List<Map<String, Object>> received = []
         when:
         server.onNextReply('{"jsonrpc":"2.0","result":101,"id":0}')
-        def f = client.subscribe(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead")
+        def f = client.subscribe(SubscribeCall.create(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead"))
         def sub = f.get(TIMEOUT, TimeUnit.SECONDS)
         sub.handler({ event ->
             received.add([
@@ -73,7 +75,7 @@ class PolkadotWsClientSpec extends Specification {
     def "Make a request"() {
         when:
         server.onNextReply('{"jsonrpc":"2.0","result":"Hello World!","id":0}')
-        def f = client.execute(String.class, "test_foo")
+        def f = client.execute(RpcCall.create(String.class, "test_foo"))
         def act = f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
         act == "Hello World!"
@@ -89,7 +91,7 @@ class PolkadotWsClientSpec extends Specification {
         client.connect().get(TIMEOUT, TimeUnit.SECONDS)
         when:
         server.onNextReply('{"jsonrpc":"2.0","result":"Hello World!","id":0}')
-        def f = client.execute(String.class, "test_foo")
+        def f = client.execute(RpcCall.create(String.class, "test_foo"))
         def act = f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
         act == "Hello World!"
@@ -106,7 +108,7 @@ class PolkadotWsClientSpec extends Specification {
         client.connect().get(TIMEOUT, TimeUnit.SECONDS)
         when:
         server.onNextReply('{"jsonrpc":"2.0","result":"Hello World!","id":0}')
-        def f = client.execute(String.class, "test_foo")
+        def f = client.execute(RpcCall.create(String.class, "test_foo"))
         def act = f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
         act == "Hello World!"
@@ -126,7 +128,7 @@ class PolkadotWsClientSpec extends Specification {
         client.connect().get(TIMEOUT, TimeUnit.SECONDS)
         when:
         server.onNextReply('{"jsonrpc":"2.0","result":"Hello World!","id":0}')
-        def f = client.execute(String.class, "test_foo")
+        def f = client.execute(RpcCall.create(String.class, "test_foo"))
         def act = f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
         act == "Hello World!"
@@ -135,7 +137,7 @@ class PolkadotWsClientSpec extends Specification {
     def "Fail to subscribe with invalid command"() {
         when:
         server.onNextReply('{"jsonrpc":"2.0","error":{"code": -1, "message": "Test"},"id":0}')
-        def f = client.subscribe(Hash256.class, "test_subscribeNone", "test_unsubscribeNone")
+        def f = client.subscribe(SubscribeCall.create(Hash256.class, "test_subscribeNone", "test_unsubscribeNone"))
         f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
         def t = thrown(ExecutionException.class)
@@ -148,7 +150,7 @@ class PolkadotWsClientSpec extends Specification {
 
     def "Ignores unknown responses"() {
         when:
-        def f = client.execute(String.class, "test_foo")
+        def f = client.execute(RpcCall.create(String.class, "test_foo"))
         Thread.sleep(SLEEP)
         server.reply('{"jsonrpc":"2.0","method":"test_none","params":{"result": "test", "subscription":101}}')
         server.reply('{"jsonrpc":"2.0","error":{"code": -1, "message": "Test"},"id":50}')

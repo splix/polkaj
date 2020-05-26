@@ -1,5 +1,6 @@
 package io.emeraldpay.pjc.apiws
 
+import io.emeraldpay.pjc.api.RpcCall
 import io.emeraldpay.pjc.api.Subscription
 import spock.lang.Specification
 
@@ -48,7 +49,7 @@ class DefaultSubscriptionSpec extends Specification {
         s.setId(10)
         s.close()
         then:
-        1 * client.execute(Boolean.class, "untest", [10]) >> CompletableFuture.completedFuture(true)
+        1 * client.execute(RpcCall.create(Boolean.class, "untest", [10])) >> CompletableFuture.completedFuture(true)
         1 * client.removeSubscription(10)
     }
 
@@ -59,7 +60,7 @@ class DefaultSubscriptionSpec extends Specification {
         def s = new DefaultSubscription(null, "untest", client)
         s.close()
         then:
-        0 * client.execute(_, _, _) >> CompletableFuture.completedFuture(false)
+        0 * client.execute(_) >> CompletableFuture.completedFuture(false)
         0 * client.removeSubscription(_)
     }
 }

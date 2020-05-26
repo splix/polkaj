@@ -1,6 +1,7 @@
 package io.emeraldpay.pjc.apiws;
 
 import com.fasterxml.jackson.databind.JavaType;
+import io.emeraldpay.pjc.api.RpcCall;
 import io.emeraldpay.pjc.api.Subscription;
 
 import java.util.function.Consumer;
@@ -53,7 +54,7 @@ public class DefaultSubscription<T> implements Subscription<T>, Consumer<Subscri
         if (id == null) {
             return;
         }
-        client.execute(Boolean.class, unsubscribeMethod, id);
+        client.execute(RpcCall.create(Boolean.class, unsubscribeMethod, id));
         client.removeSubscription(id);
     }
 
