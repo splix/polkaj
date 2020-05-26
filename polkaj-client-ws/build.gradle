@@ -1,6 +1,0 @@
-dependencies {
-    api project(":polkaj-json")
-    api project(":polkaj-client")
-
-    testImplementation 'org.java-websocket:Java-WebSocket:1.5.1'
-}

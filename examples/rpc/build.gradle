@@ -11,8 +11,8 @@ repositories {
 apply from: '../common.gradle'
 
 dependencies {
-    implementation "io.emeraldpay.polkaj:polkaj-client-rpc:$polkajVersion"
-    implementation "io.emeraldpay.polkaj:polkaj-client-ws:$polkajVersion"
+    implementation "io.emeraldpay.polkaj:polkaj-api-http:$polkajVersion"
+    implementation "io.emeraldpay.polkaj:polkaj-api-ws:$polkajVersion"
     implementation "io.emeraldpay.polkaj:polkaj-json:$polkajVersion"
     implementation 'commons-codec:commons-codec:1.14'
 }

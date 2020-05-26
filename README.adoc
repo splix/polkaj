@@ -21,9 +21,9 @@ WARNING: UNDER DEVELOPMENT
 - `io.emeraldpay.polkaj:polkaj-ss58:{lib-version}` - SS58 codec to encode/decode addresses and pubkeys
 - `io.emeraldpay.polkaj:polkaj-types:{lib-version}` - common types (Address, DotAmount, Hash256, etc)
 - `io.emeraldpay.polkaj:polkaj-json:{lib-version-dev}` - JSON RPC mapping to Java classes
-- `io.emeraldpay.polkaj:polkaj-client:{lib-version-dev}` - RPC base classes
-- `io.emeraldpay.polkaj:polkaj-client-rpc:{lib-version-dev}` - JSON RPC HTTP client
-- `io.emeraldpay.polkaj:polkaj-client-ws:{lib-version-dev}` - JSON RPC WebSocket client
+- `io.emeraldpay.polkaj:polkaj-api:{lib-version-dev}` - RPC base classes
+- `io.emeraldpay.polkaj:polkaj-api-http:{lib-version-dev}` - JSON RPC HTTP client
+- `io.emeraldpay.polkaj:polkaj-api-ws:{lib-version-dev}` - JSON RPC WebSocket client
 
 == Usage
 

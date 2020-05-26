@@ -96,7 +96,7 @@ It's based on the standard `HttpClient` provided by Java 11.
 .Gradle dependency:
 ----
 dependencies {
-    implementation 'io.emeraldpay.polkaj:polkaj-client-rpc:VERSION'
+    implementation 'io.emeraldpay.polkaj:polkaj-api-http:VERSION'
 }
 ----
 
@@ -105,9 +105,9 @@ dependencies {
 To create a new client:
 [source, java]
 ----
-import io.emeraldpay.pjc.clientrpc.PolkadotRpcClient;
+import io.emeraldpay.pjc.apihttp.PolkadotHttpApi;
 
-PolkadotRpcClient client = PolkadotRpcClient.newBuilder().build();
+PolkadotHttpApi client = PolkadotHttpApi.newBuilder().build();
 ----
 
 The default configuration is going to connect to `http://127.0.0.1:9933`, which is a default configuration of Polkadot node.
@@ -115,7 +115,7 @@ If you need to configure the client follow builder methods:
 
 [source, java]
 ----
-PolkadotRpcClient client = PolkadotRpcClient.newBuilder()
+PolkadotHttpApi client = PolkadotHttpApi.newBuilder()
         .objectMapper(objectMapper) // <1>
         .connectTo("http://10.0.1.20:9333") // <2>
         .basicAuth("alice", "secret") // <3>
@@ -127,11 +127,11 @@ PolkadotRpcClient client = PolkadotRpcClient.newBuilder()
 
 === Make calls
 
-The `PolkadotRpcClient` has the method `execute` that makes actual call and returns `Future` of the result of the call.
+The `PolkadotHttpApi` has the method `execute` that makes actual call and returns `Future` of the result of the call.
 
 [source, java]
 ----
-class PolkadotRpcClient {
+class PolkadotHttpApi {
     public <T> CompletableFuture<T> execute(
             Class<T> clazz, // <1>
             String method, // <2>
@@ -172,7 +172,7 @@ And if the server respond with:
 
 Then you'll get that `"Hello World!"` as the result of future (`result.get()`).
 
-NOTE: A uniq numeric `id` for each request is automatically set by the PolkadotRpcClient, which keeps a sequence for ids and increment if for each request.
+NOTE: A uniq numeric `id` for each request is automatically set by the client, which keeps a sequence for ids and increment if for each request.
 
 In case of JSON response with error field, a `RpcException` is thrown during Future `.get()`.
 The exception contains the code and the message from the original JSON.
