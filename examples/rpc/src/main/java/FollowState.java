@@ -1,4 +1,5 @@
 import io.emeraldpay.pjc.api.PolkadotSubscriptionApi;
+import io.emeraldpay.pjc.api.SubscribeCall;
 import io.emeraldpay.pjc.api.Subscription;
 import io.emeraldpay.pjc.apiws.PolkadotWsApi;
 import io.emeraldpay.pjc.json.BlockJson;
@@ -17,7 +18,7 @@ public class FollowState {
     public static void main(String[] args) throws InterruptedException, ExecutionException, TimeoutException {
         PolkadotWsApi client = PolkadotWsApi.newBuilder().build();
         client.connect().get(5, TimeUnit.SECONDS);
-        Future<Subscription<BlockJson.Header>> hashFuture = client.subscribe(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead");
+        Future<Subscription<BlockJson.Header>> hashFuture = client.subscribe(PolkadotSubscriptionApi.subscriptions().newHeads());
         Subscription<BlockJson.Header> subscription = hashFuture.get(5, TimeUnit.SECONDS);
         subscription.handler((Subscription.Event<BlockJson.Header> event) -> {
             BlockJson.Header header = event.getResult();

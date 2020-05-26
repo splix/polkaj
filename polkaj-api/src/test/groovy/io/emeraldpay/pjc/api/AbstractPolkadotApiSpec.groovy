@@ -128,7 +128,7 @@ class AbstractPolkadotApiSpec extends Specification {
         }
 
         @Override
-        def <T> CompletableFuture<T> execute(Class<T> clazz, String method, Object... params) {
+        def <T> CompletableFuture<T> execute(RpcCall<T> call) {
             throw new UnsupportedOperationException("Execute is not implemented for the test")
         }
     }

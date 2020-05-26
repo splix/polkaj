@@ -6,16 +6,18 @@ public interface PolkadotSubscriptionApi {
 
     /**
      * Subscribe to a method that provides multiple responses
-     * <br>
-     * For example method <code>chain_subscribeNewHead</code> provides subscription to new blocks (represented with <code>BlockJson.Header</code>)
-     * And to cancel the subscription you need to execute <code>chain_unsubscribeNewHead</code>
      *
-     * @param clazz type of the data provided with the subsription
-     * @param method method used to subscribe
-     * @param unsubscribeMethod method used to unsubscribe
-     * @param params parameters for subscription
-     * @param <T> type
+     * @param call subscription call details to execute
+     * @param <T> type of the result
      * @return Subscription instance
      */
-    <T> CompletableFuture<Subscription<T>> subscribe(Class<T> clazz, String method, String unsubscribeMethod, Object... params);
+    <T> CompletableFuture<Subscription<T>> subscribe(SubscribeCall<T> call);
+
+    /**
+     *
+     * @return Standard Polkadot RPC subscriptions
+     */
+    public static StandardSubscriptions subscriptions() {
+        return StandardSubscriptions.getInstance();
+    }
 }
