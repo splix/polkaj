@@ -1,5 +1,5 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.emeraldpay.pjc.clientrpc.PolkadotRpcClient;
+import io.emeraldpay.pjc.apihttp.PolkadotHttpApi;
 import io.emeraldpay.pjc.json.BlockResponseJson;
 import io.emeraldpay.pjc.json.jackson.PolkadotModule;
 import io.emeraldpay.pjc.types.Hash256;
@@ -9,7 +9,7 @@ import java.util.concurrent.Future;
 
 public class ShowState {
     public static void main(String[] args) throws Exception {
-        PolkadotRpcClient client = PolkadotRpcClient.newBuilder().build();
+        PolkadotHttpApi client = PolkadotHttpApi.newBuilder().build();
         Future<Hash256> hashFuture = client.execute(Hash256.class, "chain_getFinalisedHead");
         Hash256 hash;
 
@@ -23,11 +23,11 @@ public class ShowState {
         client.close();
     }
 
-    PolkadotRpcClient client() throws URISyntaxException {
+    PolkadotHttpApi client() throws URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new PolkadotModule());
 
-        PolkadotRpcClient client = PolkadotRpcClient.newBuilder()
+        PolkadotHttpApi client = PolkadotHttpApi.newBuilder()
                 .objectMapper(objectMapper) // <1>
                 .connectTo("http://10.0.1.20:9333") // <2>
                 .basicAuth("alice", "secret") // <3>

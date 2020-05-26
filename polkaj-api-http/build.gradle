@@ -1,0 +1,6 @@
+dependencies {
+    api project(":polkaj-json")
+    api project(":polkaj-api")
+
+    testImplementation 'org.mock-server:mockserver-netty:5.10'
+}
