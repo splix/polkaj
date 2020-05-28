@@ -2,6 +2,7 @@ package io.emeraldpay.pjc.api;
 
 import io.emeraldpay.pjc.json.BlockResponseJson;
 import io.emeraldpay.pjc.json.MethodsJson;
+import io.emeraldpay.pjc.json.SystemHealthJson;
 import io.emeraldpay.pjc.types.Hash256;
 
 /**
@@ -48,4 +49,11 @@ public class StandardCommands {
         return RpcCall.create(String.class, "system_chain");
     }
 
+    /**
+     * Request health status of the current node
+     * @return command
+     */
+    public RpcCall<SystemHealthJson> systemHealth() {
+        return RpcCall.create(SystemHealthJson.class, "system_health");
+    }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory
 import io.emeraldpay.pjc.json.BlockJson
 import io.emeraldpay.pjc.json.BlockResponseJson
 import io.emeraldpay.pjc.json.MethodsJson
+import io.emeraldpay.pjc.json.SystemHealthJson
 import io.emeraldpay.pjc.json.jackson.PolkadotModule
 import io.emeraldpay.pjc.types.Hash256
 import spock.lang.Specification
@@ -50,5 +51,14 @@ class StandardCommandsSpec extends Specification {
         act.method == "system_chain"
         act.params.toList() == []
         act.getResultType(typeFactory).getRawClass() == String.class
+    }
+
+    def "System Health"() {
+        when:
+        def act = StandardCommands.getInstance().systemHealth()
+        then:
+        act.method == "system_health"
+        act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == SystemHealthJson.class
     }
 }

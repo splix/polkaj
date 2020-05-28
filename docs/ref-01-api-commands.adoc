@@ -56,6 +56,21 @@ Command:: `system_chain`
 Parameters:: none
 Java Object:: `String`
 
+[#systemHealth]
+=== System Health (`system_health`)
+
+Get health status of the node
+
+Shortcut:: `{shortcut-base}.systemHealth()`
+Command:: `system_health`
+Parameters:: none
+Java Object:: `SystemHealthJson`
+
+.SystemHealthJson Properties
+- `Boolean getSyncing` - true if node does initial syncing
+- `Integer getPeers()` - amount of current peers
+- `Boolean getShouldHavePeers()` - true if node should have peers
+
 == Subscriptions
 :shortcut-base: StandardSubscriptions.getInstance()
 
