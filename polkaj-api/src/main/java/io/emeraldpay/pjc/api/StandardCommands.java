@@ -56,4 +56,12 @@ public class StandardCommands {
     public RpcCall<SystemHealthJson> systemHealth() {
         return RpcCall.create(SystemHealthJson.class, "system_health");
     }
+
+    /**
+     * Request name of the current node
+     * @return command
+     */
+    public RpcCall<String> systemName() {
+        return RpcCall.create(String.class, "system_name");
+    }
 }

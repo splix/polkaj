@@ -61,4 +61,13 @@ class StandardCommandsSpec extends Specification {
         act.params.toList() == []
         act.getResultType(typeFactory).getRawClass() == SystemHealthJson.class
     }
+
+    def "System Name"() {
+        when:
+        def act = StandardCommands.getInstance().systemName()
+        then:
+        act.method == "system_name"
+        act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == String.class
+    }
 }

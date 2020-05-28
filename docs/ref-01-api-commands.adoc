@@ -3,10 +3,15 @@
 == RPC Commands
 :shortcut-base: StandardCommands.getInstance()
 
+* Chain
 - <<getBlock>>
 - <<getFinalizedHead>>
-- <<methods>>
+* System
 - <<systemChain>>
+- <<systemHealth>>
+- <<systemName>>
+* Other
+- <<methods>>
 
 [#getBlock]
 === Get Block (`chain_getBlock`)
@@ -32,20 +37,6 @@ Command:: `chain_getFinalizedHead`
 Parameters:: none
 Java Object:: `Hash256`
 
-[#methods]
-=== Methods List (`rpc_methods`)
-
-Get list of all available RPC methods
-
-Shortcut:: `{shortcut-base}.methods()`
-Command:: `rpc_methods`
-Parameters:: none
-Java Object:: `MethodsJson`
-
-.MethodsJson Properties
-- `Integer getVersion()` - version of RPC
-- `List<String> getMethods()` - list of methods
-
 [#systemChain]
 === System Chain (`system_chain`)
 
@@ -70,6 +61,30 @@ Java Object:: `SystemHealthJson`
 - `Boolean getSyncing` - true if node does initial syncing
 - `Integer getPeers()` - amount of current peers
 - `Boolean getShouldHavePeers()` - true if node should have peers
+
+[#systemName]
+=== System Name (`system_name`)
+
+Get name of the current node
+
+Shortcut:: `{shortcut-base}.systemName()`
+Command:: `system_name`
+Parameters:: none
+Java Object:: `String`
+
+[#methods]
+=== Methods List (`rpc_methods`)
+
+Get list of all available RPC methods
+
+Shortcut:: `{shortcut-base}.methods()`
+Command:: `rpc_methods`
+Parameters:: none
+Java Object:: `MethodsJson`
+
+.MethodsJson Properties
+- `Integer getVersion()` - version of RPC
+- `List<String> getMethods()` - list of methods
 
 == Subscriptions
 :shortcut-base: StandardSubscriptions.getInstance()
