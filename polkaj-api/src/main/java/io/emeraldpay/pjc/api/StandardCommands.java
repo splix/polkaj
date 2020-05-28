@@ -5,6 +5,8 @@ import io.emeraldpay.pjc.json.MethodsJson;
 import io.emeraldpay.pjc.json.SystemHealthJson;
 import io.emeraldpay.pjc.types.Hash256;
 
+import java.util.List;
+
 /**
  * Standard/common Polkadot Commands
  */
@@ -63,5 +65,13 @@ public class StandardCommands {
      */
     public RpcCall<String> systemName() {
         return RpcCall.create(String.class, "system_name");
+    }
+
+    /**
+     * Request roles of the current node
+     * @return command
+     */
+    public RpcCall<List<String>> systemNodeRoles() {
+        return RpcCall.create(String.class, "system_nodeRoles").expectList();
     }
 }

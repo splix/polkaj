@@ -70,4 +70,13 @@ class StandardCommandsSpec extends Specification {
         act.params.toList() == []
         act.getResultType(typeFactory).getRawClass() == String.class
     }
+
+    def "System Node Roles"() {
+        when:
+        def act = StandardCommands.getInstance().systemNodeRoles()
+        then:
+        act.method == "system_nodeRoles"
+        act.params.toList() == []
+        act.getResultType(typeFactory).toCanonical() == "java.util.List<java.lang.String>"
+    }
 }

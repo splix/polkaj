@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class AbstractCall<R> {
@@ -12,6 +13,7 @@ public abstract class AbstractCall<R> {
     protected final Object[] params;
     protected Class<?> resultClazz;
     protected JavaType resultType;
+    protected boolean list = false;
 
     protected AbstractCall(String method, Object[] params) {
         if (method == null || method.isEmpty()) {
@@ -45,6 +47,9 @@ public abstract class AbstractCall<R> {
         if (typeFactory == null) {
             throw new NullPointerException("TypeFactory is required when Result Type is set as a Class");
         }
+        if (list) {
+            return typeFactory.constructCollectionLikeType(List.class, resultClazz);
+        }
         return typeFactory.constructType(resultClazz);
     }
 
@@ -68,6 +73,19 @@ public abstract class AbstractCall<R> {
             return (AbstractCall<T>) this;
         }
         throw new ClassCastException("Cannot cast " + this.resultClazz + " to " + resultClazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected AbstractCall<List<R>> expectList() {
+        if (this.list) {
+            throw new IllegalStateException("Already a list");
+        }
+        if (this.resultType != null) {
+            // JavaType is supposed to contain all details. Conversion to List works only for base Class calls
+            throw new IllegalStateException("Cannot cast as List when JavaType is set");
+        }
+        this.list = true;
+        return (AbstractCall<List<R>>) this;
     }
 
     @Override

@@ -10,6 +10,7 @@
 - <<systemChain>>
 - <<systemHealth>>
 - <<systemName>>
+- <<systemNodeRoles>>
 * Other
 - <<methods>>
 
@@ -71,6 +72,16 @@ Shortcut:: `{shortcut-base}.systemName()`
 Command:: `system_name`
 Parameters:: none
 Java Object:: `String`
+
+[#systemNodeRoles]
+=== System Node Roles (`system_nodeRoles`)
+
+Get roles of the current node
+
+Shortcut:: `{shortcut-base}.systemNodeRoles()`
+Command:: `system_nodeRoles`
+Parameters:: none
+Java Object:: `List<String>`
 
 [#methods]
 === Methods List (`rpc_methods`)

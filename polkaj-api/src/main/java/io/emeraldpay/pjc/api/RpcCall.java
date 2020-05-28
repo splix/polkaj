@@ -1,11 +1,8 @@
 package io.emeraldpay.pjc.api;
 
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Definition of a JSON RPC call.
@@ -90,6 +87,12 @@ public class RpcCall<R> extends AbstractCall<R> {
 
     public <T> RpcCall<T> cast(Class<T> resultClazz) {
         return (RpcCall<T>) super.cast(resultClazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    public RpcCall<List<R>> expectList() {
+        super.expectList();
+        return (RpcCall<List<R>>) this;
     }
 
     @Override
