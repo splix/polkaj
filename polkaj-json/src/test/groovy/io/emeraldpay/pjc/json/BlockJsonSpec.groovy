@@ -107,4 +107,38 @@ class BlockJsonSpec extends Specification {
         act == exp
     }
 
+    def "Same are equal"() {
+        setup:
+        String json = BlockJsonSpec.classLoader.getResourceAsStream("blocks/0x59d78.json").text
+        when:
+        def act1 = objectMapper.readValue(json, BlockJson)
+        def act2 = objectMapper.readValue(json, BlockJson)
+        then:
+        act1 == act2
+        act1.hashCode() == act2.hashCode()
+    }
+
+    def "Diff are not equal"() {
+        setup:
+        String json = BlockJsonSpec.classLoader.getResourceAsStream("blocks/0x59d78.json").text
+        when:
+        def act1 = objectMapper.readValue(json, BlockJson)
+        def act2 = objectMapper.readValue(json, BlockJson).tap {
+            it.extrinsics.add(ByteData.from("0x00"))
+        }
+        def act3 = objectMapper.readValue(json, BlockJson).tap {
+            it.header.number++
+        }
+        def act4 = objectMapper.readValue(json, BlockJson).tap {
+            it.header.digest.logs.remove(0)
+        }
+        then:
+        act1 != act2
+        act1 != act3
+        act1 != act4
+        act2 != act3
+        act2 != act4
+        act3 != act4
+    }
+
 }

@@ -45,4 +45,9 @@ public class ByteData {
         ByteData byteData = (ByteData) o;
         return Arrays.equals(value, byteData.value);
     }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(value);
+    }
 }

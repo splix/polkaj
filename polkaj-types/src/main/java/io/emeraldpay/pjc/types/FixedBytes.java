@@ -22,10 +22,16 @@ abstract public class FixedBytes extends ByteData {
     }
 
     protected static byte[] parseHex(String hex) {
+        if (hex == null) {
+            throw new NullPointerException("Hex value is null");
+        }
         if (hex.startsWith("0x")) {
             hex = hex.substring(2);
         }
         int len = hex.length();
+        if (len % 2 != 0) {
+            throw new NumberFormatException("Not event number of digits provided");
+        }
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] = Integer.valueOf(hex.substring(i, i+2), 16).byteValue();
