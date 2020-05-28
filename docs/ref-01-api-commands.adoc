@@ -3,7 +3,33 @@
 == RPC Commands
 :shortcut-base: StandardCommands.getInstance()
 
+- <<getBlock>>
+- <<getFinalizedHead>>
 - <<methods>>
+
+[#getBlock]
+=== Get Block (`chain_getBlock`)
+
+Get block by its hash
+
+Shortcut:: `{shortcut-base}.getBlock(Hash256)`
+Command:: `chain_getBlock`
+Parameters:: hash of the requested block
+Java Object:: `BlockResponseJson`
+
+.BlockResponseJson Properties
+- `BlockJson getBlock()` block details
+- `Object getJustification()`
+
+[#getFinalizedHead]
+=== Get Finalised Head (`chain_getFinalizedHead`)
+
+Get the hash of the finalized head
+
+Shortcut:: `{shortcut-base}.getFinalizedHead()`
+Command:: `chain_getFinalizedHead`
+Parameters:: none
+Java Object:: `Hash256`
 
 [#methods]
 === Methods List (`rpc_methods`)
@@ -20,3 +46,16 @@ Java Object:: `MethodsJson`
 - `List<String> getMethods()` - list of methods
 
 == Subscriptions
+:shortcut-base: StandardSubscriptions.getInstance()
+
+- <<newHeads>>
+
+[#newHeads]
+=== New Heads (`chain_subscribeNewHead`)
+
+Subscribe to the head changes, i.e. to block on the head of the current blockchain.
+
+Shortcut:: `{shortcut-base}.newHeads()`
+Command:: `chain_subscribeNewHead`
+Parameters:: none
+Java Object:: `BlockJson.Header`
