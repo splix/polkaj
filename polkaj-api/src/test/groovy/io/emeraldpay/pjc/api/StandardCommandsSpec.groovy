@@ -42,4 +42,13 @@ class StandardCommandsSpec extends Specification {
         act.params.toList() == []
         act.getResultType(typeFactory).getRawClass() == MethodsJson.class
     }
+
+    def "System Chain"() {
+        when:
+        def act = StandardCommands.getInstance().systemChain()
+        then:
+        act.method == "system_chain"
+        act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == String.class
+    }
 }

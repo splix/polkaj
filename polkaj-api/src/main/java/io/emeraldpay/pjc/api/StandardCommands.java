@@ -40,4 +40,12 @@ public class StandardCommands {
         return RpcCall.create(MethodsJson.class, "rpc_methods");
     }
 
+    /**
+     * Request name of the current chain
+     * @return command
+     */
+    public RpcCall<String> systemChain() {
+        return RpcCall.create(String.class, "system_chain");
+    }
+
 }

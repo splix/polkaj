@@ -6,6 +6,7 @@
 - <<getBlock>>
 - <<getFinalizedHead>>
 - <<methods>>
+- <<systemChain>>
 
 [#getBlock]
 === Get Block (`chain_getBlock`)
@@ -44,6 +45,16 @@ Java Object:: `MethodsJson`
 .MethodsJson Properties
 - `Integer getVersion()` - version of RPC
 - `List<String> getMethods()` - list of methods
+
+[#systemChain]
+=== System Chain (`system_chain`)
+
+Get name of the current blockchain
+
+Shortcut:: `{shortcut-base}.systemChain()`
+Command:: `system_chain`
+Parameters:: none
+Java Object:: `String`
 
 == Subscriptions
 :shortcut-base: StandardSubscriptions.getInstance()
