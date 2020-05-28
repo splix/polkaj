@@ -1,0 +1,22 @@
+= Standard RPC Commands and Subscriptions
+
+== RPC Commands
+:shortcut-base: StandardCommands.getInstance()
+
+- <<methods>>
+
+[#methods]
+=== Methods List (`rpc_methods`)
+
+Get list of all available RPC methods
+
+Shortcut:: `{shortcut-base}.methods()`
+Command:: `rpc_methods`
+Parameters:: none
+Java Object:: `MethodsJson`
+
+.MethodsJson Properties
+- `Integer getVersion()` - version of RPC
+- `List<String> getMethods()` - list of methods
+
+== Subscriptions

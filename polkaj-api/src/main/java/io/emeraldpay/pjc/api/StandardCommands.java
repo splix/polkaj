@@ -1,6 +1,7 @@
 package io.emeraldpay.pjc.api;
 
 import io.emeraldpay.pjc.json.BlockResponseJson;
+import io.emeraldpay.pjc.json.MethodsJson;
 import io.emeraldpay.pjc.types.Hash256;
 
 /**
@@ -31,5 +32,12 @@ public class StandardCommands {
         return RpcCall.create(Hash256.class, "chain_getFinalizedHead");
     }
 
+    /**
+     * Request a list of available RPC methods
+     * @return command
+     */
+    public RpcCall<MethodsJson> methods() {
+        return RpcCall.create(MethodsJson.class, "rpc_methods");
+    }
 
 }

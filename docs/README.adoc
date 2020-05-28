@@ -6,6 +6,10 @@
 . link:02-encoding.adoc[Encoding and Decoding (SCALE, SS58)]
 . link:03-rpc-client.adoc[RPC Client]
 
+== Reference
+
+. link:ref-01-api-commands.adoc[Standard RPC Commands and Subscriptions]
+
 == Examples
 
 See code used in the documentation in the link:../examples[Examples]

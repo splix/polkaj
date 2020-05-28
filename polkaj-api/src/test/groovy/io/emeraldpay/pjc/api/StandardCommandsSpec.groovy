@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.type.TypeFactory
 import io.emeraldpay.pjc.json.BlockJson
 import io.emeraldpay.pjc.json.BlockResponseJson
+import io.emeraldpay.pjc.json.MethodsJson
 import io.emeraldpay.pjc.json.jackson.PolkadotModule
 import io.emeraldpay.pjc.types.Hash256
 import spock.lang.Specification
@@ -31,5 +32,14 @@ class StandardCommandsSpec extends Specification {
         act.method == "chain_getFinalizedHead"
         act.params.toList() == []
         act.getResultType(typeFactory).getRawClass() == Hash256.class
+    }
+
+    def "Rpc methods"() {
+        when:
+        def act = StandardCommands.getInstance().methods()
+        then:
+        act.method == "rpc_methods"
+        act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == MethodsJson.class
     }
 }
