@@ -79,4 +79,13 @@ class StandardCommandsSpec extends Specification {
         act.params.toList() == []
         act.getResultType(typeFactory).toCanonical() == "java.util.List<java.lang.String>"
     }
+
+    def "System Peers"() {
+        when:
+        def act = StandardCommands.getInstance().systemPeers()
+        then:
+        act.method == "system_peers"
+        act.params.toList() == []
+        act.getResultType(typeFactory).toCanonical() == "java.util.List<io.emeraldpay.pjc.json.PeerJson>"
+    }
 }

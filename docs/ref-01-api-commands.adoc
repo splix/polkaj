@@ -83,6 +83,23 @@ Command:: `system_nodeRoles`
 Parameters:: none
 Java Object:: `List<String>`
 
+[#systemPeers]
+=== System Peers (`system_peers`)
+
+Get peer list connected to the current node
+
+Shortcut:: `{shortcut-base}.systemPeers()`
+Command:: `system_peers`
+Parameters:: none
+Java Object:: `List<PeerJson>`
+
+.PeerJson Properties
+- `Hash256 getBestHash()`
+- `Long getBestNumber()`
+- `String getPeerId()`
+- `Integer getProtocolVersion()`
+- `String getRoles()`
+
 [#methods]
 === Methods List (`rpc_methods`)
 

@@ -2,6 +2,7 @@ package io.emeraldpay.pjc.api;
 
 import io.emeraldpay.pjc.json.BlockResponseJson;
 import io.emeraldpay.pjc.json.MethodsJson;
+import io.emeraldpay.pjc.json.PeerJson;
 import io.emeraldpay.pjc.json.SystemHealthJson;
 import io.emeraldpay.pjc.types.Hash256;
 
@@ -73,5 +74,13 @@ public class StandardCommands {
      */
     public RpcCall<List<String>> systemNodeRoles() {
         return RpcCall.create(String.class, "system_nodeRoles").expectList();
+    }
+
+    /**
+     * Request peer list connected to the current node
+     * @return command
+     */
+    public RpcCall<List<PeerJson>> systemPeers() {
+        return RpcCall.create(PeerJson.class, "system_peers").expectList();
     }
 }
