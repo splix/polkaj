@@ -83,4 +83,12 @@ public class StandardCommands {
     public RpcCall<List<PeerJson>> systemPeers() {
         return RpcCall.create(PeerJson.class, "system_peers").expectList();
     }
+
+    /**
+     * Request version of the current node
+     * @return command
+     */
+    public RpcCall<String> systemVersion() {
+        return RpcCall.create(String.class, "system_version");
+    }
 }

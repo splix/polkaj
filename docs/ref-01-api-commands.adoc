@@ -11,6 +11,8 @@
 - <<systemHealth>>
 - <<systemName>>
 - <<systemNodeRoles>>
+- <<systemPeers>>
+- <<systemVersion>>
 * Other
 - <<methods>>
 
@@ -99,6 +101,16 @@ Java Object:: `List<PeerJson>`
 - `String getPeerId()`
 - `Integer getProtocolVersion()`
 - `String getRoles()`
+
+[#systemVersion]
+=== System Version (`system_version`)
+
+Get version of the current node
+
+Shortcut:: `{shortcut-base}.systemVersion()`
+Command:: `system_version`
+Parameters:: none
+Java Object:: `String`
 
 [#methods]
 === Methods List (`rpc_methods`)

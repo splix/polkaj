@@ -88,4 +88,13 @@ class StandardCommandsSpec extends Specification {
         act.params.toList() == []
         act.getResultType(typeFactory).toCanonical() == "java.util.List<io.emeraldpay.pjc.json.PeerJson>"
     }
+
+    def "System Version"() {
+        when:
+        def act = StandardCommands.getInstance().systemVersion()
+        then:
+        act.method == "system_version"
+        act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == String.class
+    }
 }
