@@ -6,6 +6,7 @@
 * Chain
 - <<getBlock>>
 - <<getFinalizedHead>>
+- <<getHead>>
 * System
 - <<systemChain>>
 - <<systemHealth>>
@@ -37,6 +38,16 @@ Get the hash of the finalized head
 
 Shortcut:: `{shortcut-base}.getFinalizedHead()`
 Command:: `chain_getFinalizedHead`
+Parameters:: none
+Java Object:: `Hash256`
+
+[#getHead]
+=== Get Head (`chain_getHead`)
+
+Get the hash of the head
+
+Shortcut:: `{shortcut-base}.getHead()`
+Command:: `chain_getHead`
 Parameters:: none
 Java Object:: `Hash256`
 

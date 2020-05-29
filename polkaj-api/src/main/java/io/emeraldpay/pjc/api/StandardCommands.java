@@ -37,6 +37,14 @@ public class StandardCommands {
     }
 
     /**
+     * Request for the hash of the current head
+     * @return command
+     */
+    public RpcCall<Hash256> getHead() {
+        return RpcCall.create(Hash256.class, "chain_getHead");
+    }
+
+    /**
      * Request a list of available RPC methods
      * @return command
      */

@@ -35,6 +35,15 @@ class StandardCommandsSpec extends Specification {
         act.getResultType(typeFactory).getRawClass() == Hash256.class
     }
 
+    def "Chain get head"() {
+        when:
+        def act = StandardCommands.getInstance().getHead()
+        then:
+        act.method == "chain_getHead"
+        act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == Hash256.class
+    }
+
     def "Rpc methods"() {
         when:
         def act = StandardCommands.getInstance().methods()
