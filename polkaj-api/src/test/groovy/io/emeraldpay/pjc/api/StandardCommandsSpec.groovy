@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory
 import io.emeraldpay.pjc.json.BlockJson
 import io.emeraldpay.pjc.json.BlockResponseJson
 import io.emeraldpay.pjc.json.MethodsJson
+import io.emeraldpay.pjc.json.RuntimeVersionJson
 import io.emeraldpay.pjc.json.SystemHealthJson
 import io.emeraldpay.pjc.json.jackson.PolkadotModule
 import io.emeraldpay.pjc.types.Hash256
@@ -33,6 +34,15 @@ class StandardCommandsSpec extends Specification {
         act.method == "chain_getFinalizedHead"
         act.params.toList() == []
         act.getResultType(typeFactory).getRawClass() == Hash256.class
+    }
+
+    def "Chain get runtime version"() {
+        when:
+        def act = StandardCommands.getInstance().getRuntimeVersion()
+        then:
+        act.method == "chain_getRuntimeVersion"
+        act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == RuntimeVersionJson.class
     }
 
     def "Chain get head"() {

@@ -1,9 +1,6 @@
 package io.emeraldpay.pjc.api;
 
-import io.emeraldpay.pjc.json.BlockResponseJson;
-import io.emeraldpay.pjc.json.MethodsJson;
-import io.emeraldpay.pjc.json.PeerJson;
-import io.emeraldpay.pjc.json.SystemHealthJson;
+import io.emeraldpay.pjc.json.*;
 import io.emeraldpay.pjc.types.Hash256;
 
 import java.util.List;
@@ -42,6 +39,14 @@ public class StandardCommands {
      */
     public RpcCall<Hash256> getHead() {
         return RpcCall.create(Hash256.class, "chain_getHead");
+    }
+
+    /**
+     * Request the runtime version of the blockchain
+     * @return command
+     */
+    public RpcCall<RuntimeVersionJson> getRuntimeVersion() {
+        return RpcCall.create(RuntimeVersionJson.class, "chain_getRuntimeVersion");
     }
 
     /**
