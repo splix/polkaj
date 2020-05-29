@@ -160,20 +160,21 @@ Java Object:: `MethodsJson`
 == Subscriptions
 :shortcut-base: StandardSubscriptions.getInstance()
 
-- <<finalizedHeads>>
-- <<newHeads>>
+- <<subFinalizedHeads>>
+- <<subNewHeads>>
+- <<subRuntimeVersion>>
 
-[#finalizedHeads]
+[#subFinalizedHeads]
 === Finalized Heads (`chain_subscribeFinalizedHeads`)
 
-Subscribe to the head changes, i.e. to block on the head of the current blockchain.
+Subscribe to the finalized head changes, i.e. to the finalized block on the head of the current blockchain.
 
 Shortcut:: `{shortcut-base}.finalizedHeads()`
 Command:: `chain_subscribeFinalizedHeads`
 Parameters:: none
 Java Object:: `BlockJson.Header`
 
-[#newHeads]
+[#subNewHeads]
 === New Heads (`chain_subscribeNewHead`)
 
 Subscribe to the head changes, i.e. to block on the head of the current blockchain.
@@ -182,3 +183,13 @@ Shortcut:: `{shortcut-base}.newHeads()`
 Command:: `chain_subscribeNewHead`
 Parameters:: none
 Java Object:: `BlockJson.Header`
+
+[#subRuntimeVersion]
+=== Runtime Version (`chain_subscribeRuntimeVersion`)
+
+Subscribe to the changes to the Runtime Version.
+
+Shortcut:: `{shortcut-base}.runtimeVersion()`
+Command:: `chain_subscribeRuntimeVersion`
+Parameters:: none
+Java Object:: `RuntimeVersion`
