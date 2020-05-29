@@ -21,4 +21,13 @@ public class StandardSubscriptions {
     public SubscribeCall<BlockJson.Header> newHeads() {
         return SubscribeCall.create(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead");
     }
+
+    /**
+     * Subscribe to finalized headers
+     *
+     * @return command
+     */
+    public SubscribeCall<BlockJson.Header> finalizedHeads() {
+        return SubscribeCall.create(BlockJson.Header.class, "chain_subscribeFinalizedHeads", "chain_unsubscribeFinalizedHeads");
+    }
 }

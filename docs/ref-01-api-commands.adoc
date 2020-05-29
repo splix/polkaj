@@ -160,7 +160,18 @@ Java Object:: `MethodsJson`
 == Subscriptions
 :shortcut-base: StandardSubscriptions.getInstance()
 
+- <<finalizedHeads>>
 - <<newHeads>>
+
+[#finalizedHeads]
+=== Finalized Heads (`chain_subscribeFinalizedHeads`)
+
+Subscribe to the head changes, i.e. to block on the head of the current blockchain.
+
+Shortcut:: `{shortcut-base}.finalizedHeads()`
+Command:: `chain_subscribeFinalizedHeads`
+Parameters:: none
+Java Object:: `BlockJson.Header`
 
 [#newHeads]
 === New Heads (`chain_subscribeNewHead`)
