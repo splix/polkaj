@@ -23,22 +23,32 @@ class MethodsJsonSpec extends Specification {
         setup:
         String json = BlockJsonSpec.classLoader.getResourceAsStream("other/methods.json").text
         when:
-        def act = objectMapper.readValue(json, MethodsJson)
-        def act2 = objectMapper.readValue(json, MethodsJson)
+        def x = objectMapper.readValue(json, MethodsJson)
+        def y = objectMapper.readValue(json, MethodsJson)
         then:
-        act == act2
-        act.hashCode() == act2.hashCode()
+        x == y
+        x == x
+        x.hashCode() == y.hashCode()
+    }
+
+    def "Diff types are not equal"() {
+        setup:
+        String json = BlockJsonSpec.classLoader.getResourceAsStream("other/methods.json").text
+        when:
+        def x = objectMapper.readValue(json, MethodsJson)
+        then:
+        x != json
     }
 
     def "Diff data is not equal"() {
         setup:
         String json = BlockJsonSpec.classLoader.getResourceAsStream("other/methods.json").text
         when:
-        def act = objectMapper.readValue(json, MethodsJson)
-        def act2 = objectMapper.readValue(json, MethodsJson)
-        act.methods.remove(0)
+        def x = objectMapper.readValue(json, MethodsJson)
+        def y = objectMapper.readValue(json, MethodsJson)
+        x.methods.remove(0)
         then:
-        act != act2
+        x != y
     }
 
 }

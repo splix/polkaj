@@ -30,15 +30,26 @@ class SystemHealthJsonSpec extends Specification {
         x.hashCode() == y.hashCode()
     }
 
-    def "Diff data are not equal"() {
+    def "Not equal to other"() {
         setup:
         String json = BlockJsonSpec.classLoader.getResourceAsStream("system/health.json").text
         when:
         def x = objectMapper.readValue(json, SystemHealthJson.class)
-        def y = objectMapper.readValue(json, SystemHealthJson.class).tap {
-            peers++
-        }
         then:
+        x != json
+    }
+
+    def "Diff data are not equal"() {
+        setup:
+        String json = BlockJsonSpec.classLoader.getResourceAsStream("system/health.json").text
+        expect:
+        def x = objectMapper.readValue(json, SystemHealthJson.class)
+        def y = objectMapper.readValue(json, SystemHealthJson.class).tap {
+            it.metaClass.setProperty(it, field, null)
+        }
         x != y
+        where:
+        field << ["syncing", "peers", "shouldHavePeers"]
+
     }
 }

@@ -33,19 +33,30 @@ class RuntimeVersionJsonSpec extends Specification {
         def y = objectMapper.readValue(json, RuntimeVersionJson)
         then:
         x == y
+        x == x
         x.hashCode() == y.hashCode()
+    }
+
+    def "Not equal to others"() {
+        setup:
+        String json = BlockJsonSpec.classLoader.getResourceAsStream("chain/runtimeVersion.json").text
+        when:
+        def x = objectMapper.readValue(json, RuntimeVersionJson)
+        then:
+        x != json
     }
 
     def "Diff are not equal"() {
         setup:
         String json = BlockJsonSpec.classLoader.getResourceAsStream("chain/runtimeVersion.json").text
-        when:
+        expect:
         def x = objectMapper.readValue(json, RuntimeVersionJson)
         def y = objectMapper.readValue(json, RuntimeVersionJson).tap {
-            specVersion++
+            it.metaClass.setProperty(it, field, null)
         }
-        then:
         x != y
+        where:
+        field << ["apis", "authoringVersion", "implName", "implVersion", "specName", "specVersion", "transactionVersion"]
     }
 
 }

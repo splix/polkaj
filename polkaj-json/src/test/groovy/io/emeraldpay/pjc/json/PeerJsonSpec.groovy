@@ -55,19 +55,30 @@ class PeerJsonSpec extends Specification {
         def y = objectMapper.readValue(json, type)
         then:
         x == y
+        x == x
         x.hashCode() == y.hashCode()
+    }
+
+    def "Diff types are not equal"() {
+        setup:
+        String json = BlockJsonSpec.classLoader.getResourceAsStream("system/peers.json").text
+        when:
+        def x = objectMapper.readValue(json, type)
+        then:
+        x != json
     }
 
     def "Diff are not equal"() {
         setup:
         String json = BlockJsonSpec.classLoader.getResourceAsStream("system/peers.json").text
-        when:
+        expect:
         def x = objectMapper.readValue(json, type) as List<PeerJson>
         def y = (objectMapper.readValue(json, type) as List<PeerJson>).tap {
             it[0].protocolVersion--
         }
-        then:
         x != y
+        where:
+        fields << ["bestHash", "bestNumber", "peerId", "protocolVersion", "roles"]
     }
 
 }

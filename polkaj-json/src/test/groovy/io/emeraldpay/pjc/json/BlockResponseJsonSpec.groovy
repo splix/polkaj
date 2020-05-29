@@ -32,6 +32,7 @@ class BlockResponseJsonSpec extends Specification {
         def act2 = objectMapper.readValue(json, BlockResponseJson)
         then:
         act1 == act2
+        act1 == act1
         act1.hashCode() == act2.hashCode()
     }
 
