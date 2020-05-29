@@ -1,10 +1,10 @@
 package scale;
 
-import io.emeraldpay.pjc.scale.ScaleCodecReader;
-import io.emeraldpay.pjc.scale.ScaleCodecWriter;
-import io.emeraldpay.pjc.scale.ScaleReader;
-import io.emeraldpay.pjc.scale.ScaleWriter;
-import io.emeraldpay.pjc.types.Hash256;
+import io.emeraldpay.polkaj.scale.ScaleCodecReader;
+import io.emeraldpay.polkaj.scale.ScaleCodecWriter;
+import io.emeraldpay.polkaj.scale.ScaleReader;
+import io.emeraldpay.polkaj.scale.ScaleWriter;
+import io.emeraldpay.polkaj.types.Hash256;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 

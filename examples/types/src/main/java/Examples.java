@@ -1,5 +1,5 @@
-import io.emeraldpay.pjc.ss58.SS58Type;
-import io.emeraldpay.pjc.types.*;
+import io.emeraldpay.polkaj.ss58.SS58Type;
+import io.emeraldpay.polkaj.types.*;
 
 public class Examples {
 

@@ -2,10 +2,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.emeraldpay.pjc.json.jackson.HexLongDeserializer;
-import io.emeraldpay.pjc.json.jackson.HexLongSerializer;
-import io.emeraldpay.pjc.json.jackson.PolkadotModule;
-import io.emeraldpay.pjc.types.Hash256;
+import io.emeraldpay.polkaj.json.jackson.HexLongDeserializer;
+import io.emeraldpay.polkaj.json.jackson.HexLongSerializer;
+import io.emeraldpay.polkaj.json.jackson.PolkadotModule;
+import io.emeraldpay.polkaj.types.Hash256;
 
 public class Encodings {
 

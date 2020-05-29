@@ -1,13 +1,13 @@
 package scale;
 
-import io.emeraldpay.pjc.scale.ScaleCodecReader;
-import io.emeraldpay.pjc.scale.ScaleCodecWriter;
-import io.emeraldpay.pjc.scale.UnionValue;
-import io.emeraldpay.pjc.scale.reader.*;
-import io.emeraldpay.pjc.scale.writer.CompactBigIntWriter;
-import io.emeraldpay.pjc.scale.writer.CompactUIntWriter;
-import io.emeraldpay.pjc.scale.writer.UInt32Writer;
-import io.emeraldpay.pjc.scale.writer.UnionWriter;
+import io.emeraldpay.polkaj.scale.ScaleCodecReader;
+import io.emeraldpay.polkaj.scale.ScaleCodecWriter;
+import io.emeraldpay.polkaj.scale.UnionValue;
+import io.emeraldpay.polkaj.scale.reader.*;
+import io.emeraldpay.polkaj.scale.writer.CompactBigIntWriter;
+import io.emeraldpay.polkaj.scale.writer.CompactUIntWriter;
+import io.emeraldpay.polkaj.scale.writer.UInt32Writer;
+import io.emeraldpay.polkaj.scale.writer.UnionWriter;
 import org.apache.commons.codec.binary.Hex;
 
 import java.io.ByteArrayOutputStream;

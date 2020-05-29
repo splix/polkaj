@@ -1,8 +1,8 @@
-import io.emeraldpay.pjc.api.PolkadotSubscriptionApi;
-import io.emeraldpay.pjc.api.SubscribeCall;
-import io.emeraldpay.pjc.api.Subscription;
-import io.emeraldpay.pjc.apiws.PolkadotWsApi;
-import io.emeraldpay.pjc.json.BlockJson;
+import io.emeraldpay.polkaj.api.PolkadotSubscriptionApi;
+import io.emeraldpay.polkaj.api.SubscribeCall;
+import io.emeraldpay.polkaj.api.Subscription;
+import io.emeraldpay.polkaj.apiws.PolkadotWsApi;
+import io.emeraldpay.polkaj.json.BlockJson;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

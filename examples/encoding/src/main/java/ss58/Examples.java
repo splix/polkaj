@@ -1,8 +1,8 @@
 package ss58;
 
-import io.emeraldpay.pjc.ss58.SS58;
-import io.emeraldpay.pjc.ss58.SS58Codec;
-import io.emeraldpay.pjc.ss58.SS58Type;
+import io.emeraldpay.polkaj.ss58.SS58;
+import io.emeraldpay.polkaj.ss58.SS58Codec;
+import io.emeraldpay.polkaj.ss58.SS58Type;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 

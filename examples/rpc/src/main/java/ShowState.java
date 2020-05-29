@@ -1,10 +1,10 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.emeraldpay.pjc.api.PolkadotApi;
-import io.emeraldpay.pjc.api.RpcCall;
-import io.emeraldpay.pjc.apihttp.PolkadotHttpApi;
-import io.emeraldpay.pjc.json.BlockResponseJson;
-import io.emeraldpay.pjc.json.jackson.PolkadotModule;
-import io.emeraldpay.pjc.types.Hash256;
+import io.emeraldpay.polkaj.api.PolkadotApi;
+import io.emeraldpay.polkaj.api.RpcCall;
+import io.emeraldpay.polkaj.apihttp.PolkadotHttpApi;
+import io.emeraldpay.polkaj.json.BlockResponseJson;
+import io.emeraldpay.polkaj.json.jackson.PolkadotModule;
+import io.emeraldpay.polkaj.types.Hash256;
 
 import java.net.URISyntaxException;
 import java.util.concurrent.Future;
