@@ -4,7 +4,7 @@ include "polkaj-ss58",
         "polkaj-scale",
         "polkaj-types",
         "polkaj-json",
-        "polkaj-api",
+        "polkaj-api-base",
         "polkaj-api-http",
         "polkaj-api-ws"
 
