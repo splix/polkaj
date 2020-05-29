@@ -228,3 +228,5 @@ Future<BlockResponseJson> blockFuture = client.execute(
 BlockResponseJson block = blockFuture.get();
 System.out.println("Block number: " + block.getBlock().getHeader().getNumber());
 ----
+
+For the list of all standard commands please see link:ref-01-api-commands.adoc[API Commands Reference list]

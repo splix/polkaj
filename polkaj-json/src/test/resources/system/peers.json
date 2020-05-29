@@ -1,0 +1,30 @@
+[
+  {
+    "bestHash": "0xf8aa3c720af4ee1d5d6399c5ec519c93ea3fd6accdd89b5cad9a17aaa2386bf5",
+    "bestNumber": 2498544,
+    "peerId": "12D3KooWEGHw84b4hfvXEfyq4XWEmWCbRGuHMHQMpby4BAtZ4xJf",
+    "protocolVersion": 6,
+    "roles": "FULL"
+  },
+  {
+    "bestHash": "0xf8aa3c720af4ee1d5d6399c5ec519c93ea3fd6accdd89b5cad9a17aaa2386bf5",
+    "bestNumber": 2498544,
+    "peerId": "12D3KooWCzvSFZp2tD6CAkwm3zXLiDDCnG8M7DuNagXM3UQvqM55",
+    "protocolVersion": 6,
+    "roles": "AUTHORITY"
+  },
+  {
+    "bestHash": "0xf8aa3c720af4ee1d5d6399c5ec519c93ea3fd6accdd89b5cad9a17aaa2386bf5",
+    "bestNumber": 2498544,
+    "peerId": "12D3KooWF9KDPRMN8WpeyXhEeURZGP8Dmo7go1tDqi7hTYpxV9uW",
+    "protocolVersion": 6,
+    "roles": "FULL"
+  },
+  {
+    "bestHash": "0x93a44c200f8a8ed7026f5f46c831e56440a46fdb3bfaca6dee085db8926f8538",
+    "bestNumber": 2498542,
+    "peerId": "12D3KooWDgtynm4S9M3m6ZZhXYu2RrWKdvkCSScc25xKDVSg1Sjd",
+    "protocolVersion": 6,
+    "roles": "FULL"
+  }
+]

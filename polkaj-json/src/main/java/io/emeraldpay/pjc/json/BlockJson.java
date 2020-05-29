@@ -9,6 +9,7 @@ import io.emeraldpay.pjc.types.Hash256;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class BlockJson {
 
@@ -29,6 +30,20 @@ public class BlockJson {
 
     public void setHeader(Header header) {
         this.header = header;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BlockJson)) return false;
+        BlockJson blockJson = (BlockJson) o;
+        return Objects.equals(extrinsics, blockJson.extrinsics) &&
+                Objects.equals(header, blockJson.header);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(extrinsics, header);
     }
 
     public static class Header {
@@ -80,6 +95,23 @@ public class BlockJson {
             this.stateRoot = stateRoot;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Header)) return false;
+            Header header = (Header) o;
+            return Objects.equals(digest, header.digest) &&
+                    Objects.equals(extrinsicsRoot, header.extrinsicsRoot) &&
+                    Objects.equals(number, header.number) &&
+                    Objects.equals(parentHash, header.parentHash) &&
+                    Objects.equals(stateRoot, header.stateRoot);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(digest, extrinsicsRoot, number, parentHash, stateRoot);
+        }
+
         public static class Digest {
             private List<ByteData> logs = Collections.emptyList();
 
@@ -89,6 +121,19 @@ public class BlockJson {
 
             public void setLogs(List<ByteData> logs) {
                 this.logs = logs;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (!(o instanceof Digest)) return false;
+                Digest digest = (Digest) o;
+                return Objects.equals(logs, digest.logs);
+            }
+
+            @Override
+            public int hashCode() {
+                return Objects.hash(logs);
             }
         }
     }

@@ -1,0 +1,195 @@
+= Standard RPC Commands and Subscriptions
+
+== RPC Commands
+:shortcut-base: StandardCommands.getInstance()
+
+* Chain
+- <<getBlock>>
+- <<getFinalizedHead>>
+- <<getHead>>
+- <<getRuntimeVersion>>
+* System
+- <<systemChain>>
+- <<systemHealth>>
+- <<systemName>>
+- <<systemNodeRoles>>
+- <<systemPeers>>
+- <<systemVersion>>
+* Other
+- <<methods>>
+
+[#getBlock]
+=== Get Block (`chain_getBlock`)
+
+Get block by its hash
+
+Shortcut:: `{shortcut-base}.getBlock(Hash256)`
+Command:: `chain_getBlock`
+Parameters:: hash of the requested block
+Java Object:: `BlockResponseJson`
+
+.BlockResponseJson Properties
+- `BlockJson getBlock()` block details
+- `Object getJustification()`
+
+[#getFinalizedHead]
+=== Get Finalised Head (`chain_getFinalizedHead`)
+
+Get the hash of the finalized head
+
+Shortcut:: `{shortcut-base}.getFinalizedHead()`
+Command:: `chain_getFinalizedHead`
+Parameters:: none
+Java Object:: `Hash256`
+
+[#getHead]
+=== Get Head (`chain_getHead`)
+
+Get the hash of the head
+
+Shortcut:: `{shortcut-base}.getHead()`
+Command:: `chain_getHead`
+Parameters:: none
+Java Object:: `Hash256`
+
+[#getRuntimeVersion]
+=== Get Runtime Version (`chain_getRuntimeVersion`)
+
+Get the Runtime Version of the current blockchain
+
+Shortcut:: `{shortcut-base}.getRuntimeVersion()`
+Command:: `chain_getRuntimeVersion`
+Parameters:: none
+Java Object:: `RuntimeVersionJson`
+
+.RuntimeVersionJson Properties
+- `List<List<?>> getApis()`
+- `Integer getAuthoringVersion()`
+- `String getImplName()`
+- `Integer getImplVersion()`
+- `String getSpecName()`
+- `Integer getSpecVersion()`
+- `Integer getTransactionVersion()`
+
+[#systemChain]
+=== System Chain (`system_chain`)
+
+Get name of the current blockchain
+
+Shortcut:: `{shortcut-base}.systemChain()`
+Command:: `system_chain`
+Parameters:: none
+Java Object:: `String`
+
+[#systemHealth]
+=== System Health (`system_health`)
+
+Get health status of the node
+
+Shortcut:: `{shortcut-base}.systemHealth()`
+Command:: `system_health`
+Parameters:: none
+Java Object:: `SystemHealthJson`
+
+.SystemHealthJson Properties
+- `Boolean getSyncing` - true if node does initial syncing
+- `Integer getPeers()` - amount of current peers
+- `Boolean getShouldHavePeers()` - true if node should have peers
+
+[#systemName]
+=== System Name (`system_name`)
+
+Get name of the current node
+
+Shortcut:: `{shortcut-base}.systemName()`
+Command:: `system_name`
+Parameters:: none
+Java Object:: `String`
+
+[#systemNodeRoles]
+=== System Node Roles (`system_nodeRoles`)
+
+Get roles of the current node
+
+Shortcut:: `{shortcut-base}.systemNodeRoles()`
+Command:: `system_nodeRoles`
+Parameters:: none
+Java Object:: `List<String>`
+
+[#systemPeers]
+=== System Peers (`system_peers`)
+
+Get peer list connected to the current node
+
+Shortcut:: `{shortcut-base}.systemPeers()`
+Command:: `system_peers`
+Parameters:: none
+Java Object:: `List<PeerJson>`
+
+.PeerJson Properties
+- `Hash256 getBestHash()`
+- `Long getBestNumber()`
+- `String getPeerId()`
+- `Integer getProtocolVersion()`
+- `String getRoles()`
+
+[#systemVersion]
+=== System Version (`system_version`)
+
+Get version of the current node
+
+Shortcut:: `{shortcut-base}.systemVersion()`
+Command:: `system_version`
+Parameters:: none
+Java Object:: `String`
+
+[#methods]
+=== Methods List (`rpc_methods`)
+
+Get list of all available RPC methods
+
+Shortcut:: `{shortcut-base}.methods()`
+Command:: `rpc_methods`
+Parameters:: none
+Java Object:: `MethodsJson`
+
+.MethodsJson Properties
+- `Integer getVersion()` - version of RPC
+- `List<String> getMethods()` - list of methods
+
+== Subscriptions
+:shortcut-base: StandardSubscriptions.getInstance()
+
+- <<subFinalizedHeads>>
+- <<subNewHeads>>
+- <<subRuntimeVersion>>
+
+[#subFinalizedHeads]
+=== Finalized Heads (`chain_subscribeFinalizedHeads`)
+
+Subscribe to the finalized head changes, i.e. to the finalized block on the head of the current blockchain.
+
+Shortcut:: `{shortcut-base}.finalizedHeads()`
+Command:: `chain_subscribeFinalizedHeads`
+Parameters:: none
+Java Object:: `BlockJson.Header`
+
+[#subNewHeads]
+=== New Heads (`chain_subscribeNewHead`)
+
+Subscribe to the head changes, i.e. to block on the head of the current blockchain.
+
+Shortcut:: `{shortcut-base}.newHeads()`
+Command:: `chain_subscribeNewHead`
+Parameters:: none
+Java Object:: `BlockJson.Header`
+
+[#subRuntimeVersion]
+=== Runtime Version (`chain_subscribeRuntimeVersion`)
+
+Subscribe to the changes to the Runtime Version.
+
+Shortcut:: `{shortcut-base}.runtimeVersion()`
+Command:: `chain_subscribeRuntimeVersion`
+Parameters:: none
+Java Object:: `RuntimeVersion`

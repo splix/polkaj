@@ -1,6 +1,7 @@
 package io.emeraldpay.pjc.api;
 
 import io.emeraldpay.pjc.json.BlockJson;
+import io.emeraldpay.pjc.json.RuntimeVersionJson;
 
 /**
  * Standard/common Polkadot subscriptions
@@ -20,5 +21,23 @@ public class StandardSubscriptions {
      */
     public SubscribeCall<BlockJson.Header> newHeads() {
         return SubscribeCall.create(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead");
+    }
+
+    /**
+     * Subscribe to finalized headers
+     *
+     * @return command
+     */
+    public SubscribeCall<BlockJson.Header> finalizedHeads() {
+        return SubscribeCall.create(BlockJson.Header.class, "chain_subscribeFinalizedHeads", "chain_unsubscribeFinalizedHeads");
+    }
+
+    /**
+     * Subscribe to new runtime versions
+     *
+     * @return command
+     */
+    public SubscribeCall<RuntimeVersionJson> runtimeVersion() {
+        return SubscribeCall.create(RuntimeVersionJson.class, "chain_subscribeRuntimeVersion", "chain_unsubscribeRuntimeVersion");
     }
 }

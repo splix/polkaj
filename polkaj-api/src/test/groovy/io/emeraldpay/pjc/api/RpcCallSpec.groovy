@@ -161,6 +161,14 @@ class RpcCallSpec extends Specification {
         act != null
     }
 
+    def "Convert to list result"() {
+        when:
+        def act = RpcCall.create(Integer.class, "test_foo").expectList()
+        then:
+        act != null
+        act.getResultType(objectMapper.typeFactory).toCanonical() == "java.util.List<java.lang.Integer>"
+    }
+
     def "Same calls are equal"() {
         when:
         def a = RpcCall.create(Integer.class, "test_foo", 1, "foo")
