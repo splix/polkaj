@@ -18,6 +18,7 @@ WARNING: UNDER DEVELOPMENT
 == Modules
 
 - `io.emeraldpay.polkaj:polkaj-scale:{lib-version}` - SCALE codec implementation
+- `io.emeraldpay.polkaj:polkaj-scale-types:{lib-version-dev}` - SCALE mapping for standard Polkadot types
 - `io.emeraldpay.polkaj:polkaj-ss58:{lib-version}` - SS58 codec to encode/decode addresses and pubkeys
 - `io.emeraldpay.polkaj:polkaj-types:{lib-version}` - common types (Address, DotAmount, Hash256, etc)
 - `io.emeraldpay.polkaj:polkaj-json:{lib-version-dev}` - JSON RPC mapping to Java classes
