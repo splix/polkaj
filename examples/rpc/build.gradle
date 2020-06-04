@@ -14,9 +14,10 @@ dependencies {
     implementation "io.emeraldpay.polkaj:polkaj-api-http:$polkajVersion"
     implementation "io.emeraldpay.polkaj:polkaj-api-ws:$polkajVersion"
     implementation "io.emeraldpay.polkaj:polkaj-json:$polkajVersion"
+    implementation "io.emeraldpay.polkaj:polkaj-scale:$polkajVersion"
     implementation 'commons-codec:commons-codec:1.14'
 }
 
 application {
-    mainClassName = 'ShowState'
+    mainClassName = project.hasProperty("mainClass") ? getProperty("mainClass") : "ShowState"
 }

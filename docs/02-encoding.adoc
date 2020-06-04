@@ -55,7 +55,10 @@ System.out.println("Union read #" + f.getIndex() + " = " + f.getValue());
 - `BoolReader` -> `Boolean`
 - `CompactBigIntReader` -> unsigned `BigInteger` encoded as _Compact Integer_
 - `CompactUintReader` -> unsigned `Integer` encoded as _Compact Integer_
+- `EnumReader<T extends Enum<?>>` -> Java enum, whose ordinal id is encoded as a single byte
+- `Int32Reader` -> signed `Integer` encoded as 32 bits
 - `ListReader<T>` -> `List<T>`, where you should also specify reader for actual items of the list
+- `StringReader` -> UTF-8 encoded `String`
 - `UByteReader` -> unsigned `Integer` encoded as a single byte (i.e., 0..255)
 - `UInt16Reader` -> unsigned `Integer` encoded as 16 bits
 - `UInt32Reader` -> unsigned `Long` encoded as 32 bits

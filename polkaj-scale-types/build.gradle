@@ -1,0 +1,5 @@
+dependencies {
+    api project(":polkaj-scale")
+
+    testImplementation("nl.jqno.equalsverifier:equalsverifier:3.3")
+}

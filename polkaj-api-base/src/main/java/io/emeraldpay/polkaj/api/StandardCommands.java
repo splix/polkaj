@@ -1,6 +1,7 @@
 package io.emeraldpay.polkaj.api;
 
 import io.emeraldpay.polkaj.json.*;
+import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.Hash256;
 
 import java.util.List;
@@ -103,5 +104,13 @@ public class StandardCommands {
      */
     public RpcCall<String> systemVersion() {
         return RpcCall.create(String.class, "system_version");
+    }
+
+    /**
+     * Request runtime metadata of the current node
+     * @return command
+     */
+    public RpcCall<ByteData> stateMetadata() {
+        return RpcCall.create(ByteData.class, "state_getMetadata");
     }
 }

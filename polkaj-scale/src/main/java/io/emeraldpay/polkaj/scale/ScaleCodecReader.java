@@ -12,9 +12,11 @@ public class ScaleCodecReader {
     public static final UByteReader UBYTE = new UByteReader();
     public static final UInt16Reader UINT16 = new UInt16Reader();
     public static final UInt32Reader UINT32 = new UInt32Reader();
+    public static final Int32Reader INT32 = new Int32Reader();
     public static final CompactUIntReader COMPACT_UINT = new CompactUIntReader();
     public static final BoolReader BOOL = new BoolReader();
     public static final BoolOptionalReader BOOL_OPTIONAL = new BoolOptionalReader();
+    public static final StringReader STRING = new StringReader();
 
     private byte[] source;
     private int pos = 0;
@@ -132,5 +134,13 @@ public class ScaleCodecReader {
         System.arraycopy(source, pos, result, 0, result.length);
         pos += len;
         return result;
+    }
+
+    /**
+     * Read string, encoded as UTF-8 bytes
+     * @return string value
+     */
+    public String readString() {
+        return new String(readByteArray());
     }
 }

@@ -8,6 +8,8 @@
 - <<getFinalizedHead>>
 - <<getHead>>
 - <<getRuntimeVersion>>
+* State
+- <<stateMetadata>>
 * System
 - <<systemChain>>
 - <<systemHealth>>
@@ -70,6 +72,24 @@ Java Object:: `RuntimeVersionJson`
 - `String getSpecName()`
 - `Integer getSpecVersion()`
 - `Integer getTransactionVersion()`
+
+[#stateMetadata]
+=== Runtime Metadata (`state_getMetadata`)
+
+Get name of the current blockchain
+
+Shortcut:: `{shortcut-base}.stateMetadata()`
+Command:: `state_getMetadata`
+Parameters:: none
+Java Object:: `ByteData`
+
+The metadata is encoded with SCALE codec, if you need to decode the object use:
+[source, java]
+----
+Future<Metadata> metadataFuture = client.execute(StandardCommands.getInstance().stateMetadata())
+        .thenApply(ByteData::getBytes)
+        .thenApply(ScaleExtract.fromBytes(new MetadataReader()));
+----
 
 [#systemChain]
 === System Chain (`system_chain`)

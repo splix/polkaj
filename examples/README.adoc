@@ -19,3 +19,23 @@ Examples for DotAmount, formatting, hashes and Address
 ----
 gradle run
 ----
+
+== RPC
+
+Examples for accessing JSON RPC through HTTP or WebSockets.
+The examples expect Polkadot node running and listening for RPC and WS requests (i.e. default node options)
+
+.Show current head
+----
+gradle run
+----
+
+.Follow updates to the current head (use `Ctrl+C` to exit)
+----
+gradle run -PmainClass=FollowState
+----
+
+.Describe runtime
+----
+gradle run -PmainClass=DescribeRuntime
+----
