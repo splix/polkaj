@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory
 import io.emeraldpay.polkaj.json.MethodsJson
 import io.emeraldpay.polkaj.json.RuntimeVersionJson
 import io.emeraldpay.polkaj.json.SystemHealthJson
+import io.emeraldpay.polkaj.types.ByteData
 import io.emeraldpay.polkaj.types.Hash256
 import io.emeraldpay.polkaj.json.BlockResponseJson
 import io.emeraldpay.polkaj.json.jackson.PolkadotModule
@@ -114,5 +115,14 @@ class StandardCommandsSpec extends Specification {
         act.method == "system_version"
         act.params.toList() == []
         act.getResultType(typeFactory).getRawClass() == String.class
+    }
+
+    def "State Metadata"() {
+        when:
+        def act = StandardCommands.getInstance().stateMetadata()
+        then:
+        act.method == "state_getMetadata"
+        act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == ByteData.class
     }
 }
