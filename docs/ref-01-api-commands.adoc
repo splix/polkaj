@@ -10,6 +10,7 @@
 - <<getRuntimeVersion>>
 * State
 - <<stateMetadata>>
+- <<stateGetStorage>>
 * System
 - <<systemChain>>
 - <<systemHealth>>
@@ -90,6 +91,16 @@ Future<Metadata> metadataFuture = client.execute(StandardCommands.getInstance().
         .thenApply(ByteData::getBytes)
         .thenApply(ScaleExtract.fromBytes(new MetadataReader()));
 ----
+
+[#stateGetStorage]
+=== Get Storage (`state_getStorage`)
+
+Get state from a Storage.
+
+Shortcut:: `{shortcut-base}.stateGetStorage(key)`
+Command:: `state_getStorage`
+Parameters:: `key` - bytes (`byte[]` or `ByteDate`)
+Java Object:: `ByteData`
 
 [#systemChain]
 === System Chain (`system_chain`)

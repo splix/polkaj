@@ -113,4 +113,23 @@ public class StandardCommands {
     public RpcCall<ByteData> stateMetadata() {
         return RpcCall.create(ByteData.class, "state_getMetadata");
     }
+
+    /**
+     * Request data from storage
+     * @param request key (depending on the storage)
+     * @return command
+     */
+    public RpcCall<ByteData> stateGetStorage(ByteData request) {
+        return RpcCall.create(ByteData.class, "state_getStorage", request.toString());
+    }
+
+    /**
+     * Request data from storage
+     * @param request key (depending on the storage)
+     * @return command
+     */
+    public RpcCall<ByteData> stateGetStorage(byte[] request) {
+        return stateGetStorage(new ByteData(request));
+    }
+
 }

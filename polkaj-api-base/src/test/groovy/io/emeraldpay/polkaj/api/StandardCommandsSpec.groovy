@@ -9,6 +9,7 @@ import io.emeraldpay.polkaj.types.ByteData
 import io.emeraldpay.polkaj.types.Hash256
 import io.emeraldpay.polkaj.json.BlockResponseJson
 import io.emeraldpay.polkaj.json.jackson.PolkadotModule
+import org.apache.commons.codec.binary.Hex
 import spock.lang.Specification
 
 class StandardCommandsSpec extends Specification {
@@ -123,6 +124,22 @@ class StandardCommandsSpec extends Specification {
         then:
         act.method == "state_getMetadata"
         act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == ByteData.class
+    }
+
+    def "State Get Storage"() {
+        when:
+        def act = StandardCommands.getInstance().stateGetStorage(Hex.decodeHex("0102"))
+        then:
+        act.method == "state_getStorage"
+        act.params.toList() == ["0x0102"]
+        act.getResultType(typeFactory).getRawClass() == ByteData.class
+
+        when:
+        act = StandardCommands.getInstance().stateGetStorage( ByteData.from("0x0102"))
+        then:
+        act.method == "state_getStorage"
+        act.params.toList() == ["0x0102"]
         act.getResultType(typeFactory).getRawClass() == ByteData.class
     }
 }
