@@ -18,7 +18,7 @@ jobs:
       - name: Check
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: check -Ptestcoverage=true
+          arguments: check
 
       - name: Build Coverage Report
         uses: eskatos/gradle-command-action@v1
@@ -36,7 +36,7 @@ jobs:
     continue-on-error: ${{ matrix.java != '11' }}
     strategy:
       matrix:
-        java: ["11", "12", "13", "14", "15-ea"]
+        java: ["11", "12", "13", "14"]
         os: ["windows-latest", "macos-latest", "ubuntu-latest"]
     runs-on: ${{ matrix.os }}
     steps:

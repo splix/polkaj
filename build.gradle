@@ -63,11 +63,6 @@ subprojects {
         useJUnitPlatform()
         testLogging.showStandardStreams = true
         testLogging.exceptionFormat = 'full'
-
-        jacoco {
-            //enable code coverage only when it needed. also jacoco breaks the build on EA versions of Java
-            enabled = project.hasProperty('testcoverate') && project.property('testcoverate') == 'true'
-        }
     }
 
     jacocoTestReport {
