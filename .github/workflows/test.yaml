@@ -36,7 +36,7 @@ jobs:
     continue-on-error: ${{ matrix.java != '11' }}
     strategy:
       matrix:
-        java: ["11", "12", "13", "14", "15-ea"]
+        java: ["11", "12", "13", "14"]
         os: ["windows-latest", "macos-latest", "ubuntu-latest"]
     runs-on: ${{ matrix.os }}
     steps:
