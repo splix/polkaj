@@ -46,13 +46,38 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.emeraldpay.polkaj:polkaj-common-types:{lib-version}'
+    implementation 'io.emeraldpay.polkaj:polkaj-api-http:{lib-version}'
 }
 ----
 
 == Documentation
 
 See link:docs/[Documentation] in `./docs` directory, and a demonstration in `./examples`.
+
+== Example
+
+.Show current finalized block
+[source,java]
+----
+PolkadotHttpApi client = PolkadotHttpApi.newBuilder().build();
+Future<Hash256> hashFuture = client.execute(
+        PolkadotApi.commands().getFinalizedHead()
+);
+
+Hash256 hash = hashFuture.get();
+System.out.println("Current head: " + hash);
+
+Future<BlockResponseJson> blockFuture = client.execute(
+        PolkadotApi.commands().getBlock(hash)
+);
+
+BlockResponseJson block = blockFuture.get();
+System.out.println("Current height: " + block.getBlock().getHeader().getNumber());
+System.out.println("State hash: " + block.getBlock().getHeader().getStateRoot());
+
+
+client.close();
+----
 
 == License
 

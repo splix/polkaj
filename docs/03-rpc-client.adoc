@@ -1,6 +1,8 @@
 = RPC Client
+:lib-version: 0.2.0-SNAPSHOT
 :examples-dir: ../examples
 :examples-encoding: {examples-dir}/rpc/src/main/java
+
 
 Polkadot node provides a convenient RPC API to access most of the functions through HTTP and WebSockets.
 The API is based on JSON-RPC 2.0 protocol, see https://www.jsonrpc.org/ for the specification.
@@ -13,9 +15,10 @@ Please note, that Polkaj tries, where it's possible, to map Polkadot specific da
 JSON mapping is based on https://github.com/FasterXML/jackson[Jackson JSON] library.
 
 .Gradle dependency:
+[subs="attributes"]
 ----
 dependencies {
-    implementation 'io.emeraldpay.polkaj:polkaj-json:VERSION'
+    implementation 'io.emeraldpay.polkaj:polkaj-json-types:{lib-version}'
 }
 ----
 
@@ -127,17 +130,12 @@ PolkadotHttpApi client = PolkadotHttpApi.newBuilder()
 
 === Make calls
 
-The `PolkadotHttpApi` has the method `execute` that makes actual call and returns `Future` of the result of the call.
+The `PolkadotApi` has the method `execute` that makes actual call and returns `Future` of the result of the call.
 
 [source, java]
 ----
 interface PolkadotApi {
-    public <T> CompletableFuture<T> execute(
-            RpcCall<T> call
-            Class<T> clazz, // <1>
-            String method, // <2>
-            Object... params // <3>
-    );
+    <T> CompletableFuture<T> execute(RpcCall<T> call);
 }
 ----
 
@@ -156,6 +154,7 @@ RpcCall.create(
 <3> (optional) parameters
 
 So if you call it as:
+
 [source, java]
 ----
 Future<String> result = client.execute(RpcCall.create(String.class, "hello_world"))
@@ -230,3 +229,108 @@ System.out.println("Block number: " + block.getBlock().getHeader().getNumber());
 ----
 
 For the list of all standard commands please see link:ref-01-api-commands.adoc[API Commands Reference list]
+
+=== Convert complex data returned from a call
+
+It's common in Polkadot to return (or accept as parameter) a complex object, usually encoded with Hex and SCALE.
+Here is an example how you handle it and decode the data to a Java object.
+
+----
+Future<Metadata> metadataFuture = client.execute(StandardCommands.getInstance().stateMetadata()) // <1>
+        .thenApply(ByteData::getBytes) // <2>
+        .thenApply(ScaleExtract.fromBytes(new MetadataReader())); // <3>
+----
+<1> Requesting Runtime Metadata which describes all configured modules and storages for the blockchain
+<2> Since the response is Hex string (handled by `ByteData` class) we convert it to actual bytes
+<3> And then apply ScaleReader implemented with class `MetadataReader`
+
+The `Metadata` class, as well as `MetadataReader` are provided by the module `io.emeraldpay.polkaj:polkaj-scale-types:{lib-version}`
+
+== WebSockets client
+
+In addition to HTTP based JSON RPC protocol, Polkadot nodes provide WebSocket based API.
+It allows subscribing to the events happening on the blockchain, such as changing of the Head block.
+
+=== Setup WS Client
+
+[source, java]
+----
+PolkadotWsApi client = PolkadotWsApi.newBuilder().build();
+
+// IMPORTANT! connect to the node as the first step before making calls or subscriptions.
+client.connect().get(5, TimeUnit.SECONDS);
+----
+
+Class `PolkadotWsApi` implements `PolkadotSubscriptionApi` (as well as standard `PolkadotApi`)
+
+[source, java]
+----
+interface PolkadotSubscriptionApi {
+    <T> CompletableFuture<Subscription<T>> subscribe(SubscribeCall<T> call);
+}
+----
+
+The `Subscription<T>` instance provides method `handler()` to handle events.
+Note that if handler added twice, a new handler replaces a previous one.
+Providing a null handler removes the handler.
+
+[source, java]
+----
+interface Subscription<T> extends AutoCloseable {
+    void handler(Consumer<? extends Subscription.Event<? extends T>> handler);
+}
+----
+
+And the Event itself is a simple wrapper around the JSON-based result, with a method name provided by the subscription response.
+For the most of the cases you can ignore latter (method name) and use the result only.
+
+[source, java]
+----
+class Event<T> {
+    public T getResult();
+    public String getMethod();
+}
+----
+
+=== Subscribing to Polkadot events
+
+The first thing you have to do (after `.connect`) is to start the subscription by sending a command.
+You can construct `SubscribeCall<T>` manually, or use a command from the predefines set of standard subscriptions provided by `PolkadotSubscriptionApi.subscriptions()`
+
+For the completed list of all standard subsriptions please see link:ref-01-api-commands.adoc[API Commands Reference list]
+
+In the example below we subscribe to new heads, i.e. to the headers of the new blocks on the top of the blockchain.
+We then wait for subscription to be confirmed for 5 seconds.
+Note, it's the time we wait for the response from the server that provide use with subscription, not for the events itself.
+
+[source, java]
+----
+Future<Subscription<BlockJson.Header>> hashFuture = client.subscribe(
+        PolkadotSubscriptionApi.subscriptions().newHeads()
+);
+Subscription<BlockJson.Header> subscription = hashFuture.get(5, TimeUnit.SECONDS);
+----
+
+Once we got the Subscription we can add a handler to it, which in the example below just prints block header info to the console.
+
+[source, java]
+----
+subscription.handler((Subscription.Event<BlockJson.Header> event) -> {
+    BlockJson.Header header = event.getResult();
+    List<String> line = List.of(
+            Instant.now().truncatedTo(ChronoUnit.SECONDS).toString(),
+            header.getNumber().toString(),
+            header.getStateRoot().toString()
+    );
+    System.out.println(String.join("\t", line));
+});
+----
+
+Since the `PolkadotWsApi` implements standard `PolkadotApi` you can make all other calls through the same WebSocket connection:
+
+[source, java]
+----
+Future<BlockResponseJson> previousBlock = client.execute(
+    PolkadotApi.commands().getBlock(header.getParentHash())
+);
+----

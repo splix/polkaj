@@ -17,8 +17,12 @@ public class FollowState {
 
     public static void main(String[] args) throws InterruptedException, ExecutionException, TimeoutException {
         PolkadotWsApi client = PolkadotWsApi.newBuilder().build();
+
+        // IMPORTANT! connect to the node as the first step before making calls or subscriptions.
         client.connect().get(5, TimeUnit.SECONDS);
+
         Future<Subscription<BlockJson.Header>> hashFuture = client.subscribe(PolkadotSubscriptionApi.subscriptions().newHeads());
+
         Subscription<BlockJson.Header> subscription = hashFuture.get(5, TimeUnit.SECONDS);
         subscription.handler((Subscription.Event<BlockJson.Header> event) -> {
             BlockJson.Header header = event.getResult();

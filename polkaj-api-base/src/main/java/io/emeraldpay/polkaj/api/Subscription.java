@@ -12,7 +12,9 @@ import java.util.function.Consumer;
 public interface Subscription<T> extends AutoCloseable {
 
     /**
-     * Add handler to the subscription. If added twice, a new handler replaces previous. Providing null removes handler.
+     * Add handler to the subscription.
+     * If handler added twice, a new handler replaces a previous one.
+     * Providing a null handler removes the handler.
      *
      * @param handler handler that consumer all new events
      */
