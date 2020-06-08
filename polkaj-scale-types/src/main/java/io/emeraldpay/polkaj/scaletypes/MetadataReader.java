@@ -115,7 +115,7 @@ public class MetadataReader implements ScaleReader<Metadata> {
         @Override
         public Metadata.Storage.DoubleMapType read(ScaleCodecReader rdr) {
             Metadata.Storage.DoubleMapDefinition definition = new Metadata.Storage.DoubleMapDefinition();
-            definition.setHasher(HASHER_ENUM_READER.read(rdr));
+            definition.setFirstHasher(HASHER_ENUM_READER.read(rdr));
             definition.setFirstKey(rdr.readString());
             definition.setSecondKey(rdr.readString());
             definition.setType(rdr.readString());

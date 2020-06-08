@@ -268,9 +268,9 @@ public class Metadata {
                 this.value = value;
             }
 
-            abstract TypeId getId();
+            public abstract TypeId getId();
 
-            T get() {
+            public T get() {
                 return value;
             }
 
@@ -302,7 +302,7 @@ public class Metadata {
             }
 
             @Override
-            TypeId getId() {
+            public TypeId getId() {
                 return TypeId.PLAIN;
             }
         }
@@ -368,24 +368,24 @@ public class Metadata {
             }
 
             @Override
-            TypeId getId() {
+            public TypeId getId() {
                 return TypeId.MAP;
             }
         }
 
         public static class DoubleMapDefinition {
-            private Hasher hasher;
+            private Hasher firstHasher;
             private String firstKey;
+            private Hasher secondHasher;
             private String secondKey;
             private String type;
-            private Hasher secondHasher;
 
-            public Hasher getHasher() {
-                return hasher;
+            public Hasher getFirstHasher() {
+                return firstHasher;
             }
 
-            public void setHasher(Hasher hasher) {
-                this.hasher = hasher;
+            public void setFirstHasher(Hasher firstHasher) {
+                this.firstHasher = firstHasher;
             }
 
             public String getFirstKey() {
@@ -425,7 +425,7 @@ public class Metadata {
                 if (this == o) return true;
                 if (!(o instanceof DoubleMapDefinition)) return false;
                 DoubleMapDefinition that = (DoubleMapDefinition) o;
-                return hasher == that.hasher &&
+                return firstHasher == that.firstHasher &&
                         Objects.equals(firstKey, that.firstKey) &&
                         Objects.equals(secondKey, that.secondKey) &&
                         Objects.equals(type, that.type) &&
@@ -434,7 +434,7 @@ public class Metadata {
 
             @Override
             public final int hashCode() {
-                return Objects.hash(hasher, firstKey, secondKey, type, secondHasher);
+                return Objects.hash(firstHasher, firstKey, secondKey, type, secondHasher);
             }
         }
 
@@ -444,7 +444,7 @@ public class Metadata {
             }
 
             @Override
-            TypeId getId() {
+            public TypeId getId() {
                 return TypeId.DOUBLEMAP;
             }
         }
