@@ -2,9 +2,9 @@ rootProject.name = 'polkaj-root'
 
 include "polkaj-ss58",
         "polkaj-scale",
+        "polkaj-json-types",
         "polkaj-scale-types",
-        "polkaj-types",
-        "polkaj-json",
+        "polkaj-common-types",
         "polkaj-api-base",
         "polkaj-api-http",
         "polkaj-api-ws"
