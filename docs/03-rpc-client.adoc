@@ -31,8 +31,12 @@ The library implements serialization and deserialization for the following commo
 Plus mapping for standard JSON RPC types:
 
 - Block
+- Methods List
+- Peer
+- Runtime Version
+- System Health
 
-To configure the JSON mapping you need to registed Polkadot Module in Jackson ObjectMapper:
+To configure the JSON mapping you need to register Polkadot Module in Jackson ObjectMapper:
 
 [source, java]
 ----
