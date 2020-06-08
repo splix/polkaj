@@ -1,0 +1,38 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="fragments/main :: head (title = 'Event ' + ${event.name})"></div>
+</head>
+<body>
+
+<div th:replace="fragments/main :: header
+    (
+    title = ${event.name} ,
+    description = 'Storage event ' + ${event.name} + ' of module ' + ${module.getName()}
+    )"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Storage</h1>
+            <dl class="row">
+                <dt class="col-3">Prefix</dt>
+                <dd class="col-9" th:text="${module.storage.getPrefix()}"></dd>
+            </dl>
+        </div>
+        <div class="col-12">
+            <h1>Storage event</h1>
+            <dl class="row">
+                <dt class="col-3">Name</dt>
+                <dd class="col-9" th:text="${event.name}">NAME</dd>
+                <div th:each="item, pos: ${event.arguments}" th:remove="tag">
+                    <dt class="col-3" th:text="${'Arg #' + pos.index}"></dt>
+                    <dd class="col-9" th:text="${item}"></dd>
+                </div>
+            </dl>
+
+            <div th:replace="fragments/docs :: p (docs = ${event.documentation})"></div>
+
+        </div>
+    </div>
+</div>

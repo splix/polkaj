@@ -1,0 +1,34 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="fragments/main :: head (title = 'Error' + ${error.name})"></div>
+</head>
+<body>
+
+<div th:replace="fragments/main :: header
+    (
+    title = ${error.name} ,
+    description = 'Storage error ' + ${error.name} + ' of module ' + ${module.getName()}
+    )"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Storage</h1>
+            <dl class="row">
+                <dt class="col-3">Prefix</dt>
+                <dd class="col-9" th:text="${module.storage.getPrefix()}"></dd>
+            </dl>
+        </div>
+        <div class="col-12">
+            <h1>Storage error</h1>
+            <dl class="row">
+                <dt class="col-3">Name</dt>
+                <dd class="col-9" th:text="${error.name}">NAME</dd>
+            </dl>
+
+            <div th:replace="fragments/docs :: p (docs = ${error.documentation})"></div>
+
+        </div>
+    </div>
+</div>

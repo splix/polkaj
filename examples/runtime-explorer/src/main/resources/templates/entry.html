@@ -1,0 +1,72 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="fragments/main :: head (title = 'Storage ' + ${entry.name})"></div>
+</head>
+<body>
+
+<div th:replace="fragments/main :: header
+    (
+    title = ${entry.name} ,
+    description = 'Storage entry ' + ${entry.name} + ' of module ' + ${module.getName()}
+    )"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Storage</h1>
+            <dl class="row">
+                <dt class="col-3">Prefix</dt>
+                <dd class="col-9" th:text="${module.storage.getPrefix()}"></dd>
+            </dl>
+        </div>
+        <div class="col-12">
+            <h1>Storage Entry</h1>
+            <div class="row">
+                <div class="col">
+                    <dl class="row">
+                        <dt class="col-3">Name</dt>
+                        <dd class="col-9" th:text="${entry.name}">NAME</dd>
+                        <dt class="col-3">Type</dt>
+                        <dd class="col-9" th:text="${entry.type.getId()}">TYPE</dd>
+                        <dt class="col-3">Modifier</dt>
+                        <dd class="col-9" th:text="${entry.modifier}">MOD</dd>
+                        <div th:if="${entry.type.getId().name() == 'PLAIN'}" th:remove="tag">
+                            <dt class="col-3">Value</dt>
+                            <dd class="col-9" th:text="${entry.type.get()}">VALUE</dd>
+                        </div>
+                        <div th:if="${entry.type.getId().name() == 'MAP'}" th:remove="tag">
+                            <dt class="col-3">Key</dt>
+                            <dd class="col-9" th:text="${entry.type.get().key}">KEY</dd>
+                            <dt class="col-3">Type</dt>
+                            <dd class="col-9" th:text="${entry.type.get().type}">TYPE</dd>
+                            <dt class="col-3">Hasher</dt>
+                            <dd class="col-9" th:text="${entry.type.get().hasher}">HASHER</dd>
+                        </div>
+                        <div th:if="${entry.type.getId().name() == 'DOUBLEMAP'}" th:remove="tag">
+                            <dt class="col-3">First Key</dt>
+                            <dd class="col-9" th:text="${entry.type.get().firstKey}">KEY</dd>
+                            <dt class="col-3">First Hasher</dt>
+                            <dd class="col-9" th:text="${entry.type.get().firstHasher}">HASHER</dd>
+                            <dt class="col-3">Second Key</dt>
+                            <dd class="col-9" th:text="${entry.type.get().secondKey}">KEY</dd>
+                            <dt class="col-3">Second Hasher</dt>
+                            <dd class="col-9" th:text="${entry.type.get().secondHasher}">HASHER</dd>
+                            <dt class="col-3">Type</dt>
+                            <dd class="col-9" th:text="${entry.type.get().type}">TYPE</dd>
+                        </div>
+                        <dt class="col-3">Default</dt>
+                        <dd class="col-9" th:text="${#conversions.convert(entry.defaults, 'String')}">MOD</dd>
+
+                    </dl>
+
+                    <div th:replace="fragments/docs :: p (docs = ${entry.documentation})"></div>
+                </div>
+            </div>
+    </div>
+</div>
+
+<div th:replace="fragments/main :: footer"></div>
+
+</body>
+</html>

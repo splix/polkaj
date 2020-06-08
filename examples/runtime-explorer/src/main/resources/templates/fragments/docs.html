@@ -1,0 +1,8 @@
+<html xmlns:th="http://www.thymeleaf.org">
+    <p th:fragment="p (docs)">
+    <span th:each="doc: ${docs}" th:remove="tag">
+        <span th:text="${doc}"></span>
+        <br th:if="${doc == ''}"/>
+    </span>
+    </p>
+</html>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="fragments/main :: head (title = 'Modules List')"></div>
+</head>
+<body>
+
+<div th:replace="fragments/main :: header
+    (title = 'List of modules',
+    description = 'All modules available on the current blockchain')"></div>
+
+<div class="container">
+    <div th:each="module, pos: ${metadata.modules}" class="row">
+        <div class="col-10">
+            <h3>
+                <span class="small">Module</span>
+                <a class="" th:href="'/module/' + ${pos.index}" th:text="${module.name}">MODULE</a>
+            </h3>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/main :: footer"></div>
+
+</body>
+</html>

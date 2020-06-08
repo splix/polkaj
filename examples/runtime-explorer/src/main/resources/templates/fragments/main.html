@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:remove="tag" th:fragment="head (title)">
+    <meta charset="utf-8">
+    <title>[[${title}]] | Polkadot Runtime Explorer</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div th:remove="tag" th:fragment="header (title, description)">
+    <div class="container header">
+        <div class="jumbotron">
+            <h1 class="display-4">[[${title}]]</h1>
+            <p class="lead">[[${description}]]</p>
+            <hr class="my-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a class="" href="/" role="button">All Modules</a>
+                    </li>
+                    <li class="breadcrumb-item" th:if="${moduleId}" aria-current="page">
+                        <a role="button"
+                           th:href="${'/module/' + moduleId}"
+                           th:text="${'Module ' + module.name}">Module</a>
+                    </li>
+                    <li class="breadcrumb-item active" th:if="${moduleId}" aria-current="page" th:text="${title}"></li>
+                </ol>
+            </nav>
+
+
+        </div>
+    </div>
+</div>
+
+<div th:remove="tag" th:fragment="footer">
+    <div class="container footer">
+    </div>
+</div>
+
+</body>
+</html>

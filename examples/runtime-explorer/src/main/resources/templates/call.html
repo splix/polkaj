@@ -1,0 +1,42 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="fragments/main :: head (title = 'Call ' + ${call.name})"></div>
+</head>
+<body>
+
+<div th:replace="fragments/main :: header
+    (
+    title = ${call.name} ,
+    description = 'Storage call ' + ${call.name} + ' of module ' + ${module.getName()}
+    )"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Storage</h1>
+            <dl class="row">
+                <dt class="col-3">Prefix</dt>
+                <dd class="col-9" th:text="${module.storage.getPrefix()}"></dd>
+            </dl>
+        </div>
+        <div class="col-12">
+            <h1>Storage Call</h1>
+            <dl class="row">
+                <dt class="col-3">Name</dt>
+                <dd class="col-9" th:text="${call.name}">NAME</dd>
+                <div th:each="item, pos: ${call.arguments}" th:remove="tag">
+                    <dt class="col-3" th:text="${'Arg #' + pos.index}"></dt>
+                    <dd class="col-9">
+                        <span th:text="${item.type}"></span>
+                        &nbsp;
+                        <span th:text="${item.name}"></span>
+                    </dd>
+                </div>
+            </dl>
+
+            <div th:replace="fragments/docs :: p (docs = ${call.documentation})"></div>
+
+        </div>
+    </div>
+</div>

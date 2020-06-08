@@ -1,0 +1,38 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="fragments/main :: head (title = 'Constant ' + ${constant.name})"></div>
+</head>
+<body>
+
+<div th:replace="fragments/main :: header
+    (
+    title = ${constant.name} ,
+    description = 'Storage constant ' + ${constant.name} + ' of module ' + ${module.getName()}
+    )"></div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Storage</h1>
+            <dl class="row">
+                <dt class="col-3">Prefix</dt>
+                <dd class="col-9" th:text="${module.storage.getPrefix()}"></dd>
+            </dl>
+        </div>
+        <div class="col-12">
+            <h1>Storage constant</h1>
+            <dl class="row">
+                <dt class="col-3">Name</dt>
+                <dd class="col-9" th:text="${constant.name}">NAME</dd>
+                <dt class="col-3">Type</dt>
+                <dd class="col-9" th:text="${constant.type}">TYPE</dd>
+                <dt class="col-3">Value</dt>
+                <dd class="col-9" th:text="${#conversions.convert(constant.value, 'String')}">VALUE</dd>
+            </dl>
+
+            <div th:replace="fragments/docs :: p (docs = ${constant.documentation})"></div>
+
+        </div>
+    </div>
+</div>

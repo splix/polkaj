@@ -8,6 +8,7 @@ Examples for SCALE add SS58
 
 .Run
 ----
+cd encoding
 gradle run
 ----
 
@@ -17,25 +18,41 @@ Examples for DotAmount, formatting, hashes and Address
 
 .Run
 ----
+cd types
 gradle run
 ----
 
 == RPC
 
 Examples for accessing JSON RPC through HTTP or WebSockets.
-The examples expect Polkadot node running and listening for RPC and WS requests (i.e. default node options)
+The examples expect Polkadot node running and listening for RPC and WS requests on the localhost (i.e. default node options)
 
 .Show current head
 ----
+cd rpc
 gradle run
 ----
 
 .Follow updates to the current head (use `Ctrl+C` to exit)
 ----
+cd rpc
 gradle run -PmainClass=FollowState
 ----
 
 .Describe runtime
 ----
+cd rpc
 gradle run -PmainClass=DescribeRuntime
 ----
+
+== Runtime Explorer
+
+A web-based explorer of the Runtime Metadata.
+The examples expect Polkadot node running and listening for RPC requests on the localhost (i.e. default node options)
+
+----
+cd runtime-explorer
+gradle bootRun
+----
+
+Open http://localhost:8080
