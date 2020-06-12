@@ -68,7 +68,7 @@ public abstract class AbstractPolkadotApi implements PolkadotApi {
      * @param method method name
      * @param params params
      * @return full JSON of the request
-     * @throws JsonProcessingException if cannod encode some of the params into JSON
+     * @throws JsonProcessingException if cannot encode some of the params into JSON
      */
     public byte[] encode(int id, String method, Object[] params) throws JsonProcessingException {
         RpcRequest request = new RpcRequest(id, method, params);

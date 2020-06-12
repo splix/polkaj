@@ -44,7 +44,8 @@ ObjectMapper objectMapper;
 objectMapper.registerModule(new PolkadotModule());
 ----
 
-If you need to map a custom object, with you can define all standard Polkadot as usual:
+// TODO all standard Polkadot what? methods/objects/variables?
+If you need to map a custom object, you can define all standard Polkadot as usual:
 
 [source,java]
 ----
@@ -63,8 +64,8 @@ public class Something {
 }
 ----
 
-If you also want to map Java `Long` as Polkadot hex numbers, you need to specify serializer and deserializer.
-So Jackson would encode it as hex, instead of plain number.
+If you also want to map Java `Long` as Polkadot hex numbers, you need to specify a serializer and a deserializer.
+So Jackson would encode it as hex, instead of a plain number.
 
 [source,java]
 ----
@@ -76,7 +77,7 @@ public class Something {
 }
 ----
 
-If you encode such object as JSON:
+If you encode such an object as JSON:
 
 [source, java]
 ----
@@ -117,8 +118,8 @@ import io.emeraldpay.polkaj.apihttp.PolkadotHttpApi;
 PolkadotHttpApi client = PolkadotHttpApi.newBuilder().build();
 ----
 
-The default configuration is going to connect to `http://127.0.0.1:9933`, which is a default configuration of Polkadot node.
-If you need to configure the client follow builder methods:
+The default configuration is going to connect to `http://127.0.0.1:9933`, which is a default configuration of a Polkadot node.
+If you need to configure the client, follow the builder methods:
 
 [source, java]
 ----
@@ -134,7 +135,7 @@ PolkadotHttpApi client = PolkadotHttpApi.newBuilder()
 
 === Make calls
 
-The `PolkadotApi` has the method `execute` that makes actual call and returns `Future` of the result of the call.
+The `PolkadotApi` has the method `execute` that makes an actual call and returns `Future` as the result of the call.
 
 [source, java]
 ----
@@ -143,7 +144,7 @@ interface PolkadotApi {
 }
 ----
 
-where RpcCall can be created as
+where RpcCall can be created as:
 
 [source, java]
 ----
@@ -187,17 +188,17 @@ And if the server respond with:
 
 Then you'll get that `"Hello World!"` as the result of future (`result.get()`).
 
-NOTE: A uniq numeric `id` for each request is automatically set by the client, which keeps a sequence for ids and increment if for each request.
+NOTE: A unique numeric `id` for each request is automatically set by the client, which keeps a sequence of ids and increments it for each request.
 
-In case of JSON response with error field, a `RpcException` is thrown during Future `.get()`.
+In case of a JSON response with error field, a `RpcException` is thrown during Future `.get()`.
 The exception contains the code and the message from the original JSON.
 
 === Make Polkadot calls
 
-Calling most of the Polkadot API methods is straightforward, you just need to specify right result class.
-Though the class is needed only for convenience, and you can always execute it requiring, say, `Map.class` for flexibility.
+Calling most of the Polkadot API methods is straightforward, you just need to specify the right result class.
+The result class parameter is used only for convenience and if needed, you can always pass a generic one (e.g. `Map.class`) for flexibility.
 
-To get current _head_ of the chain call `chain_getFinalisedHead` which returns `Hash256`:
+To get current _head_ of the chain, call `chain_getFinalisedHead` which returns `Hash256`:
 
 [source, java]
 ----
@@ -213,7 +214,7 @@ Hash256 hash = hashFuture.get();
 System.out.println("Current head: " + hash);
 ----
 
-And to get a block for a hash call `chain_getBlock` with hash a parameter.
+And to get a block for a specified hash, call `chain_getBlock` with the hash value as the parameter.
 It returns `BlockResponseJson` class, with `block` (use `.getBlock()` getter) and `justification` fields:
 
 [source, java]
@@ -237,7 +238,7 @@ For the list of all standard commands please see link:ref-01-api-commands.adoc[A
 === Convert complex data returned from a call
 
 It's common in Polkadot to return (or accept as parameter) a complex object, usually encoded with Hex and SCALE.
-Here is an example how you handle it and decode the data to a Java object.
+Here is an example of how you handle it and decode the data to a Java object.
 
 ----
 Future<Metadata> metadataFuture = client.execute(StandardCommands.getInstance().stateMetadata()) // <1>
@@ -275,7 +276,7 @@ interface PolkadotSubscriptionApi {
 ----
 
 The `Subscription<T>` instance provides method `handler()` to handle events.
-Note that if handler added twice, a new handler replaces a previous one.
+Note that if handler is added twice, a new handler replaces the previous one.
 Providing a null handler removes the handler.
 
 [source, java]
@@ -301,7 +302,7 @@ class Event<T> {
 The first thing you have to do (after `.connect`) is to start the subscription by sending a command.
 You can construct `SubscribeCall<T>` manually, or use a command from the predefines set of standard subscriptions provided by `PolkadotSubscriptionApi.subscriptions()`
 
-For the completed list of all standard subsriptions please see link:ref-01-api-commands.adoc[API Commands Reference list]
+For the complete list of all standard subscriptions please see link:ref-01-api-commands.adoc[API Commands Reference list]
 
 In the example below we subscribe to new heads, i.e. to the headers of the new blocks on the top of the blockchain.
 We then wait for subscription to be confirmed for 5 seconds.
