@@ -8,6 +8,7 @@ import org.mockserver.integration.ClientAndServer
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
+import spock.lang.Shared
 import spock.lang.Specification
 
 import java.nio.charset.Charset
@@ -17,22 +18,29 @@ class PolkadotHttpClientSpec extends Specification {
 
     PolkadotHttpApi client
 
+    @Shared
+    ClientAndServer mockServer
+
     def setup() {
         client = PolkadotHttpApi.newBuilder()
             .connectTo("http://localhost:18080")
             .build()
+        mockServer = ClientAndServer.startClientAndServer(18080)
     }
 
-
+    def cleanup() {
+        mockServer.stop()
+    }
 
     def "Make request"() {
         setup:
-        ClientAndServer mockServer = ClientAndServer.startClientAndServer(18080)
         def response = '{\n' +
                 '  "jsonrpc": "2.0",\n' +
                 '  "result": "0x5d83f66b61701da4cbd7a60137db89c69469a4f798b62aba9176ab253b423828",\n' +
                 '  "id": 0\n' +
                 '}'
+
+//        TODO can the following couple of lines be pulled into a helper method and re-used?
         mockServer.when(
                 HttpRequest.request()
         ).respond(
@@ -43,13 +51,10 @@ class PolkadotHttpClientSpec extends Specification {
         then:
         act.get() == "0x5d83f66b61701da4cbd7a60137db89c69469a4f798b62aba9176ab253b423828"
 
-        cleanup:
-        mockServer.stop()
     }
 
     def "Doesn't make requests after close"() {
         setup:
-        ClientAndServer mockServer = ClientAndServer.startClientAndServer(18080)
         def response = '{\n' +
                 '  "jsonrpc": "2.0",\n' +
                 '  "result": "0x5d83f66b61701da4cbd7a60137db89c69469a4f798b62aba9176ab253b423828",\n' +
@@ -73,13 +78,10 @@ class PolkadotHttpClientSpec extends Specification {
         def t = thrown(ExecutionException)
         t.cause instanceof IllegalStateException
 
-        cleanup:
-        mockServer.stop()
     }
 
     def "Make request for complex object"() {
         setup:
-        ClientAndServer mockServer = ClientAndServer.startClientAndServer(18080)
         def response = '{' +
                 '  "jsonrpc": "2.0",' +
                 '  "result": {' +
@@ -119,13 +121,10 @@ class PolkadotHttpClientSpec extends Specification {
             header.extrinsicsRoot == Hash256.from("0xeaa154a7541c9ed34218b89c1f5e4add2976329ba830543a72d8115c61725212")
         }
 
-        cleanup:
-        mockServer.stop()
     }
 
     def "Fail if non-200 status"() {
         setup:
-        ClientAndServer mockServer = ClientAndServer.startClientAndServer(18080)
         mockServer.when(
                 HttpRequest.request()
         ).respond(
@@ -141,13 +140,10 @@ class PolkadotHttpClientSpec extends Specification {
             rpcMessage.contains("503")
         }
 
-        cleanup:
-        mockServer.stop()
     }
 
     def "Fail if non-JSON content"() {
         setup:
-        ClientAndServer mockServer = ClientAndServer.startClientAndServer(18080)
         mockServer.when(
                 HttpRequest.request()
         ).respond(
@@ -160,8 +156,6 @@ class PolkadotHttpClientSpec extends Specification {
         t.cause instanceof RpcException
         t.cause.code == -32000
 
-        cleanup:
-        mockServer.stop()
     }
 
     def "Send basic auth"() {
@@ -175,7 +169,6 @@ class PolkadotHttpClientSpec extends Specification {
                 '  "result": "0x5d83f66b61701da4cbd7a60137db89c69469a4f798b62aba9176ab253b423828",' +
                 '  "id": 0' +
                 '}'
-        ClientAndServer mockServer = ClientAndServer.startClientAndServer(18080)
         mockServer.when(
                 HttpRequest.request()
         ).respond(
@@ -189,8 +182,6 @@ class PolkadotHttpClientSpec extends Specification {
                 HttpRequest.request().withHeader("Authorization", "Basic dGVzdHVzZXI6dGVzdHBhc3N3b3Jk")
         )
 
-        cleanup:
-        mockServer.stop()
     }
 
     def "Process response error"() {
@@ -203,7 +194,6 @@ class PolkadotHttpClientSpec extends Specification {
                 '  "error": {"code": -32601, "message": "Method not found"},' +
                 '  "id": 0' +
                 '}'
-        ClientAndServer mockServer = ClientAndServer.startClientAndServer(18080)
         mockServer.when(
                 HttpRequest.request()
         ).respond(
@@ -219,8 +209,6 @@ class PolkadotHttpClientSpec extends Specification {
             rpcMessage == "Method not found"
         }
 
-        cleanup:
-        mockServer.stop()
     }
 
 }
