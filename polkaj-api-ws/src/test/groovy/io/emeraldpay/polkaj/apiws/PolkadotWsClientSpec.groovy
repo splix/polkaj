@@ -49,7 +49,7 @@ class PolkadotWsClientSpec extends Specification {
         setup:
         List<Map<String, Object>> received = []
         when:
-        server.onNextReply('{"jsonrpc":"2.0","result":101,"id":0}')
+        server.onNextReply('{"jsonrpc":"2.0","result":"EsqruyKPnZvPZ6fr","id":0}')
         def f = client.subscribe(SubscribeCall.create(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead"))
         def sub = f.get(TIMEOUT, TimeUnit.SECONDS)
         sub.handler({ event ->
@@ -58,7 +58,7 @@ class PolkadotWsClientSpec extends Specification {
                     result: event.result
             ])
         })
-        server.reply('{"jsonrpc":"2.0","method":"chain_newHead","params":{"result":{"digest":{"logs":[]},"extrinsicsRoot":"0x9869230c3cc05051ce9afef4458d2515fb2141bfd3bdcd88292f41e17ea00ae7","number":"0x1d878c","parentHash":"0xbe9110f6da6a19ac645a27472e459dcca6eaf4ee4b0b12700ca5d566eea9a638","stateRoot":"0x57059722d680b591a469937449df772b95625d4230b39a0a7d855e16d597f168"},"subscription":101}}')
+        server.reply('{"jsonrpc":"2.0","method":"chain_newHead","params":{"result":{"digest":{"logs":[]},"extrinsicsRoot":"0x9869230c3cc05051ce9afef4458d2515fb2141bfd3bdcd88292f41e17ea00ae7","number":"0x1d878c","parentHash":"0xbe9110f6da6a19ac645a27472e459dcca6eaf4ee4b0b12700ca5d566eea9a638","stateRoot":"0x57059722d680b591a469937449df772b95625d4230b39a0a7d855e16d597f168"},"subscription":"EsqruyKPnZvPZ6fr"}}')
         Thread.sleep(SLEEP)
         sub.close()
         Thread.sleep(SLEEP)
@@ -69,7 +69,7 @@ class PolkadotWsClientSpec extends Specification {
 
         server.received.size() == 2
         server.received[0].value == '{"jsonrpc":"2.0","id":0,"method":"chain_subscribeNewHead","params":[]}'
-        server.received[1].value == '{"jsonrpc":"2.0","id":1,"method":"chain_unsubscribeNewHead","params":[101]}'
+        server.received[1].value == '{"jsonrpc":"2.0","id":1,"method":"chain_unsubscribeNewHead","params":["EsqruyKPnZvPZ6fr"]}'
     }
 
     def "Make a request"() {

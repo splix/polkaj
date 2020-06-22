@@ -20,10 +20,10 @@ import java.io.IOException;
 public class DecodeResponse {
 
     private final ObjectMapper objectMapper;
-    private final TypeMapping subscriptionMapping;
-    private final TypeMapping rpcMapping;
+    private final TypeMapping<String> subscriptionMapping;
+    private final TypeMapping<Integer> rpcMapping;
 
-    public DecodeResponse(ObjectMapper objectMapper, TypeMapping rpcMapping, TypeMapping subscriptionMapping) {
+    public DecodeResponse(ObjectMapper objectMapper, TypeMapping<Integer> rpcMapping, TypeMapping<String> subscriptionMapping) {
         this.objectMapper = objectMapper;
         this.rpcMapping = rpcMapping;
         this.subscriptionMapping = subscriptionMapping;
@@ -36,8 +36,8 @@ public class DecodeResponse {
             throw new IllegalStateException("Not an object");
         }
         String method = null;
-        WsResponse.IdValue value = null;
-        Preparsed preparsed = new Preparsed(objectMapper);
+        WsResponse.IdValue<String> value = null;
+        Preparsed<Integer> preparsed = new Preparsed<>(objectMapper);
         while (parser.nextToken() != JsonToken.END_OBJECT) {
             if (parser.currentToken() == null) {
                 throw new IllegalStateException("JSON finished before data received");
@@ -107,8 +107,8 @@ public class DecodeResponse {
 
     }
 
-    protected WsResponse.IdValue decodeSubscription(TypeMapping typeMapping, JsonParser parser) throws IOException {
-        Preparsed preparsed = new Preparsed(objectMapper);
+    protected WsResponse.IdValue<String> decodeSubscription(TypeMapping<String> typeMapping, JsonParser parser) throws IOException {
+        Preparsed<String> preparsed = new Preparsed<>(objectMapper);
         while (parser.nextToken() != JsonToken.END_OBJECT) {
             if (parser.currentToken() == null) {
                 throw new IllegalStateException("JSON finished before data received");
@@ -116,7 +116,7 @@ public class DecodeResponse {
 
             String field = parser.currentName();
             if ("subscription".equals(field)) {
-                preparsed.id = decodeNumber(parser);
+                preparsed.id = decodeString(parser);
                 preparsed.type = findType(typeMapping, preparsed.id);
                 if (preparsed.isReady()) {
                     return preparsed.build();
@@ -133,7 +133,7 @@ public class DecodeResponse {
         throw new IllegalStateException("Either id or result not found in JSON");
     }
 
-    private JavaType findType(TypeMapping typeMapping, Integer id) {
+    private <T> JavaType findType(TypeMapping<T> typeMapping, T id) {
         JavaType type;
         type = typeMapping.get(id);
         if (type == null) {
@@ -152,14 +152,24 @@ public class DecodeResponse {
         return parser.getIntValue();
     }
 
-    public interface TypeMapping {
-        JavaType get(int id);
+    private String decodeString(JsonParser parser) throws IOException {
+        if (parser.currentToken() != JsonToken.VALUE_STRING) {
+            parser.nextToken();
+        }
+        if (!parser.currentToken().isScalarValue()) {
+            throw new IllegalStateException("Id is not a string");
+        }
+        return parser.getValueAsString();
     }
 
-    private static class Preparsed {
+    public interface TypeMapping<T> {
+        JavaType get(T id);
+    }
+
+    private static class Preparsed<T> {
         private final ObjectMapper objectMapper;
 
-        Integer id = null;
+        T id = null;
         JavaType type = null;
         TreeNode node = null;
 
@@ -174,12 +184,12 @@ public class DecodeResponse {
                     error != null || (type != null && node != null);
         }
 
-        public WsResponse.IdValue build() throws IOException {
+        public WsResponse.IdValue<T> build() throws IOException {
             if (id == null) {
                 throw new IllegalStateException("Id is not set");
             }
             if (error != null) {
-                return new WsResponse.IdValue(id, error);
+                return new WsResponse.IdValue<T>(id, error);
             }
             if (type == null) {
                 throw new IllegalStateException("Type is not set");
@@ -188,7 +198,7 @@ public class DecodeResponse {
                 Object value = objectMapper
                         .readerFor(type)
                         .readValue(node.traverse(objectMapper));
-                return new WsResponse.IdValue(id, value);
+                return new WsResponse.IdValue<T>(id, value);
             }
             throw new IllegalStateException("Not ready");
         }

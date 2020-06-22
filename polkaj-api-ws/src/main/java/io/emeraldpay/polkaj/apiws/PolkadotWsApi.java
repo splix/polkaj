@@ -28,7 +28,7 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
     private final AtomicInteger id = new AtomicInteger(0);
     private final AtomicReference<WebSocket> webSocket = new AtomicReference<>(null);
     private final ConcurrentHashMap<Integer, RequestExpectation<?>> execution = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer, DefaultSubscription<?>> subscriptions = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, DefaultSubscription<?>> subscriptions = new ConcurrentHashMap<>();
     private final URI target;
     private final DecodeResponse decodeResponse;
     private final HttpClient httpClient;
@@ -42,9 +42,9 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
         this.target = target;
         this.httpClient = httpClient;
         this.onClose = onClose;
-        var rpcMapping = new DecodeResponse.TypeMapping() {
+        var rpcMapping = new DecodeResponse.TypeMapping<Integer>() {
             @Override
-            public JavaType get(int id) {
+            public JavaType get(Integer id) {
                 var x = execution.get(id);
                 if (x == null) {
                     return null;
@@ -52,9 +52,9 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
                 return x.getType();
             }
         };
-        var subMapping = new DecodeResponse.TypeMapping() {
+        var subMapping = new DecodeResponse.TypeMapping<String>() {
             @Override
-            public JavaType get(int id) {
+            public JavaType get(String id) {
                 var x = subscriptions.get(id);
                 if (x == null) {
                     return null;
@@ -161,7 +161,7 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
     @Override
     public <T> CompletableFuture<Subscription<T>> subscribe(SubscribeCall<T> call) {
         var subscription = new DefaultSubscription<T>(call.getResultType(objectMapper.getTypeFactory()), call.getUnsubscribe(), this);
-        var start = this.execute(RpcCall.create(Integer.class, call.getMethod(), call.getParams()));
+        var start = this.execute(RpcCall.create(String.class, call.getMethod(), call.getParams()));
         return start.thenApply(id -> {
             subscriptions.put(id, subscription);
             subscription.setId(id);
@@ -197,7 +197,7 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
         s.accept(new Subscription.Event<T>(response.method, response.value));
     }
 
-    public boolean removeSubscription(int id) {
+    public boolean removeSubscription(String id) {
         return subscriptions.remove(id) != null;
     }
 
@@ -217,17 +217,17 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
     }
 
     static class SubscriptionResponse<T> {
-        private final int id;
+        private final String id;
         private final String method;
         private final T value;
 
-        public SubscriptionResponse(int id, String method, T value) {
+        public SubscriptionResponse(String id, String method, T value) {
             this.id = id;
             this.method = method;
             this.value = value;
         }
 
-        public int getId() {
+        public String getId() {
             return id;
         }
 
@@ -244,7 +244,7 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
             if (this == o) return true;
             if (!(o instanceof SubscriptionResponse)) return false;
             SubscriptionResponse<?> that = (SubscriptionResponse<?>) o;
-            return id == that.id &&
+            return id.equals(that.id) &&
                     Objects.equals(method, that.method) &&
                     Objects.equals(value, that.value);
         }

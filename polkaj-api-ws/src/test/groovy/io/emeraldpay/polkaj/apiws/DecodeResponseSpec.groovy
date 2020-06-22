@@ -14,9 +14,9 @@ class DecodeResponseSpec extends Specification {
 
     def "Decode rpc response with number"() {
         setup:
-        def json = '{"jsonrpc":"2.0","result":5,"id":1}'
+        def json = '{"jsonrpc":"2.0","result":"EsqruyKPnZvPZ6fr","id":1}'
         def mapping = Mock(DecodeResponse.TypeMapping) {
-            1 * get(1) >> objectMapper.typeFactory.constructType(Integer.class)
+            1 * get(1) >> objectMapper.typeFactory.constructType(String.class)
         }
         def decoder = new DecodeResponse(objectMapper, mapping, Stub(DecodeResponse.TypeMapping))
         when:
@@ -24,16 +24,16 @@ class DecodeResponseSpec extends Specification {
         then:
         act.type == WsResponse.Type.RPC
         with(act.asRpc()) {
-            result instanceof Integer
-            result == 5
+            result instanceof String
+            result == "EsqruyKPnZvPZ6fr"
         }
     }
 
     def "Decode rpc response with number, when id comes first"() {
         setup:
-        def json = '{"jsonrpc":"2.0","id":3,"result":5}'
+        def json = '{"jsonrpc":"2.0","id":3,"result":"EsqruyKPnZvPZ6fr"}'
         def mapping = Mock(DecodeResponse.TypeMapping) {
-            1 * get(3) >> objectMapper.typeFactory.constructType(Integer.class)
+            1 * get(3) >> objectMapper.typeFactory.constructType(String.class)
         }
         def decoder = new DecodeResponse(objectMapper, mapping, Stub(DecodeResponse.TypeMapping))
         when:
@@ -41,8 +41,8 @@ class DecodeResponseSpec extends Specification {
         then:
         act.type == WsResponse.Type.RPC
         with(act.asRpc()) {
-            result instanceof Integer
-            result == 5
+            result instanceof String
+            result == "EsqruyKPnZvPZ6fr"
         }
     }
 
@@ -138,11 +138,11 @@ class DecodeResponseSpec extends Specification {
                 '     "parentHash":"0xbe9110f6da6a19ac645a27472e459dcca6eaf4ee4b0b12700ca5d566eea9a638",' +
                 '     "stateRoot":"0x57059722d680b591a469937449df772b95625d4230b39a0a7d855e16d597f168"' +
                 '  },' +
-                '  "subscription":3' +
+                '  "subscription":"EsqruyKPnZvPZ6fr"' +
                 ' }' +
                 '}'
         def mapping = Mock(DecodeResponse.TypeMapping) {
-            1 * get(3) >> objectMapper.typeFactory.constructType(BlockJson.Header.class)
+            1 * get("EsqruyKPnZvPZ6fr") >> objectMapper.typeFactory.constructType(BlockJson.Header.class)
         }
         def decoder = new DecodeResponse(objectMapper, Stub(DecodeResponse.TypeMapping), mapping)
         when:
@@ -151,7 +151,7 @@ class DecodeResponseSpec extends Specification {
         act.type == WsResponse.Type.SUBSCRIPTION
         PolkadotWsApi.SubscriptionResponse event = act.asEvent()
         event.method == "chain_newHead"
-        event.id == 3
+        event.id == "EsqruyKPnZvPZ6fr"
         event.value instanceof BlockJson.Header
         with((BlockJson.Header)event.value) {
             number == 0x1d878c
@@ -167,7 +167,7 @@ class DecodeResponseSpec extends Specification {
                 '"jsonrpc":"2.0",' +
                 '"method":"chain_newHead",' +
                 '"params":{' +
-                '  "subscription":3,' +
+                '  "subscription":"EsqruyKPnZvPZ6fr",' +
                 '  "result":{' +
                 '     "digest":{"logs":["0x06424142453402d90000004077c40f00000000","0x05424142450101a0085dbd50d943878845263fa4d2bd8259cde78692f1e22488227843057d5a3101909f2bdfb492e6da3f63413366c9e189c7bf4bd62ae10607fe0c1550dc4d88"]},' +
                 '     "extrinsicsRoot":"0x9869230c3cc05051ce9afef4458d2515fb2141bfd3bdcd88292f41e17ea00ae7",' +
@@ -178,7 +178,7 @@ class DecodeResponseSpec extends Specification {
                 ' }' +
                 '}'
         def mapping = Mock(DecodeResponse.TypeMapping) {
-            1 * get(3) >> objectMapper.typeFactory.constructType(BlockJson.Header.class)
+            1 * get("EsqruyKPnZvPZ6fr") >> objectMapper.typeFactory.constructType(BlockJson.Header.class)
         }
         def decoder = new DecodeResponse(objectMapper, Stub(DecodeResponse.TypeMapping), mapping)
         when:
@@ -187,7 +187,7 @@ class DecodeResponseSpec extends Specification {
         act.type == WsResponse.Type.SUBSCRIPTION
         PolkadotWsApi.SubscriptionResponse event = act.asEvent()
         event.method == "chain_newHead"
-        event.id == 3
+        event.id == "EsqruyKPnZvPZ6fr"
         event.value instanceof BlockJson.Header
         with((BlockJson.Header)event.value) {
             number == 0x1d878c

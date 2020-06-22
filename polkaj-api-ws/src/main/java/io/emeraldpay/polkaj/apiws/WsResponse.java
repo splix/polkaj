@@ -86,16 +86,16 @@ public class WsResponse {
     /**
      * Pair of ID and associated Value
      */
-    public static class IdValue {
-        private final int id;
+    public static class IdValue<T> {
+        private final T id;
         private final Object value;
 
-        public IdValue(int id, Object value) {
+        public IdValue(T id, Object value) {
             this.id = id;
             this.value = value;
         }
 
-        public int getId() {
+        public T getId() {
             return id;
         }
 

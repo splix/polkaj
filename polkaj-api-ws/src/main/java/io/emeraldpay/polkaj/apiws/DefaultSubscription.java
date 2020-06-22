@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 public class DefaultSubscription<T> implements Subscription<T>, Consumer<Subscription.Event<? extends T>> {
 
-    private Integer id;
+    private String id;
     private final JavaType type;
     private final String unsubscribeMethod;
     private final PolkadotWsApi client;
@@ -20,7 +20,7 @@ public class DefaultSubscription<T> implements Subscription<T>, Consumer<Subscri
         this.client = client;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
@@ -28,7 +28,7 @@ public class DefaultSubscription<T> implements Subscription<T>, Consumer<Subscri
         return type;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         if (this.id != null) {
             throw new IllegalStateException("Subscription id is already set to " + this.id);
         }

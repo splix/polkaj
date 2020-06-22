@@ -11,12 +11,12 @@ class DefaultSubscriptionSpec extends Specification {
     def "Id is immutable"() {
         when:
         def s = new DefaultSubscription(null, "test", null)
-        s.setId(101)
+        s.setId("EsqruyKPnZvPZ6fr")
         then:
-        s.getId() == 101
+        s.getId() == "EsqruyKPnZvPZ6fr"
 
         when:
-        s.setId(102)
+        s.setId("EsqruyKPnZvPZ6fr")
         then:
         thrown(IllegalStateException)
     }
@@ -46,11 +46,11 @@ class DefaultSubscriptionSpec extends Specification {
         def client = Mock(PolkadotWsApi)
         when:
         def s = new DefaultSubscription(null, "untest", client)
-        s.setId(10)
+        s.setId("EsqruyKPnZvPZ6fr")
         s.close()
         then:
-        1 * client.execute(RpcCall.create(Boolean.class, "untest", [10])) >> CompletableFuture.completedFuture(true)
-        1 * client.removeSubscription(10)
+        1 * client.execute(RpcCall.create(Boolean.class, "untest", ["EsqruyKPnZvPZ6fr"])) >> CompletableFuture.completedFuture(true)
+        1 * client.removeSubscription("EsqruyKPnZvPZ6fr")
     }
 
     def "Close does nothing if not initialized"() {
