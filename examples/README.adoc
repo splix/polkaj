@@ -9,7 +9,7 @@ Examples for SCALE add SS58
 .Run
 ----
 cd encoding
-gradle run
+./gradlew run
 ----
 
 == Types
@@ -19,7 +19,7 @@ Examples for DotAmount, formatting, hashes and Address
 .Run
 ----
 cd types
-gradle run
+./gradlew run
 ----
 
 == RPC
@@ -30,19 +30,19 @@ The examples expect Polkadot node running and listening for RPC and WS requests 
 .Show current head
 ----
 cd rpc
-gradle run
+./gradlew run
 ----
 
 .Follow updates to the current head (use `Ctrl+C` to exit)
 ----
 cd rpc
-gradle run -PmainClass=FollowState
+./gradlew run -PmainClass=FollowState
 ----
 
 .Describe runtime
 ----
 cd rpc
-gradle run -PmainClass=DescribeRuntime
+./gradlew run -PmainClass=DescribeRuntime
 ----
 
 == Runtime Explorer
@@ -52,7 +52,7 @@ The examples expect Polkadot node running and listening for RPC requests on the 
 
 ----
 cd runtime-explorer
-gradle bootRun
+./gradlew bootRun
 ----
 
 Open http://localhost:8080
