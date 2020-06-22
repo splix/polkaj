@@ -2,5 +2,10 @@
 // Common config for Polkaj Examples
 //
 ext {
-   polkajVersion = "0.2.0"
+   polkajVersion = "0.2.1"
+}
+
+repositories {
+   // polkaj public repo
+   maven { url  "https://dl.bintray.com/emerald/polkaj" }
 }
