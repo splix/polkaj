@@ -1,6 +1,7 @@
 package io.emeraldpay.polkaj.api;
 
 import io.emeraldpay.polkaj.json.*;
+import io.emeraldpay.polkaj.types.Address;
 import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.Hash256;
 
@@ -136,7 +137,35 @@ public class StandardCommands {
         return RpcCall.create(ContractExecResultJson.class, "contracts_call", request);
     }
 
-    public RpcCall<ContractExecResultJson> contractsCall(ContractCallRequestJson request, Hash256 blockHash) {
-        return RpcCall.create(ContractExecResultJson.class, "contracts_call", request, blockHash);
+    public RpcCall<ContractExecResultJson> contractsCall(ContractCallRequestJson request, Hash256 at) {
+        if (at == null) {
+            return contractsCall(request);
+        }
+        return RpcCall.create(ContractExecResultJson.class, "contracts_call", request, at);
     }
+
+    /**
+     *
+     * @param address contract address
+     * @param key key
+     * @return value for the key, or null
+     */
+    public RpcCall<ByteData> contractsGetStorage(Address address, Hash256 key) {
+        return RpcCall.create(ByteData.class, "contracts_getStorage", address, key);
+    }
+
+    /**
+     *
+     * @param address contract address
+     * @param key key
+     * @param at block hash
+     * @return value for the key, or null
+     */
+    public RpcCall<ByteData> contractsGetStorage(Address address, Hash256 key, Hash256 at) {
+        if (at == null) {
+            return contractsGetStorage(address, key);
+        }
+        return RpcCall.create(ByteData.class, "contracts_getStorage", address, key, at);
+    }
+
 }

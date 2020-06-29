@@ -10,6 +10,7 @@
 - <<getRuntimeVersion>>
 * Contracts
 - <<contractsCall>>
+- <<contractsGetStorage>>
 * State
 - <<stateMetadata>>
 - <<stateGetStorage>>
@@ -79,14 +80,24 @@ Java Object:: `RuntimeVersionJson`
 [#contractsCall]
 === Contracts Call (`contracts_call`)
 
-Shortcut:: `{shortcut-base}.contractsCall()`
+Shortcut:: `{shortcut-base}.contractsCall(call, at)`
 Command:: `contracts_call`
-Parameters:: `ContractCallRequestJson call`, (optional) `Hash256 blockHash`
+Parameters:: `call` - requests data `ContractCallRequestJson`, `at` - (optional) block reference (`Hash256`)
 Java Object:: `ContractExecResultJson`
+
+[#contractsGetStorage]
+=== Contracts Get Storage (`contracts_getStorage`)
+
+Get state from a Storage.
+
+Shortcut:: `{shortcut-base}.contractsGetStorage(address, key, at)`
+Command:: `contracts_getStorage`
+Parameters:: `address` - contract address (`Address`), `key` - key (`Has256`), `at` - (optional) block reference (`Hash256`)
+Java Object:: `ByteData`
 
 
 [#stateMetadata]
-=== Runtime Metadata (`state_getMetadata`)
+=== State Runtime Metadata (`state_getMetadata`)
 
 Get name of the current blockchain
 
@@ -104,7 +115,7 @@ Future<Metadata> metadataFuture = client.execute(StandardCommands.getInstance().
 ----
 
 [#stateGetStorage]
-=== Get Storage (`state_getStorage`)
+=== State Get Storage (`state_getStorage`)
 
 Get state from a Storage.
 

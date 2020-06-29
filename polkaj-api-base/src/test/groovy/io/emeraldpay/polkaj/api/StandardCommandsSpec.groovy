@@ -7,6 +7,7 @@ import io.emeraldpay.polkaj.json.ContractExecResultJson
 import io.emeraldpay.polkaj.json.MethodsJson
 import io.emeraldpay.polkaj.json.RuntimeVersionJson
 import io.emeraldpay.polkaj.json.SystemHealthJson
+import io.emeraldpay.polkaj.types.Address
 import io.emeraldpay.polkaj.types.ByteData
 import io.emeraldpay.polkaj.types.Hash256
 import io.emeraldpay.polkaj.json.BlockResponseJson
@@ -156,10 +157,61 @@ class StandardCommandsSpec extends Specification {
         act.getResultType(typeFactory).getRawClass() == ContractExecResultJson
 
         when:
+        act = StandardCommands.getInstance().contractsCall(call, null)
+        then:
+        act.method == "contracts_call"
+        act.params.toList() == [call]
+        act.getResultType(typeFactory).getRawClass() == ContractExecResultJson
+
+        when:
         act = StandardCommands.getInstance().contractsCall(call, Hash256.from("0x814d23726176d151037f13c6371967795cadcb56400b4fb443248278180c10f0"))
         then:
         act.method == "contracts_call"
         act.params.toList() == [call, Hash256.from("0x814d23726176d151037f13c6371967795cadcb56400b4fb443248278180c10f0")]
         act.getResultType(typeFactory).getRawClass() == ContractExecResultJson
+    }
+
+    def "Contracts Get Storage"() {
+        when:
+        def act = StandardCommands.getInstance().contractsGetStorage(
+                Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy"),
+                Hash256.from("0x814d23726176d151037f13c6371967795cadcb56400b4fb443248278180c10f0")
+        )
+        then:
+        act.method == "contracts_getStorage"
+        act.params.toList() == [
+                Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy"),
+                Hash256.from("0x814d23726176d151037f13c6371967795cadcb56400b4fb443248278180c10f0")
+        ]
+        act.getResultType(typeFactory).getRawClass() == ByteData.class
+
+        when:
+        act = StandardCommands.getInstance().contractsGetStorage(
+                Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy"),
+                Hash256.from("0x814d23726176d151037f13c6371967795cadcb56400b4fb443248278180c10f0"),
+                null
+        )
+        then:
+        act.method == "contracts_getStorage"
+        act.params.toList() == [
+                Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy"),
+                Hash256.from("0x814d23726176d151037f13c6371967795cadcb56400b4fb443248278180c10f0")
+        ]
+        act.getResultType(typeFactory).getRawClass() == ByteData.class
+
+        when:
+        act = StandardCommands.getInstance().contractsGetStorage(
+                Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy"),
+                Hash256.from("0x814d23726176d151037f13c6371967795cadcb56400b4fb443248278180c10f0"),
+                Hash256.from("0x5c51037f13c637196779564726176d10f000b4fb443248278180c1adcb814d23")
+        )
+        then:
+        act.method == "contracts_getStorage"
+        act.params.toList() == [
+                Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy"),
+                Hash256.from("0x814d23726176d151037f13c6371967795cadcb56400b4fb443248278180c10f0"),
+                Hash256.from("0x5c51037f13c637196779564726176d10f000b4fb443248278180c1adcb814d23")
+        ]
+        act.getResultType(typeFactory).getRawClass() == ByteData.class
     }
 }
