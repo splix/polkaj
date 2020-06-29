@@ -11,6 +11,7 @@
 * Contracts
 - <<contractsCall>>
 - <<contractsGetStorage>>
+- <<contractsRentProjection>>
 * State
 - <<stateMetadata>>
 - <<stateGetStorage>>
@@ -80,6 +81,8 @@ Java Object:: `RuntimeVersionJson`
 [#contractsCall]
 === Contracts Call (`contracts_call`)
 
+Executes a call to a contract
+
 Shortcut:: `{shortcut-base}.contractsCall(call, at)`
 Command:: `contracts_call`
 Parameters:: `call` - requests data `ContractCallRequestJson`, `at` - (optional) block reference (`Hash256`)
@@ -88,12 +91,22 @@ Java Object:: `ContractExecResultJson`
 [#contractsGetStorage]
 === Contracts Get Storage (`contracts_getStorage`)
 
-Get state from a Storage.
+Get value under a specified storage key in a contract.
 
 Shortcut:: `{shortcut-base}.contractsGetStorage(address, key, at)`
 Command:: `contracts_getStorage`
 Parameters:: `address` - contract address (`Address`), `key` - key (`Has256`), `at` - (optional) block reference (`Hash256`)
 Java Object:: `ByteData`
+
+[#contractsRentProjection]
+=== Contracts Rent Projection (`contracts_rentProjection`)
+
+Get projected time a given contract will be able to sustain paying its rent
+
+Shortcut:: `{shortcut-base}.contractsRentProjection(address, at)`
+Command:: `contracts_getStorage`
+Parameters:: `address` - contract address (`Address`), `at` - (optional) block reference (`Hash256`)
+Java Object:: `Long`
 
 
 [#stateMetadata]

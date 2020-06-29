@@ -148,7 +148,7 @@ public class StandardCommands {
      *
      * @param address contract address
      * @param key key
-     * @return value for the key, or null
+     * @return comman
      */
     public RpcCall<ByteData> contractsGetStorage(Address address, Hash256 key) {
         return RpcCall.create(ByteData.class, "contracts_getStorage", address, key);
@@ -159,13 +159,35 @@ public class StandardCommands {
      * @param address contract address
      * @param key key
      * @param at block hash
-     * @return value for the key, or null
+     * @return command
      */
     public RpcCall<ByteData> contractsGetStorage(Address address, Hash256 key, Hash256 at) {
         if (at == null) {
             return contractsGetStorage(address, key);
         }
         return RpcCall.create(ByteData.class, "contracts_getStorage", address, key, at);
+    }
+
+    /**
+     *
+     * @param address contract address
+     * @return command
+     */
+    public RpcCall<Long> contractsRentProjection(Address address) {
+        return RpcCall.create(Long.class, "contracts_rentProjection", address);
+    }
+
+    /**
+     *
+     * @param address contract address
+     * @param at block hash
+     * @return command
+     */
+    public RpcCall<Long> contractsRentProjection(Address address, Hash256 at) {
+        if (at == null) {
+            return contractsRentProjection(address);
+        }
+        return RpcCall.create(Long.class, "contracts_rentProjection", address, at);
     }
 
 }

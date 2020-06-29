@@ -214,4 +214,32 @@ class StandardCommandsSpec extends Specification {
         ]
         act.getResultType(typeFactory).getRawClass() == ByteData.class
     }
+
+    def "Contracts Rent Projection"() {
+        when:
+        def act = StandardCommands.getInstance().contractsRentProjection(Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy"))
+        then:
+        act.method == "contracts_rentProjection"
+        act.params.toList() == [Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy")]
+        act.getResultType(typeFactory).getRawClass() == Long.class
+
+        when:
+        act = StandardCommands.getInstance().contractsRentProjection(Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy"), null)
+        then:
+        act.method == "contracts_rentProjection"
+        act.params.toList() == [Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy")]
+        act.getResultType(typeFactory).getRawClass() == Long.class
+
+        when:
+        act = StandardCommands.getInstance().contractsRentProjection(
+                Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy"),
+                Hash256.from("0x5c51037f13c637196779564726176d10f000b4fb443248278180c1adcb814d23"))
+        then:
+        act.method == "contracts_rentProjection"
+        act.params.toList() == [
+                Address.from("FqZJib4Kz759A1VFd2cXX4paQB42w7Uamsyhi4z3kGgCkQy"),
+                Hash256.from("0x5c51037f13c637196779564726176d10f000b4fb443248278180c1adcb814d23")
+        ]
+        act.getResultType(typeFactory).getRawClass() == Long.class
+    }
 }
