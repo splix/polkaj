@@ -27,6 +27,14 @@ public class StandardCommands {
         return RpcCall.create(BlockResponseJson.class, "chain_getBlock", hash);
     }
 
+    public RpcCall<Hash256> getBlockHash() {
+        return RpcCall.create(Hash256.class, "chain_getBlockHash");
+    }
+
+    public RpcCall<Hash256> getBlockHash(long at) {
+        return RpcCall.create(Hash256.class, "chain_getBlockHash", at);
+    }
+
     /**
      * Request for the hash of the current finalized head
      * @return command

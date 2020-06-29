@@ -5,6 +5,7 @@
 
 * Chain
 - <<getBlock>>
+- <<chainGetBlockHash>>
 - <<getFinalizedHead>>
 - <<getHead>>
 - <<getRuntimeVersion>>
@@ -34,6 +35,16 @@ Shortcut:: `{shortcut-base}.getBlock(Hash256)`
 Command:: `chain_getBlock`
 Parameters:: hash of the requested block
 Java Object:: `BlockResponseJson`
+
+[#chainGetBlockHash]
+=== Get Block Hash (`chain_getBlockHash`)
+
+Get the block hash for a specific block
+
+Shortcut:: `{shortcut-base}.getBlockHash(at)`
+Command:: `chain_getBlockHash`
+Parameters:: `at` - (optional) block height
+Java Object:: `Hash256`
 
 .BlockResponseJson Properties
 - `BlockJson getBlock()` block details

@@ -31,6 +31,22 @@ class StandardCommandsSpec extends Specification {
         act.getResultType(typeFactory).getRawClass() == BlockResponseJson.class
     }
 
+    def "Chain get block hash"() {
+        when:
+        def act = StandardCommands.getInstance().getBlockHash()
+        then:
+        act.method == "chain_getBlockHash"
+        act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == Hash256.class
+
+        when:
+        act = StandardCommands.getInstance().getBlockHash(101)
+        then:
+        act.method == "chain_getBlockHash"
+        act.params.toList() == [101]
+        act.getResultType(typeFactory).getRawClass() == Hash256.class
+    }
+
     def "Chain get finalized head"() {
         when:
         def act = StandardCommands.getInstance().getFinalizedHead()
