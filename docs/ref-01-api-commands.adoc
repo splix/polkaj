@@ -1,5 +1,9 @@
 = Standard RPC Commands and Subscriptions
 
+- <<calls>>
+- <<subsriptions>>
+
+[#calls]
 == RPC Commands
 :shortcut-base: StandardCommands.getInstance()
 
@@ -16,6 +20,7 @@
 * State
 - <<stateMetadata>>
 - <<stateGetStorage>>
+- <<stateGetReadProof>>
 * System
 - <<systemChain>>
 - <<systemHealth>>
@@ -106,7 +111,10 @@ Get value under a specified storage key in a contract.
 
 Shortcut:: `{shortcut-base}.contractsGetStorage(address, key, at)`
 Command:: `contracts_getStorage`
-Parameters:: `address` - contract address (`Address`), `key` - key (`Has256`), `at` - (optional) block reference (`Hash256`)
+Parameters::
+  - `address` - contract address (`Address`),
+  - `key` - key (`Has256`),
+  - `at` - (optional) block reference (`Hash256`)
 Java Object:: `ByteData`
 
 [#contractsRentProjection]
@@ -116,7 +124,9 @@ Get projected time a given contract will be able to sustain paying its rent
 
 Shortcut:: `{shortcut-base}.contractsRentProjection(address, at)`
 Command:: `contracts_getStorage`
-Parameters:: `address` - contract address (`Address`), `at` - (optional) block reference (`Hash256`)
+Parameters::
+  - `address` - contract address (`Address`),
+  - `at` - (optional) block reference (`Hash256`)
 Java Object:: `Long`
 
 
@@ -147,6 +157,18 @@ Shortcut:: `{shortcut-base}.stateGetStorage(key)`
 Command:: `state_getStorage`
 Parameters:: `key` - bytes (`byte[]` or `ByteDate`)
 Java Object:: `ByteData`
+
+[#stateGetReadProof]
+=== State Get Read Proof (`state_getReadProof`)
+
+Get proof of storage entries at a specific block state
+
+Shortcut:: `{shortcut-base}.stateGetReadProof(keys, at?)`
+Command:: `state_getReadProof`
+Parameters::
+  - `keys` - list of keys (`List<ByteDate>`)
+  - `at` - (optional) block reference (`Hash256`)
+Java Object:: `ReadProofJson`
 
 [#systemChain]
 === System Chain (`system_chain`)
@@ -234,12 +256,14 @@ Java Object:: `MethodsJson`
 - `Integer getVersion()` - version of RPC
 - `List<String> getMethods()` - list of methods
 
+[#subsriptions]
 == Subscriptions
 :shortcut-base: StandardSubscriptions.getInstance()
 
 - <<subFinalizedHeads>>
 - <<subNewHeads>>
 - <<subRuntimeVersion>>
+- <<subStorage>>
 
 [#subFinalizedHeads]
 === Finalized Heads (`chain_subscribeFinalizedHeads`)
@@ -262,11 +286,21 @@ Parameters:: none
 Java Object:: `BlockJson.Header`
 
 [#subRuntimeVersion]
-=== Runtime Version (`chain_subscribeRuntimeVersion`)
+=== Runtime Version (`state_subscribeRuntimeVersion`)
 
 Subscribe to the changes to the Runtime Version.
 
 Shortcut:: `{shortcut-base}.runtimeVersion()`
-Command:: `chain_subscribeRuntimeVersion`
+Command:: `state_subscribeRuntimeVersion`
 Parameters:: none
 Java Object:: `RuntimeVersion`
+
+[#subStorage]
+=== Storage (`state_subscribeStorage`)
+
+Subscribe to the changes to the Storage.
+
+Shortcut:: `{shortcut-base}.storage(keys?)`
+Command:: `state_subscribeRuntimeVersion`
+Parameters:: `keys` - (optional) Storage Keys (`Hash256`)
+Java Object:: `StorageChangeSetJson`
