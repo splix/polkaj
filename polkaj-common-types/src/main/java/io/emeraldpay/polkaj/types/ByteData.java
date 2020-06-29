@@ -18,6 +18,10 @@ public class ByteData {
         return new ByteData(value);
     }
 
+    public static ByteData empty() {
+        return new ByteData(new byte[0]);
+    }
+
     /**
      * @return bytes value
      */

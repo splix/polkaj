@@ -25,6 +25,13 @@ class ByteDataSpec extends Specification {
         act.bytes.size() == 0
     }
 
+    def "Create empty from static helper"() {
+        when:
+        def act = ByteData.empty()
+        then:
+        act.bytes.size() == 0
+    }
+
     def "Cannot create from null"() {
         when:
         ByteData.from(null)

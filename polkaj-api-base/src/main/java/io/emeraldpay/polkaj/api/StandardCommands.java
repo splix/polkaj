@@ -132,4 +132,11 @@ public class StandardCommands {
         return stateGetStorage(new ByteData(request));
     }
 
+    public RpcCall<ContractExecResultJson> contractsCall(ContractCallRequestJson request) {
+        return RpcCall.create(ContractExecResultJson.class, "contracts_call", request);
+    }
+
+    public RpcCall<ContractExecResultJson> contractsCall(ContractCallRequestJson request, Hash256 blockHash) {
+        return RpcCall.create(ContractExecResultJson.class, "contracts_call", request, blockHash);
+    }
 }

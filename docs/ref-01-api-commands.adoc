@@ -8,6 +8,8 @@
 - <<getFinalizedHead>>
 - <<getHead>>
 - <<getRuntimeVersion>>
+* Contracts
+- <<contractsCall>>
 * State
 - <<stateMetadata>>
 - <<stateGetStorage>>
@@ -73,6 +75,15 @@ Java Object:: `RuntimeVersionJson`
 - `String getSpecName()`
 - `Integer getSpecVersion()`
 - `Integer getTransactionVersion()`
+
+[#contractsCall]
+=== Contracts Call (`contracts_call`)
+
+Shortcut:: `{shortcut-base}.contractsCall()`
+Command:: `contracts_call`
+Parameters:: `ContractCallRequestJson call`, (optional) `Hash256 blockHash`
+Java Object:: `ContractExecResultJson`
+
 
 [#stateMetadata]
 === Runtime Metadata (`state_getMetadata`)

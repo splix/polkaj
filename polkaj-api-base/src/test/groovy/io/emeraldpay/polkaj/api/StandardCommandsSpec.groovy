@@ -2,6 +2,8 @@ package io.emeraldpay.polkaj.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.type.TypeFactory
+import io.emeraldpay.polkaj.json.ContractCallRequestJson
+import io.emeraldpay.polkaj.json.ContractExecResultJson
 import io.emeraldpay.polkaj.json.MethodsJson
 import io.emeraldpay.polkaj.json.RuntimeVersionJson
 import io.emeraldpay.polkaj.json.SystemHealthJson
@@ -141,5 +143,23 @@ class StandardCommandsSpec extends Specification {
         act.method == "state_getStorage"
         act.params.toList() == ["0x0102"]
         act.getResultType(typeFactory).getRawClass() == ByteData.class
+    }
+
+    def "Contracts Call"() {
+        setup:
+        def call = new ContractCallRequestJson()
+        when:
+        def act = StandardCommands.getInstance().contractsCall(call)
+        then:
+        act.method == "contracts_call"
+        act.params.toList() == [call]
+        act.getResultType(typeFactory).getRawClass() == ContractExecResultJson
+
+        when:
+        act = StandardCommands.getInstance().contractsCall(call, Hash256.from("0x814d23726176d151037f13c6371967795cadcb56400b4fb443248278180c10f0"))
+        then:
+        act.method == "contracts_call"
+        act.params.toList() == [call, Hash256.from("0x814d23726176d151037f13c6371967795cadcb56400b4fb443248278180c10f0")]
+        act.getResultType(typeFactory).getRawClass() == ContractExecResultJson
     }
 }
