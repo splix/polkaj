@@ -1,6 +1,6 @@
 = PolkaJ - Polkadot Java Client
-:lib-version: 0.2.0
-:lib-version-dev: 0.2.0
+:lib-version: 0.2.2
+:lib-version-dev: 0.2.2
 
 image:https://github.com/emeraldpay/polkaj/workflows/Tests/badge.svg["Unit Tests"]
 image:https://codecov.io/gh/emeraldpay/polkaj/branch/master/graph/badge.svg["Coverage",link="https://codecov.io/gh/emeraldpay/polkaj"]

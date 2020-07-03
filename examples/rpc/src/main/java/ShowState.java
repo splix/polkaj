@@ -25,6 +25,7 @@ public class ShowState {
         );
 
         Hash256 hash = hashFuture.get();
+        Hash256 blockHash = client.execute(PolkadotApi.commands().getBlockHash()).get();
 
         Future<BlockResponseJson> blockFuture = client.execute(
                 // Another way to prepare a call, instead of manually constructing RpcCall instances
@@ -50,6 +51,7 @@ public class ShowState {
         System.out.println("Peers count: " + health.getPeers());
         System.out.println("Is syncing: " + health.getSyncing());
         System.out.println("Current head: " + hash);
+        System.out.println("Current block hash: " + blockHash);
         System.out.println("Current height: " + block.getBlock().getHeader().getNumber());
         System.out.println("State hash: " + block.getBlock().getHeader().getStateRoot());
         client.close();
