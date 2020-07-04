@@ -56,22 +56,13 @@ class StandardCommandsSpec extends Specification {
         act.getResultType(typeFactory).getRawClass() == Hash256.class
     }
 
-    def "Chain get runtime version"() {
+    def "State get runtime version"() {
         when:
         def act = StandardCommands.getInstance().getRuntimeVersion()
         then:
-        act.method == "chain_getRuntimeVersion"
+        act.method == "state_getRuntimeVersion"
         act.params.toList() == []
         act.getResultType(typeFactory).getRawClass() == RuntimeVersionJson.class
-    }
-
-    def "Chain get head"() {
-        when:
-        def act = StandardCommands.getInstance().getHead()
-        then:
-        act.method == "chain_getHead"
-        act.params.toList() == []
-        act.getResultType(typeFactory).getRawClass() == Hash256.class
     }
 
     def "Rpc methods"() {

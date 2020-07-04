@@ -20,9 +20,9 @@ class StandardSubscriptionsSpec extends Specification {
         when:
         def act = StandardSubscriptions.getInstance().newHeads()
         then:
-        act.method == "chain_subscribeNewHead"
+        act.method == "chain_subscribeNewHeads"
         act.params.size() == 0
-        act.unsubscribe == "chain_unsubscribeNewHead"
+        act.unsubscribe == "chain_unsubscribeNewHeads"
         act.getResultType(typeFactory).getRawClass() == BlockJson.Header.class
     }
 

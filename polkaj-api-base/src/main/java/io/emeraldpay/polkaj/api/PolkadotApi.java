@@ -2,6 +2,9 @@ package io.emeraldpay.polkaj.api;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @see PolkadotMethod
+ */
 public interface PolkadotApi {
 
     /**

@@ -24,7 +24,7 @@ public class StandardSubscriptions {
      * @return command
      */
     public SubscribeCall<BlockJson.Header> newHeads() {
-        return SubscribeCall.create(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead");
+        return SubscribeCall.create(BlockJson.Header.class, PolkadotMethod.CHAIN_SUBSCRIBE_NEW_HEADS, PolkadotMethod.CHAIN_UNSUBSCRIBE_NEW_HEADS);
     }
 
     /**
@@ -33,7 +33,7 @@ public class StandardSubscriptions {
      * @return command
      */
     public SubscribeCall<BlockJson.Header> finalizedHeads() {
-        return SubscribeCall.create(BlockJson.Header.class, "chain_subscribeFinalizedHeads", "chain_unsubscribeFinalizedHeads");
+        return SubscribeCall.create(BlockJson.Header.class, PolkadotMethod.CHAIN_SUBSCRIBE_FINALIZED_HEADS, PolkadotMethod.CHAIN_UNSUBSCRIBE_FINALIZED_HEADS);
     }
 
     /**
@@ -42,17 +42,17 @@ public class StandardSubscriptions {
      * @return command
      */
     public SubscribeCall<RuntimeVersionJson> runtimeVersion() {
-        return SubscribeCall.create(RuntimeVersionJson.class, "state_subscribeRuntimeVersion", "state_unsubscribeRuntimeVersion");
+        return SubscribeCall.create(RuntimeVersionJson.class, PolkadotMethod.STATE_SUBSCRIBE_RUNTIME_VERSION, PolkadotMethod.STATE_UNSUBSCRIBE_RUNTIME_VERSION);
     }
 
     public SubscribeCall<StorageChangeSetJson> storage() {
-        return SubscribeCall.create(StorageChangeSetJson.class, "state_subscribeStorage", "state_unsubscribeStorage");
+        return SubscribeCall.create(StorageChangeSetJson.class, PolkadotMethod.STATE_SUBSCRIBE_STORAGE, PolkadotMethod.STATE_UNSUBSCRIBE_STORAGE);
     }
 
     public SubscribeCall<StorageChangeSetJson> storage(List<ByteData> keys) {
         if (keys == null || keys.isEmpty()) {
             return storage();
         }
-        return SubscribeCall.create(StorageChangeSetJson.class, "state_subscribeStorage", "state_unsubscribeStorage", List.of(keys));
+        return SubscribeCall.create(StorageChangeSetJson.class, PolkadotMethod.STATE_SUBSCRIBE_STORAGE, PolkadotMethod.STATE_UNSUBSCRIBE_STORAGE, List.of(keys));
     }
 }
