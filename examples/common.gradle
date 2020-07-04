@@ -2,7 +2,7 @@
 // Common config for Polkaj Examples
 //
 ext {
-   polkajVersion = "0.2.2"
+   polkajVersion = "0.2.3"
 }
 
 repositories {

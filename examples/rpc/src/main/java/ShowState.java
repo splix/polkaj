@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.emeraldpay.polkaj.api.PolkadotApi;
+import io.emeraldpay.polkaj.api.PolkadotMethod;
 import io.emeraldpay.polkaj.api.RpcCall;
 import io.emeraldpay.polkaj.apihttp.PolkadotHttpApi;
 import io.emeraldpay.polkaj.json.BlockResponseJson;
@@ -21,7 +22,7 @@ public class ShowState {
                 // the first parameter is Class / JavaType of the expected result
                 // second is the method name
                 // and optionally a list of parameters for the call
-                RpcCall.create(Hash256.class, "chain_getFinalisedHead")
+                RpcCall.create(Hash256.class, PolkadotMethod.CHAIN_GET_FINALIZED_HEAD)
         );
 
         Hash256 hash = hashFuture.get();
