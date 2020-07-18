@@ -6,11 +6,14 @@ import java.security.SecureRandom;
 /**
  * Schnorrkel implements Schnorr signature on Ristretto compressed Ed25519 points, as well as related protocols like
  * HDKD, MuSig, and a verifiable random function (VRF).
- *
+ * <br>
  * The Java library is a wrapper around Rust implementation of the algorithms.
- *
- * @link <a href="https://github.com/w3f/schnorrkel">Rust implementatiion</a>
- * @link <a href="https://tools.ietf.org/html/rfc8032">RFC 8032 - Edwards-Curve Digital Signature Algorithm (EdDSA)</a>
+ * <br>
+ * See also:
+ * <ul>
+ *     <li><a href="https://github.com/w3f/schnorrkel">Rust implementatiion</a></li>
+ *     <li><a href="https://tools.ietf.org/html/rfc8032">RFC 8032 - Edwards-Curve Digital Signature Algorithm (EdDSA)</a></li>
+ * </ul>
  */
 public class Schnorrkel {
 
@@ -39,21 +42,32 @@ public class Schnorrkel {
      */
     public static final int KEYPAIR_LENGTH = SECRET_KEY_LENGTH + PUBLIC_KEY_LENGTH;
 
-    public static byte[] sign(byte[] message, Keypair keypair) throws SchnorrkelException {
-        return sign(keypair.publicKey, keypair.secretKey, message);
+    public static byte[] sign(byte[] message, KeyPair keypair) throws SchnorrkelException {
+        return sign(keypair.getPublicKey(), keypair.getSecretKey(), message);
     }
 
-    public static native boolean verify(byte[] signature, byte[] message, byte[] publicKey) throws SchnorrkelException;
+    /**
+     * Verify signature
+     *
+     * @param signature signature
+     * @param message signed message
+     * @param publicKey public key of the signer
+     * @return true if signature is correct
+     * @throws SchnorrkelException when signature or public key are invalid
+     */
+    public static boolean verify(byte[] signature, byte[] message, PublicKey publicKey) throws SchnorrkelException {
+        return verify(signature, message, publicKey.getPublicKey());
+    }
 
-    public static Keypair generateKey() throws SchnorrkelException {
+    public static KeyPair generateKeyPair() throws SchnorrkelException {
         try {
-            return generateKey(SecureRandom.getInstanceStrong());
+            return generateKeyPair(SecureRandom.getInstanceStrong());
         } catch (NoSuchAlgorithmException e) {
             throw new SchnorrkelException("Secure Random is not available");
         }
     }
 
-    public static Keypair generateKey(SecureRandom random) throws SchnorrkelException {
+    public static KeyPair generateKeyPair(SecureRandom random) throws SchnorrkelException {
         byte[] seed = new byte[32];
         random.nextBytes(seed);
         byte[] key = keypairFromSeed(seed);
@@ -66,7 +80,7 @@ public class Schnorrkel {
         byte[] publicKey = new byte[PUBLIC_KEY_LENGTH];
         System.arraycopy(key, SECRET_KEY_LENGTH, publicKey, 0, PUBLIC_KEY_LENGTH);
 
-        return new Keypair(publicKey, secretKey);
+        return new KeyPair(publicKey, secretKey);
     }
 
     static {
@@ -74,24 +88,43 @@ public class Schnorrkel {
     }
 
     private static native byte[] sign(byte[] publicKey, byte[] secretKey, byte[] message);
-
     private static native byte[] keypairFromSeed(byte[] seed);
+    private static native boolean verify(byte[] signature, byte[] message, byte[] publicKey) throws SchnorrkelException;
 
-    static class Keypair {
+    /**
+     * Public Key
+     */
+    public static class PublicKey {
+
         private final byte[] publicKey;
-        private final byte[] secretKey;
 
-        public Keypair(byte[] publicKey, byte[] secretKey) {
+        public PublicKey(byte[] publicKey) {
             this.publicKey = publicKey;
-            this.secretKey = secretKey;
         }
-
         public byte[] getPublicKey() {
             return publicKey;
+        }
+    }
+
+    /**
+     * Pair of Public and Secret Keys
+     */
+    public static class KeyPair extends PublicKey {
+
+        private final byte[] secretKey;
+
+        public KeyPair(PublicKey publicKey, byte[] secretKey) {
+            this(publicKey.publicKey, secretKey);
+        }
+
+        public KeyPair(byte[] publicKey, byte[] secretKey) {
+            super(publicKey);
+            this.secretKey = secretKey;
         }
 
         public byte[] getSecretKey() {
             return secretKey;
         }
     }
+
 }
