@@ -1,0 +1,12 @@
+[package]
+name = "polkaj-schnorrkel"
+version = "0.3.0"
+
+[lib]
+crate_type = ["cdylib"]
+
+[dependencies]
+jni = "0.17.0"
+schnorrkel = "0.9.1"
+hex = "0.4.2"
+rand = "0.7.3"

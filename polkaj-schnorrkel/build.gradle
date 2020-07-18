@@ -1,0 +1,15 @@
+apply plugin: 'c'
+
+dependencies {
+}
+
+test {
+    systemProperty "java.library.path", file("${buildDir}/rust/release").absolutePath
+}
+
+task compileRust(type:Exec) {
+    workingDir 'src/rust'
+    commandLine 'cargo', 'build', '--release', '--target-dir=../../build/rust'
+}
+
+compileJava.dependsOn(compileRust)
