@@ -140,11 +140,32 @@ class SchnorrkelSpec extends Specification {
     def "Derive key"() {
         setup:
         def seed = Hex.decodeHex("fac7959dbfe72f052e5a0c3c8d6530f202b02fd8f9f5ca3580ec8deb7797479e")
-        def cc = Hex.decodeHex("14416c6963650000000000000000000000000000000000000000000000000000") // Alice
+        def cc = Schnorrkel.ChainCode.from(Hex.decodeHex("14416c696365")) // Alice
         when:
         def base = Schnorrkel.generateKeyPairFromSeed(seed)
         def keypair = Schnorrkel.deriveKeyPair(base, cc)
         then:
         Hex.encodeHexString(keypair.getPublicKey()) == "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
+    }
+
+    def "Derive soft key"() {
+        setup:
+        def seed = Hex.decodeHex("fac7959dbfe72f052e5a0c3c8d6530f202b02fd8f9f5ca3580ec8deb7797479e")
+        def cc = new Schnorrkel.ChainCode(Hex.decodeHex("0c666f6f00000000000000000000000000000000000000000000000000000000"))
+        when:
+        def base = Schnorrkel.generateKeyPairFromSeed(seed)
+        def keypair = Schnorrkel.deriveKeyPairSoft(base, cc)
+        then:
+        Hex.encodeHexString(keypair.getPublicKey()) == "40b9675df90efa6069ff623b0fdfcf706cd47ca7452a5056c7ad58194d23440a"
+    }
+
+    def "Derive soft public key"() {
+        setup:
+        def pub = Hex.decodeHex("46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a")
+        def cc = Schnorrkel.ChainCode.from(Hex.decodeHex("0c666f6f00000000000000000000000000000000000000000000000000000000"))
+        when:
+        def act = Schnorrkel.derivePublicKeySoft(new Schnorrkel.PublicKey(pub), cc)
+        then:
+        Hex.encodeHexString(act.getPublicKey()) == "40b9675df90efa6069ff623b0fdfcf706cd47ca7452a5056c7ad58194d23440a"
     }
 }

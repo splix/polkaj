@@ -1,7 +1,10 @@
 package io.emeraldpay.polkaj.schnorrkel;
 
+import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Schnorrkel implements Schnorr signature on Ristretto compressed Ed25519 points, as well as related protocols like
@@ -42,6 +45,11 @@ public class Schnorrkel {
      */
     public static final int KEYPAIR_LENGTH = SECRET_KEY_LENGTH + PUBLIC_KEY_LENGTH;
 
+    /**
+     * Length in bytes of chain codes
+     */
+    public static final int CHAIN_CODE_LENGTH = 32;
+
     public static byte[] sign(byte[] message, KeyPair keypair) throws SchnorrkelException {
         return sign(keypair.getPublicKey(), keypair.getSecretKey(), message);
     }
@@ -79,9 +87,19 @@ public class Schnorrkel {
         return decodeKeyPair(key);
     }
 
-    public static KeyPair deriveKeyPair(KeyPair base, byte[] chainCode)  throws SchnorrkelException {
-        byte[] key = deriveHard(encodeKeyPair(base), chainCode);
+    public static KeyPair deriveKeyPair(KeyPair base, ChainCode chainCode) throws SchnorrkelException {
+        byte[] key = deriveHard(encodeKeyPair(base), chainCode.getValue());
         return decodeKeyPair(key);
+    }
+
+    public static KeyPair deriveKeyPairSoft(KeyPair base, ChainCode chainCode) throws SchnorrkelException {
+        byte[] key = deriveSoft(encodeKeyPair(base), chainCode.getValue());
+        return decodeKeyPair(key);
+    }
+
+    public static PublicKey derivePublicKeySoft(PublicKey base, ChainCode chainCode) throws SchnorrkelException {
+        byte[] key = derivePublicKeySoft(base.publicKey, chainCode.getValue());
+        return new PublicKey(key);
     }
 
     private static KeyPair decodeKeyPair(byte[] key) throws SchnorrkelException {
@@ -111,6 +129,8 @@ public class Schnorrkel {
     private static native byte[] keypairFromSeed(byte[] seed);
     private static native boolean verify(byte[] signature, byte[] message, byte[] publicKey);
     private static native byte[] deriveHard(byte[] secret, byte[] cc);
+    private static native byte[] deriveSoft(byte[] secret, byte[] cc);
+    private static native byte[] derivePublicKeySoft(byte[] publicKey, byte[] cc);
 
     /**
      * Public Key
@@ -145,6 +165,33 @@ public class Schnorrkel {
 
         public byte[] getSecretKey() {
             return secretKey;
+        }
+    }
+
+    public static class ChainCode {
+        private final byte[] value;
+
+        public ChainCode(byte[] value) {
+            if (value.length != CHAIN_CODE_LENGTH) {
+                throw new IllegalArgumentException("Chain code must be " + CHAIN_CODE_LENGTH + " bytes");
+            }
+            this.value = value;
+        }
+
+        public static ChainCode from(byte[] value) {
+            if (value.length > CHAIN_CODE_LENGTH) {
+                throw new IllegalArgumentException("Chain code must be " + CHAIN_CODE_LENGTH + " bytes (if less, then padded with zeroes)");
+            }
+            if (value.length == CHAIN_CODE_LENGTH) {
+                return new ChainCode(value);
+            }
+            byte[] full = new byte[CHAIN_CODE_LENGTH];
+            System.arraycopy(value, 0, full, 0, value.length);
+            return new ChainCode(full);
+        }
+
+        public byte[] getValue() {
+            return value;
         }
     }
 

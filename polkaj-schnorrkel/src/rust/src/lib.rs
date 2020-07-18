@@ -11,7 +11,7 @@ use jni::JNIEnv;
 use jni::objects::{JClass};
 use jni::sys::{jbyteArray, jboolean};
 use schnorrkel::{SecretKey, PublicKey, Signature, SignatureError, MiniSecretKey, ExpansionMode, Keypair};
-use schnorrkel::derive::{ChainCode, CHAIN_CODE_LENGTH};
+use schnorrkel::derive::{ChainCode, CHAIN_CODE_LENGTH, Derivation};
 use std::string::String;
 
 const SIGNING_CTX: &'static [u8] = b"substrate";
@@ -71,6 +71,24 @@ pub fn derive_keypair_hard(pair: &[u8], cc: &[u8]) -> Result<Vec<u8>, String> {
         .hard_derive_mini_secret_key(Some(create_cc(cc)), &[]).0
         .expand_to_keypair(ExpansionMode::Ed25519)
         .to_half_ed25519_bytes()
+        .to_vec();
+    Ok(result)
+}
+
+pub fn derive_keypair_soft(pair: &[u8], cc: &[u8]) -> Result<Vec<u8>, String> {
+    let result = Keypair::from_half_ed25519_bytes(pair)
+        .map_err(|e| e.to_string())?
+        .derived_key_simple(create_cc(cc), &[]).0
+        .to_half_ed25519_bytes()
+        .to_vec();
+    Ok(result)
+}
+
+pub fn derive_pubkey_soft(pubkey: &[u8], cc: &[u8]) -> Result<Vec<u8>, String> {
+    let result = 	PublicKey::from_bytes(pubkey)
+        .map_err(|e| e.to_string())?
+        .derived_key_simple(create_cc(cc), &[]).0
+        .to_bytes()
         .to_vec();
     Ok(result)
 }
@@ -157,6 +175,54 @@ pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_deriveHar
         .expect("ChainCode is not provided");
 
     let output = match derive_keypair_hard(keypair.as_slice(), cc.as_slice()) {
+        Ok(value) => {
+            env.byte_array_from_slice(value.as_slice())
+                .expect("Couldn't create result")
+        },
+        Err(msg) => {
+            let none = env.new_byte_array(0)
+                .expect("Couldn't create empty result");
+            env.throw_new("io/emeraldpay/polkaj/schnorrkel/SchnorrkelException", msg).unwrap();
+            none
+        }
+    };
+    output
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_deriveSoft
+(env: JNIEnv, _class: JClass, keypair: jbyteArray, cc: jbyteArray) -> jbyteArray {
+
+    let keypair = env.convert_byte_array(keypair)
+        .expect("Keypair is not provided");
+    let cc = env.convert_byte_array(cc)
+        .expect("ChainCode is not provided");
+
+    let output = match derive_keypair_soft(keypair.as_slice(), cc.as_slice()) {
+        Ok(value) => {
+            env.byte_array_from_slice(value.as_slice())
+                .expect("Couldn't create result")
+        },
+        Err(msg) => {
+            let none = env.new_byte_array(0)
+                .expect("Couldn't create empty result");
+            env.throw_new("io/emeraldpay/polkaj/schnorrkel/SchnorrkelException", msg).unwrap();
+            none
+        }
+    };
+    output
+}
+
+#[no_mangle]
+pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_derivePublicKeySoft
+(env: JNIEnv, _class: JClass, pubkey: jbyteArray, cc: jbyteArray) -> jbyteArray {
+
+    let pubkey = env.convert_byte_array(pubkey)
+        .expect("Keypair is not provided");
+    let cc = env.convert_byte_array(cc)
+        .expect("ChainCode is not provided");
+
+    let output = match derive_pubkey_soft(pubkey.as_slice(), cc.as_slice()) {
         Ok(value) => {
             env.byte_array_from_slice(value.as_slice())
                 .expect("Couldn't create result")
