@@ -11,15 +11,17 @@ package io.emeraldpay.polkaj.schnorrkel;
  */
 public class Schnorrkel {
 
-    private static native byte[] sign(byte[] pubKey, byte[] secretKey, byte[] message);
-
     public static byte[] sign(byte[] message, Keypair keypair) throws SchnorrkelException {
         return sign(keypair.publicKey, keypair.secretKey, message);
     }
 
+    public static native boolean verify(byte[] signature, byte[] message, byte[] publicKey) throws SchnorrkelException;
+
     static {
         System.loadLibrary("polkaj_schnorrkel");
     }
+    private static native byte[] sign(byte[] publicKey, byte[] secretKey, byte[] message);
+
 
     static class Keypair {
         private final byte[] publicKey;
