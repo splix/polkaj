@@ -113,4 +113,38 @@ class SchnorrkelSpec extends Specification {
         then:
         act
     }
+
+    def "Generates key from default Secure Random"() {
+        when:
+        def keypair = Schnorrkel.generateKeyPair()
+        then:
+        keypair != null
+        keypair.publicKey.length == Schnorrkel.PUBLIC_KEY_LENGTH
+        keypair.secretKey.length == Schnorrkel.SECRET_KEY_LENGTH
+        new BigInteger(1, keypair.publicKey) != BigInteger.ZERO
+        new BigInteger(1, keypair.secretKey) != BigInteger.ZERO
+    }
+
+    def "Generates from seed"() {
+        when:
+        def keypair = Schnorrkel.generateKeyPairFromSeed(Hex.decodeHex("fac7959dbfe72f052e5a0c3c8d6530f202b02fd8f9f5ca3580ec8deb7797479e"))
+        then:
+        keypair != null
+        keypair.publicKey.length == Schnorrkel.PUBLIC_KEY_LENGTH
+        keypair.secretKey.length == Schnorrkel.SECRET_KEY_LENGTH
+        new BigInteger(1, keypair.publicKey) != BigInteger.ZERO
+        new BigInteger(1, keypair.secretKey) != BigInteger.ZERO
+        Hex.encodeHexString(keypair.getPublicKey()) == "46ebddef8cd9bb167dc30878d7113b7e168e6f0646beffd77d69d39bad76b47a"
+    }
+
+    def "Derive key"() {
+        setup:
+        def seed = Hex.decodeHex("fac7959dbfe72f052e5a0c3c8d6530f202b02fd8f9f5ca3580ec8deb7797479e")
+        def cc = Hex.decodeHex("14416c6963650000000000000000000000000000000000000000000000000000") // Alice
+        when:
+        def base = Schnorrkel.generateKeyPairFromSeed(seed)
+        def keypair = Schnorrkel.deriveKeyPair(base, cc)
+        then:
+        Hex.encodeHexString(keypair.getPublicKey()) == "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"
+    }
 }

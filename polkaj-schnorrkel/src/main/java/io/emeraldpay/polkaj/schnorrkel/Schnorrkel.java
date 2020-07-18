@@ -71,7 +71,20 @@ public class Schnorrkel {
         byte[] seed = new byte[32];
         random.nextBytes(seed);
         byte[] key = keypairFromSeed(seed);
+        return decodeKeyPair(key);
+    }
 
+    public static KeyPair generateKeyPairFromSeed(byte[] seed) throws SchnorrkelException {
+        byte[] key = keypairFromSeed(seed);
+        return decodeKeyPair(key);
+    }
+
+    public static KeyPair deriveKeyPair(KeyPair base, byte[] chainCode)  throws SchnorrkelException {
+        byte[] key = deriveHard(encodeKeyPair(base), chainCode);
+        return decodeKeyPair(key);
+    }
+
+    private static KeyPair decodeKeyPair(byte[] key) throws SchnorrkelException {
         if (key.length != KEYPAIR_LENGTH) {
             throw new SchnorrkelException("Invalid key generated");
         }
@@ -83,13 +96,21 @@ public class Schnorrkel {
         return new KeyPair(publicKey, secretKey);
     }
 
+    private static byte[] encodeKeyPair(KeyPair keyPair) {
+        byte[] result = new byte[KEYPAIR_LENGTH];
+        System.arraycopy(keyPair.secretKey, 0, result, 0, keyPair.secretKey.length);
+        System.arraycopy(keyPair.getPublicKey(), 0, result, SECRET_KEY_LENGTH, keyPair.getPublicKey().length);
+        return result;
+    }
+
     static {
         System.loadLibrary("polkaj_schnorrkel");
     }
 
     private static native byte[] sign(byte[] publicKey, byte[] secretKey, byte[] message);
     private static native byte[] keypairFromSeed(byte[] seed);
-    private static native boolean verify(byte[] signature, byte[] message, byte[] publicKey) throws SchnorrkelException;
+    private static native boolean verify(byte[] signature, byte[] message, byte[] publicKey);
+    private static native byte[] deriveHard(byte[] secret, byte[] cc);
 
     /**
      * Public Key
