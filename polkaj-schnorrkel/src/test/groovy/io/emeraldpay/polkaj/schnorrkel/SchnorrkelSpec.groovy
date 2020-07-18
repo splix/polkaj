@@ -3,6 +3,8 @@ package io.emeraldpay.polkaj.schnorrkel
 import org.apache.commons.codec.binary.Hex
 import spock.lang.Specification
 
+import java.security.SecureRandom
+
 class SchnorrkelSpec extends Specification {
 
     def key1 = new Schnorrkel.Keypair(
@@ -90,5 +92,25 @@ class SchnorrkelSpec extends Specification {
         Schnorrkel.verify(signature, msg, Hex.decodeHex("11223344"))
         then:
         thrown(SchnorrkelException)
+    }
+
+    def "Generates working key"() {
+        setup:
+        def random = SecureRandom.instanceStrong
+        byte[] msg = "hello".bytes
+        when:
+        def keypair = Schnorrkel.generateKey(random)
+        then:
+        keypair != null
+        keypair.publicKey.length == Schnorrkel.PUBLIC_KEY_LENGTH
+        keypair.secretKey.length == Schnorrkel.SECRET_KEY_LENGTH
+        new BigInteger(1, keypair.publicKey) != BigInteger.ZERO
+        new BigInteger(1, keypair.secretKey) != BigInteger.ZERO
+
+        when:
+        byte[] signature = Schnorrkel.sign(msg, keypair)
+        def act = Schnorrkel.verify(signature, msg, keypair.publicKey)
+        then:
+        act
     }
 }
