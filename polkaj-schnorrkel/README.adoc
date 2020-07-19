@@ -1,3 +1,7 @@
 == Schnorrkel / Ristretto x25519 (aka sr25519)
 
 Java wrapper around Rust implementation of the Schnorrkel / Ristretto x25519
+
+Implementation is based on WASM code:
+
+- https://github.com/polkadot-js/wasm/

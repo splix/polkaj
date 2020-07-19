@@ -56,3 +56,12 @@ cd runtime-explorer
 ----
 
 Open http://localhost:8080
+
+== Keys
+
+Generate Secret/Public Keys and Address
+
+----
+cd keys
+./gradlew run
+----

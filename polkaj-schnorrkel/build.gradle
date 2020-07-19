@@ -1,5 +1,3 @@
-apply plugin: 'c'
-
 dependencies {
 }
 
@@ -13,3 +11,18 @@ task compileRust(type:Exec) {
 }
 
 compileJava.dependsOn(compileRust)
+
+jar {
+    from("${buildDir}/rust/release") {
+        into "native/macos"
+        include '*.dylib'
+    }
+    from("${buildDir}/rust/release") {
+        into "native/linux"
+        include '*.so'
+    }
+    from("${buildDir}/rust/release") {
+        into "native/windows"
+        include '*.dll'
+    }
+}
