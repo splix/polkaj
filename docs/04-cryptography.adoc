@@ -1,0 +1,71 @@
+= Cryptography
+
+== Schnorrkel / Ristretto x25519 / sr25519
+
+Polkadot uses Schnorrkel/Ristretto x25519 ("sr25519") as its key derivation and signing algorithm.
+
+Sr25519 is based on the same underlying Curve25519 as its EdDSA counterpart, Ed25519.
+However, it uses Schnorr signatures instead of the EdDSA scheme.
+Schnorr's signatures bring some noticeable benefits over the ECDSA/EdDSA schemes.
+For one, it is more efficient and still retains the same feature set and security assumptions.
+Additionally, it allows for native multisignature through signature aggregation.
+
+The names Schnorrkel and Ristretto come from the two Rust libraries that implement this scheme, the Schnorrkel library for Schnorr signatures and the Ristretto library that makes it possible to use cofactor-8 curves like Curve25519.
+
+PolkaJ provide a Java wrapper around Rust library with JNI.
+The code of the interface is inspired by https://github.com/polkadot-js/wasm/[WASM implementation.]
+
+.Links
+- https://github.com/w3f/schnorrkel
+- https://github.com/polkadot-js/wasm/
+- https://polkadot.js.org/api/start/keyring.html
+
+== Generating Key Pair
+
+`Schnorrkel.generateKeyPair()` generates a new pair of Public and Secret Keys using default Secure Random source.
+
+.Generate a Key Pair
+[source, java]
+----
+import io.emeraldpay.polkaj.schnorrkel.Schnorrkel;
+
+Schnorrkel.KeyPair rootKey = Schnorrkel.generateKeyPair();
+----
+
+.To derive a new Key Pair from the Root Key:
+[source, java]
+----
+import io.emeraldpay.polkaj.schnorrkel.Schnorrkel;
+
+Schnorrkel.KeyPair key = Schnorrkel.deriveKeyPair(rootKey, Schnorrkel.ChainCode.from("//Alice".getBytes()));
+----
+
+.The generated Key Pair can be used to build an Address
+[source, java]
+----
+Address address = new Address(SS58Type.Network.CANARY, key.getPublicKey());
+----
+
+
+It's also possible to derive a new address from an existing:
+
+.Derive new address from existing
+[source, java]
+----
+// From current address
+Address address = Address.from("HhjZogQpUMuQEu8ChSAQUWj9UCnqAmCkogitYjqzCqD7xrq");
+Schnorrkel.PublicKey publicKey = new Schnorrkel.PublicKey(address.getPubkey());
+
+// Derive a new public key
+Schnorrkel.PublicKey derived = Schnorrkel.derivePublicKeySoft(
+        publicKey,
+        // using derivation path "//Bob"
+        Schnorrkel.ChainCode.from("//Bob".getBytes())
+);
+
+// Use it as a new Address
+Address anotherAddress = new Address(SS58Type.Network.CANARY, derived.getPublicKey());
+// Prints new address: HPYy6BTtHu6eCsDxEWcQ8TX86cPQeCm7WBDd1tQkWw9mnAR
+System.out.println("   Address: " + anotherAddress);
+System.out.println("Public Key: " + Hex.encodeHexString(derived.getPublicKey()));
+----

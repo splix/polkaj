@@ -1,0 +1,22 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}
+
+apply from: '../common.gradle'
+
+dependencies {
+    implementation "io.emeraldpay.polkaj:polkaj-common-types:$polkajVersion"
+    implementation "io.emeraldpay.polkaj:polkaj-ss58:$polkajVersion"
+    implementation "io.emeraldpay.polkaj:polkaj-schnorrkel:$polkajVersion"
+    implementation 'commons-codec:commons-codec:1.14'
+}
+
+application {
+    mainClassName = "Keys"
+}

@@ -71,6 +71,12 @@ public class Schnorrkel {
         return verify(signature, message, publicKey.getPublicKey());
     }
 
+    /**
+     * Generate a new Key Pair using default Secure Random source
+     *
+     * @return new Key Pair
+     * @throws SchnorrkelException is Secure Random is not available
+     */
     public static KeyPair generateKeyPair() throws SchnorrkelException {
         try {
             return generateKeyPair(SecureRandom.getInstanceStrong());
@@ -79,6 +85,13 @@ public class Schnorrkel {
         }
     }
 
+    /**
+     * Generate a new Key Pair
+     *
+     * @param random provide a Secure Random for key generation
+     * @return new Key Pair
+     * @throws SchnorrkelException if failed to generate from the source of random
+     */
     public static KeyPair generateKeyPair(SecureRandom random) throws SchnorrkelException {
         byte[] seed = new byte[32];
         random.nextBytes(seed);
@@ -86,21 +99,51 @@ public class Schnorrkel {
         return decodeKeyPair(key);
     }
 
+    /**
+     * Generate a new Key Pair from provided seed
+     *
+     * @param seed seed value
+     * @return new Key Pair
+     * @throws SchnorrkelException if seed is invalid
+     */
     public static KeyPair generateKeyPairFromSeed(byte[] seed) throws SchnorrkelException {
         byte[] key = keypairFromSeed(seed);
         return decodeKeyPair(key);
     }
 
+    /**
+     * Derive a New Key pair from existing.
+     *
+     * @param base current Key Pair
+     * @param chainCode derivation path
+     * @return new Key Pair
+     * @throws SchnorrkelException if Key Pair or Derivation Path are invalid
+     */
     public static KeyPair deriveKeyPair(KeyPair base, ChainCode chainCode) throws SchnorrkelException {
         byte[] key = deriveHard(encodeKeyPair(base), chainCode.getValue());
         return decodeKeyPair(key);
     }
 
-    public static KeyPair deriveKeyPairSoft(KeyPair base, ChainCode chainCode) throws SchnorrkelException {
+    /**
+     * Derive a New Key pair from existing, using Soft algorithm (which allows to generate Public key separately)
+     *
+     * @param base current Key Pair
+     * @param chainCode derivation path
+     * @return new Key Pair
+     * @throws SchnorrkelException if Key Pair or Derivation Path are invalid
+     */    public static KeyPair deriveKeyPairSoft(KeyPair base, ChainCode chainCode) throws SchnorrkelException {
         byte[] key = deriveSoft(encodeKeyPair(base), chainCode.getValue());
         return decodeKeyPair(key);
     }
 
+    /**
+     * Derive a new Public Key from existing
+     *
+     * @param base existing Public Key
+     * @param chainCode derivation path
+     * @return new Public Key
+     * @throws SchnorrkelException if Public Key or Derivation Path are invalid
+     */
     public static PublicKey derivePublicKeySoft(PublicKey base, ChainCode chainCode) throws SchnorrkelException {
         byte[] key = derivePublicKeySoft(base.publicKey, chainCode.getValue());
         return new PublicKey(key);
