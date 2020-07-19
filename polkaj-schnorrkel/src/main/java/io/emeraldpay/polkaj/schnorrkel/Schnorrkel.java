@@ -3,7 +3,8 @@ package io.emeraldpay.polkaj.schnorrkel;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
@@ -348,9 +349,9 @@ public class Schnorrkel {
         System.setProperty(libraryPathProperty, userLibs);
         // But since it may be already processed and cached we need to erase the current value
         try {
-            final Field sysPathsField = ClassLoader.class.getDeclaredField("sys_paths");
-            sysPathsField.setAccessible(true);
-            sysPathsField.set(null, null);
+            MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(ClassLoader.class, MethodHandles.lookup());
+            VarHandle sysPathsField = lookup.findStaticVarHandle(ClassLoader.class, "sys_paths", String[].class);
+            sysPathsField.set(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             System.err.println("Unable to update sys_paths field. " + e.getClass() + ":" + e.getMessage());
         }
