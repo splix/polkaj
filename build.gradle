@@ -52,7 +52,7 @@ subprojects {
         testImplementation ('org.spockframework:spock-core:2.0-M2-groovy-3.0') {
             exclude group: 'org.codehaus.groovy'
         }
-        testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.1.13'
+        testImplementation "nl.jqno.equalsverifier:equalsverifier:3.3"
         testImplementation 'org.codehaus.groovy:groovy-all:3.0.3'
         testImplementation 'commons-codec:commons-codec:1.14'
         testImplementation 'cglib:cglib-nodep:3.3.0'

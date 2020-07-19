@@ -1,8 +1,11 @@
 package io.emeraldpay.polkaj.schnorrkel
 
+import nl.jqno.equalsverifier.EqualsVerifier
+import nl.jqno.equalsverifier.Warning
 import org.apache.commons.codec.binary.Hex
 import spock.lang.Specification
 
+import java.security.PrivateKey
 import java.security.SecureRandom
 
 class SchnorrkelSpec extends Specification {
@@ -167,5 +170,30 @@ class SchnorrkelSpec extends Specification {
         def act = Schnorrkel.derivePublicKeySoft(new Schnorrkel.PublicKey(pub), cc)
         then:
         Hex.encodeHexString(act.getPublicKey()) == "40b9675df90efa6069ff623b0fdfcf706cd47ca7452a5056c7ad58194d23440a"
+    }
+
+    def "Equals for Pubkey"() {
+        when:
+        def v = EqualsVerifier.forClass(Schnorrkel.PublicKey)
+                .suppress(Warning.STRICT_INHERITANCE)
+        then:
+        v.verify()
+    }
+
+    def "Equals for KeyPair"() {
+        when:
+        def v = EqualsVerifier.forClass(Schnorrkel.KeyPair)
+                .withRedefinedSuperclass()
+                .suppress(Warning.STRICT_INHERITANCE)
+        then:
+        v.verify()
+    }
+
+    def "Equals for ChainCode"() {
+        when:
+        def v = EqualsVerifier.forClass(Schnorrkel.ChainCode)
+                .suppress(Warning.STRICT_INHERITANCE)
+        then:
+        v.verify()
     }
 }

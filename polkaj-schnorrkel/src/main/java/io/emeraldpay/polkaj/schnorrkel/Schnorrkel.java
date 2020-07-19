@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 /**
  * Schnorrkel implements Schnorr signature on Ristretto compressed Ed25519 points, as well as related protocols like
@@ -139,6 +140,20 @@ public class Schnorrkel {
         public byte[] getPublicKey() {
             return publicKey;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof PublicKey)) return false;
+            if (o instanceof KeyPair) return false;
+            PublicKey publicKey1 = (PublicKey) o;
+            return Arrays.equals(publicKey, publicKey1.publicKey);
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(publicKey);
+        }
     }
 
     /**
@@ -159,6 +174,22 @@ public class Schnorrkel {
 
         public byte[] getSecretKey() {
             return secretKey;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof KeyPair)) return false;
+            KeyPair keyPair = (KeyPair) o;
+            return Arrays.equals(getPublicKey(), keyPair.getPublicKey())
+                    && Arrays.equals(secretKey, keyPair.secretKey);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = super.hashCode();
+            result = 31 * result + Arrays.hashCode(secretKey);
+            return result;
         }
     }
 
@@ -186,6 +217,19 @@ public class Schnorrkel {
 
         public byte[] getValue() {
             return value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ChainCode)) return false;
+            ChainCode chainCode = (ChainCode) o;
+            return Arrays.equals(value, chainCode.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(value);
         }
     }
 
