@@ -1,10 +1,13 @@
 package io.emeraldpay.polkaj.schnorrkel;
 
-import java.nio.charset.Charset;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Schnorrkel implements Schnorr signature on Ristretto compressed Ed25519 points, as well as related protocols like
@@ -121,16 +124,7 @@ public class Schnorrkel {
         return result;
     }
 
-    static {
-        System.loadLibrary("polkaj_schnorrkel");
-    }
-
-    private static native byte[] sign(byte[] publicKey, byte[] secretKey, byte[] message);
-    private static native byte[] keypairFromSeed(byte[] seed);
-    private static native boolean verify(byte[] signature, byte[] message, byte[] publicKey);
-    private static native byte[] deriveHard(byte[] secret, byte[] cc);
-    private static native byte[] deriveSoft(byte[] secret, byte[] cc);
-    private static native byte[] derivePublicKeySoft(byte[] publicKey, byte[] cc);
+    // ====================== Supporting Classes ======================
 
     /**
      * Public Key
@@ -195,4 +189,83 @@ public class Schnorrkel {
         }
     }
 
+    // ====================== Mapping to the Native Library ======================
+
+    private static native byte[] sign(byte[] publicKey, byte[] secretKey, byte[] message);
+    private static native byte[] keypairFromSeed(byte[] seed);
+    private static native boolean verify(byte[] signature, byte[] message, byte[] publicKey);
+    private static native byte[] deriveHard(byte[] secret, byte[] cc);
+    private static native byte[] deriveSoft(byte[] secret, byte[] cc);
+    private static native byte[] derivePublicKeySoft(byte[] publicKey, byte[] cc);
+
+    // ====================== LOAD NATIVE LIBRARY ======================
+
+    private static final String LIBNAME = "polkaj_schnorrkel";
+
+    static {
+        try {
+            // JVM needs native libraries to be loaded from filesystem, so first we need to extract
+            // files for current OS into a temp dir
+            extractJNI();
+        } catch (IOException e) {
+            System.err.println("Failed to extract JNI library from Jar file. " + e.getClass() + ":" + e.getMessage());
+        }
+        try {
+            // load the native library
+            System.loadLibrary(LIBNAME);
+        } catch (UnsatisfiedLinkError e) {
+            System.err.println("Failed to load native library. Polkaj Schnorrkel methods are unavailable. Error: " + e.getMessage());
+        }
+    }
+
+    private static void extractJNI() throws IOException {
+        // define which of files bundled with Jar to extract
+        String os = System.getProperty("os.name", "unknown").toLowerCase();
+        if (os.contains("win")) {
+            os = "windows";
+        } else if (os.contains("mac")) {
+            os = "macos";
+        } else if (os.contains("nux")) {
+            os = "linux";
+        } else {
+            System.err.println("Unknown OS: " + os + ". Unable to setup native library for Polkaj Schnorrkel");
+            return;
+        }
+        String filename = System.mapLibraryName(LIBNAME);
+        String classpathFile = "/native/" + os + "/" + filename;
+
+        // extract native lib to the filesystem
+        InputStream lib = Schnorrkel.class.getResourceAsStream(classpathFile);
+        if (lib == null) {
+            System.err.println("Library " + classpathFile + " is not found in the classpath");
+            return;
+        }
+        Path dir = Files.createTempDirectory(LIBNAME);
+        Path target = dir.resolve(filename);
+        Files.copy(lib, target);
+
+        // setup JVM to delete files on exit, when possible
+        target.toFile().deleteOnExit();
+        dir.toFile().deleteOnExit();
+
+        // prepare new path to native libraries, including the directly with just extracted file
+        final String libraryPathProperty = "java.library.path";
+        String userLibs = System.getProperty(libraryPathProperty);
+        if (userLibs == null || "".equals(userLibs)) {
+            userLibs = dir.toAbsolutePath().toString();
+        } else {
+            userLibs = userLibs + File.pathSeparatorChar + dir.toAbsolutePath().toString();
+        }
+
+        // Update paths to search for native libraries
+        System.setProperty(libraryPathProperty, userLibs);
+        // But since it may be already processed and cached we need to erase the current value
+        try {
+            final Field sysPathsField = ClassLoader.class.getDeclaredField("sys_paths");
+            sysPathsField.setAccessible(true);
+            sysPathsField.set(null, null);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            System.err.println("Unable to update sys_paths field. " + e.getClass() + ":" + e.getMessage());
+        }
+    }
 }
