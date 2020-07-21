@@ -5,8 +5,50 @@ on:
     types: [created]
 
 jobs:
+  #
+  # Build native binary for Schnorrkel, used througj JNI
+  #
+  native:
+    name: Prepare JNI lib (${{ matrix.os }})
+    strategy:
+      matrix:
+        os: ["windows-latest", "macos-latest", "ubuntu-latest"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@master
+        with:
+          ref: ${{ github.ref }}
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Build Rust
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --manifest-path=polkaj-schnorrkel/src/rust/Cargo.toml
+      - name: Upload Lib
+        uses: actions/upload-artifact@v2
+        with:
+          name: schnorrkel-lib
+          path: |
+            polkaj-schnorrkel/src/rust/target/release/*.dll
+            polkaj-schnorrkel/src/rust/target/release/*.so
+            polkaj-schnorrkel/src/rust/target/release/*.dylib
+      - name: Remove old artifacts
+        uses: c-hive/gha-remove-artifacts@v1
+        with:
+          age: '1 week'
+
+  #
+  # Publish Jars to current Github release
+  #
   publish-github:
+    name: To Github
     runs-on: ubuntu-latest
+    needs: native
     steps:
       - uses: actions/checkout@master
         with:
@@ -15,6 +57,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Download native lib
+        uses: actions/download-artifact@v2
+        with:
+          name: schnorrkel-lib
+          path: polkaj-schnorrkel/build/rust/release
       - name: Check
         uses: eskatos/gradle-command-action@v1
         with:
@@ -36,8 +83,13 @@ jobs:
           file: ./build/libs/*.jar
           file_glob: true
 
+  #
+  # Maven release to Bintray
+  #
   publish-bintray:
+    name: To Bintray
     runs-on: ubuntu-latest
+    needs: native
     steps:
       - uses: actions/checkout@master
         with:
@@ -46,6 +98,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Download native lib
+        uses: actions/download-artifact@v2
+        with:
+          name: schnorrkel-lib
+          path: polkaj-schnorrkel/build/rust/release
       - name: Check
         uses: eskatos/gradle-command-action@v1
         with:
