@@ -26,10 +26,9 @@ jobs:
           override: true
       - name: Build Rust
         uses: actions-rs/cargo@v1
-        working-directory: polkaj-schnorrkel/src/rust
         with:
           command: build
-          args: --all --release
+          args: --release --manifest-path=polkaj-schnorrkel/src/rust/Cargo.toml
       - name: Upload Lib
         uses: actions/upload-artifact@v2
         with:
