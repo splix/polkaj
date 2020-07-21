@@ -25,9 +25,11 @@ jobs:
           toolchain: stable
           override: true
       - name: Build Rust
-        uses: eskatos/gradle-command-action@v1
+        uses: actions-rs/cargo@v1
+        working-directory: polkaj-schnorrkel/src/rust
         with:
-          arguments: build
+          command: build
+          args: --all --release
       - name: Upload Lib
         uses: actions/upload-artifact@v2
         with:
