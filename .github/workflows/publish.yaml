@@ -3,18 +3,58 @@ name: Publish
 on:
   release:
     types: [created]
+  # on a pull request
+  pull_request:
+    branches:
+      - master
 
 jobs:
-  publish-github:
+  native:
+    strategy:
+      matrix:
+        os: ["windows-latest", "macos-latest", "ubuntu-latest"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@master
+#        with:
+#          ref: ${{ github.ref }}
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: Build Rust
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: build
+      - name: Upload Lib
+        uses: actions/upload-artifact@v2
+        with:
+          name: schnorrkel-lib
+          path: |
+            polkaj-schnorrkel/src/rust/target/release/*.dll
+            polkaj-schnorrkel/src/rust/target/release/*.so
+            polkaj-schnorrkel/src/rust/target/release/*.dylib
+      - name: Remove old artifacts
+        uses: c-hive/gha-remove-artifacts@v1
+        with:
+          age: '1 week'
+
+  build-dist:
+    needs: native
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-        with:
-          ref: ${{ github.ref }}
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Download native lib
+        uses: actions/download-artifact@v2
+        with:
+          name: schnorrkel-lib
+          path: polkaj-schnorrkel/build/rust/release
       - name: Check
         uses: eskatos/gradle-command-action@v1
         with:
@@ -27,33 +67,61 @@ jobs:
         uses: eskatos/gradle-command-action@v1
         with:
           arguments: syncJars
-      - name: Upload Jars
-        id: upload-release-asset
-        uses: svenstaro/upload-release-action@v1-release
+      - name: Upload jars
+        uses: actions/upload-artifact@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref }}
-          file: ./build/libs/*.jar
-          file_glob: true
+          name: jars
+          path: build/libs/*.jar
 
-  publish-bintray:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-        with:
-          ref: ${{ github.ref }}
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - name: Check
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: check
-      - name: Upload to Bintray
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: bintrayUpload
-        env:
-          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+#  publish-github:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@master
+#        with:
+#          ref: ${{ github.ref }}
+#      - name: Set up JDK
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: 11
+#      - name: Check
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: check
+#      - name: Build
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: build
+#      - name: Sync Jars
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: syncJars
+#      - name: Upload Jars
+#        id: upload-release-asset
+#        uses: svenstaro/upload-release-action@v1-release
+#        with:
+#          repo_token: ${{ secrets.GITHUB_TOKEN }}
+#          tag: ${{ github.ref }}
+#          file: ./build/libs/*.jar
+#          file_glob: true
+
+#  publish-bintray:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@master
+#        with:
+#          ref: ${{ github.ref }}
+#      - name: Set up JDK
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: 11
+#      - name: Check
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: check
+#      - name: Upload to Bintray
+#        uses: eskatos/gradle-command-action@v1
+#        with:
+#          arguments: bintrayUpload
+#        env:
+#          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+#          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
