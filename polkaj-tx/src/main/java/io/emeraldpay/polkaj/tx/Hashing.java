@@ -1,6 +1,8 @@
 package io.emeraldpay.polkaj.tx;
 
+import io.emeraldpay.polkaj.types.Address;
 import net.openhft.hashing.LongHashFunction;
+import org.bouncycastle.crypto.digests.Blake2bDigest;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -28,5 +30,30 @@ public class Hashing {
                 .put(LongHashFunction.xx(0).hashBytes(valueBytes))
                 .put(LongHashFunction.xx(1).hashBytes(valueBytes));
         return buf.flip().array();
+    }
+
+    /**
+     * Hash with Blake2-256
+     *
+     * @param value value to hash
+     * @return 256 bit (32 bytes) hash
+     */
+    public static byte[] blake2(byte[] value) {
+        Blake2bDigest digest = new Blake2bDigest(256);
+        digest.update(value, 0, value.length);
+
+        byte[] result = new byte[32];
+        digest.doFinal(result, 0);
+        return result;
+    }
+
+    /**
+     * Hash address with Blake2-256. Uses Public Key for the hash input, i.e. Address Network is not included.
+     *
+     * @param value value to hash
+     * @return 256 bit (32 bytes) hash
+     */
+    public static byte[] blake2(Address value) {
+        return blake2(value.getPubkey());
     }
 }
