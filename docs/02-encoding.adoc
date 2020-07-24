@@ -62,6 +62,7 @@ System.out.println("Union read #" + f.getIndex() + " = " + f.getValue());
 - `UByteReader` -> unsigned `Integer` encoded as a single byte (i.e., 0..255)
 - `UInt16Reader` -> unsigned `Integer` encoded as 16 bits
 - `UInt32Reader` -> unsigned `Long` encoded as 32 bits
+- `UInt128Reader` -> unsigned `BigInteger` encoded as 128 bits
 - `UnionReader` -> a enumeration, where individual readers are tagged
 
 ==== Using custom reader

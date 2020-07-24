@@ -2,6 +2,7 @@ package io.emeraldpay.polkaj.scale;
 
 import io.emeraldpay.polkaj.scale.reader.*;
 
+import java.math.BigInteger;
 import java.util.Optional;
 
 /**
@@ -12,6 +13,7 @@ public class ScaleCodecReader {
     public static final UByteReader UBYTE = new UByteReader();
     public static final UInt16Reader UINT16 = new UInt16Reader();
     public static final UInt32Reader UINT32 = new UInt32Reader();
+    public static final UInt128Reader UINT128 = new UInt128Reader();
     public static final Int32Reader INT32 = new Int32Reader();
     public static final CompactUIntReader COMPACT_UINT = new CompactUIntReader();
     public static final BoolReader BOOL = new BoolReader();
@@ -91,6 +93,10 @@ public class ScaleCodecReader {
 
     public long readUint32() {
         return UINT32.read(this);
+    }
+
+    public BigInteger readUint128() {
+        return UINT128.read(this);
     }
 
     public int readCompactInt() {
