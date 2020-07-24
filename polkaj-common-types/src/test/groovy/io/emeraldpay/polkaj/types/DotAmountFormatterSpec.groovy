@@ -173,4 +173,11 @@ class DotAmountFormatterSpec extends Specification {
         then:
         act == forLocale("0.000789 mDOT")
     }
+
+    def "Gives null on null input"() {
+        when:
+        def act = DotAmountFormatter.newBuilder().build().format(null)
+        then:
+        act == null
+    }
 }
