@@ -11,6 +11,12 @@
 
 <div class="container">
 
+    <dl class="row">
+        <dt class="col-3">Module Name</dt>
+        <dd class="col-9" th:text="${module.name}">NAME</dd>
+        <dt class="col-3">Storage Prefix</dt>
+        <dd class="col-9" th:text="${module.storage.prefix}">NAME</dd>
+    </dl>
 
     <div class="row">
         <div class="col-12" th:if="${!#lists.isEmpty(module.storage.entries)}">

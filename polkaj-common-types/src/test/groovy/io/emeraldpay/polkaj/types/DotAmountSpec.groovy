@@ -21,6 +21,14 @@ class DotAmountSpec extends Specification {
         act.units.main.name == "Dot"
     }
 
+    def "Create from string"() {
+        when:
+        def act = DotAmount.fromPlancks("123456789")
+        then:
+        act.value == 123456789
+        act.units.main.name == "Dot"
+    }
+
     def "Create from dots"() {
         when:
         def act = DotAmount.fromDots(123.456789)

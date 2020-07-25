@@ -79,6 +79,10 @@ public class DotAmount implements Comparable<DotAmount>{
         return new DotAmount(BigInteger.valueOf(amount), Polkadots);
     }
 
+    public static DotAmount fromPlancks(String amount) {
+        return new DotAmount(new BigInteger(amount), Polkadots);
+    }
+
     public static DotAmount fromDots(long amount) {
         return new DotAmount(
                 BigInteger.valueOf(amount)
