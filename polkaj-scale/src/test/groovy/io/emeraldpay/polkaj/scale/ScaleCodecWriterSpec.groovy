@@ -70,7 +70,7 @@ class ScaleCodecWriterSpec extends Specification {
 
     def "Write byte array"() {
         expect:
-        codec.writeByteArray(Hex.decodeHex(value))
+        codec.writeAsList(Hex.decodeHex(value))
         Hex.encodeHexString(buf.toByteArray()) == hex
         where:
         hex         | value

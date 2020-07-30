@@ -11,6 +11,7 @@ import java.util.Optional;
 public class ScaleCodecWriter implements Closeable {
 
     public static final CompactUIntWriter COMPACT_UINT = new CompactUIntWriter();
+    public static final CompactBigIntWriter COMPACT_BIGINT = new CompactBigIntWriter();
     public static final UInt16Writer UINT16 = new UInt16Writer();
     public static final UInt32Writer UINT32 = new UInt32Writer();
     public static final UInt128Writer UINT128 = new UInt128Writer();
@@ -28,10 +29,14 @@ public class ScaleCodecWriter implements Closeable {
         if (value.length != 32) {
             throw new IllegalArgumentException("Value must be 32 byte array");
         }
-        out.write(value, 0, value.length);
+        writeByteArray(value);
     }
 
     public void writeByteArray(byte[] value) throws IOException {
+        out.write(value, 0, value.length);
+    }
+
+    public void writeAsList(byte[] value) throws IOException {
         writeCompact(value.length);
         out.write(value, 0, value.length);
     }
