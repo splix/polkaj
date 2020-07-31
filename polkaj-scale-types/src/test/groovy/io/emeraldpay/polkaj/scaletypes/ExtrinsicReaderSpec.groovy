@@ -27,8 +27,8 @@ class ExtrinsicReaderSpec extends Specification {
             era == 229
             nonce == 3
             tip == DotAmount.ZERO
-            signatureType == Extrinsic.SignatureType.SR25519
-            signature == Hash512.from("0xbc11655de6e7461b0951353db25f4aaf67a58db547fa3a2f20cbcd7772ba715f8ccbe9d8bddf253c7f6e6f6acb83848a7da1f27de248afca10d3291de92ede8c")
+            signature.getType() == Extrinsic.SignatureType.SR25519
+            signature.getValue() == Hash512.from("0xbc11655de6e7461b0951353db25f4aaf67a58db547fa3a2f20cbcd7772ba715f8ccbe9d8bddf253c7f6e6f6acb83848a7da1f27de248afca10d3291de92ede8c")
         }
         with(act.call) {
             moduleIndex == 4

@@ -57,7 +57,8 @@ public class Extrinsic<CALL extends ExtrinsicCall> {
 
     public static enum SignatureType {
         ED25519(0),
-        SR25519(1);
+        SR25519(1),
+        ECDSA(2);
 
         private final int code;
 
@@ -89,13 +90,9 @@ public class Extrinsic<CALL extends ExtrinsicCall> {
          */
         private Address sender;
         /**
-         * Signature type. By default it's SR25519
+         * Signature
          */
-        private SignatureType signatureType = Extrinsic.SignatureType.SR25519;
-        /**
-         * 64-byte signature
-         */
-        private Hash512 signature;
+        private SR25519Signature signature;
         /**
          * Era to execute extrinsic. Immortal by default (i.e. 0)
          */
@@ -117,19 +114,11 @@ public class Extrinsic<CALL extends ExtrinsicCall> {
             this.sender = sender;
         }
 
-        public Hash512 getSignature() {
+        public SR25519Signature getSignature() {
             return signature;
         }
 
-        public SignatureType getSignatureType() {
-            return signatureType;
-        }
-
-        public void setSignatureType(SignatureType signatureType) {
-            this.signatureType = signatureType;
-        }
-
-        public void setSignature(Hash512 signature) {
+        public void setSignature(SR25519Signature signature) {
             this.signature = signature;
         }
 
@@ -163,7 +152,6 @@ public class Extrinsic<CALL extends ExtrinsicCall> {
             if (!(o instanceof TransactionInfo)) return false;
             TransactionInfo that = (TransactionInfo) o;
             return Objects.equals(sender, that.sender) &&
-                    signatureType == that.signatureType &&
                     Objects.equals(signature, that.signature) &&
                     Objects.equals(era, that.era) &&
                     Objects.equals(nonce, that.nonce) &&
@@ -172,7 +160,36 @@ public class Extrinsic<CALL extends ExtrinsicCall> {
 
         @Override
         public int hashCode() {
-            return Objects.hash(sender, signatureType, era, nonce);
+            return Objects.hash(sender, era, nonce);
+        }
+    }
+
+    public static class SR25519Signature {
+        private final Hash512 value;
+
+        public SR25519Signature(Hash512 value) {
+            this.value = value;
+        }
+
+        public Hash512 getValue() {
+            return value;
+        }
+
+        public SignatureType getType() {
+            return SignatureType.SR25519;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof SR25519Signature)) return false;
+            SR25519Signature that = (SR25519Signature) o;
+            return Objects.equals(value, that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
         }
     }
 

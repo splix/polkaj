@@ -34,7 +34,7 @@ public class ExtrinsicWriter<CALL extends ExtrinsicCall> implements ScaleWriter<
         public void write(ScaleCodecWriter wrt, Extrinsic.TransactionInfo value) throws IOException {
             wrt.writeUint256(value.getSender().getPubkey());
             wrt.writeByte(Extrinsic.SignatureType.SR25519.getCode());
-            wrt.writeByteArray(value.getSignature().getBytes());
+            wrt.writeByteArray(value.getSignature().getValue().getBytes());
             wrt.writeCompact(value.getEra());
             wrt.write(ScaleCodecWriter.COMPACT_BIGINT, BigInteger.valueOf(value.getNonce()));
             wrt.write(ScaleCodecWriter.COMPACT_BIGINT, value.getTip().getValue());
