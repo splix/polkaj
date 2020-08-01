@@ -2,6 +2,8 @@ package io.emeraldpay.polkaj.tx;
 
 public interface Era {
 
+    public static final Era IMMORTAL = new Era.Immortal();
+
     public byte[] encode();
 
     /**
@@ -20,6 +22,8 @@ public interface Era {
      * @return target block number
      */
     public long death(long current);
+
+    public boolean isImmortal();
 
     public static Era decode(int value) {
         if (value < 0) {
@@ -56,6 +60,11 @@ public interface Era {
         @Override
         public long death(long current) {
             return Long.MAX_VALUE;
+        }
+
+        @Override
+        public boolean isImmortal() {
+            return true;
         }
     }
 
@@ -109,6 +118,11 @@ public interface Era {
         @Override
         public long death(long current) {
             return this.birth(current) + period;
+        }
+
+        @Override
+        public boolean isImmortal() {
+            return false;
         }
     }
 

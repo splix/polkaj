@@ -25,6 +25,7 @@ class EraSpec extends Specification {
         def act = Era.decode(0)
         then:
         act instanceof Era.Immortal
+        act.isImmortal()
     }
 
     def "Encode immortal"() {
@@ -43,6 +44,7 @@ class EraSpec extends Specification {
             period == 32768
             phase == 20000
         }
+        !act.isImmortal()
     }
 
     def "Encode mortal"() {
