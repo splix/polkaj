@@ -20,6 +20,7 @@ public class Hashing {
      * Hash with xxhash algorithm. Produces 128 bits output. The xxhash by default gives only 64 bytes, so
      * the xxhash128 applies it twice with seed 0 and seed 1
      *
+     * @param buf buffer to put the result
      * @param value string to hash
      */
     public static void xxhash128(ByteBuffer buf, String value) {
@@ -34,22 +35,35 @@ public class Hashing {
     }
 
     /**
-     * Hash with Blake2-256
+     * Hash with Blake2 256 bit
      *
+     * @param buf buffer to put the result
      * @param value value to hash
      */
     public static void blake2(ByteBuffer buf, byte[] value) {
+        buf.put(blake2(value));
+    }
+
+    /**
+     * Hash with Blake2 256 bit
+     *
+     * @param value value to hash
+     * @return hash of the value
+     */
+    public static byte[] blake2(byte[] value) {
         Blake2bDigest digest = new Blake2bDigest(256);
         digest.update(value, 0, value.length);
 
         byte[] result = new byte[32];
         digest.doFinal(result, 0);
-        buf.put(result);
+        return result;
     }
 
+
     /**
-     * Hash address with Blake2-256. Uses Public Key for the hash input, i.e. Address Network is not included.
+     * Hash address with Blake2 256 bit. Uses Public Key for the hash input, i.e. Address Network is not included.
      *
+     * @param buf buffer to put the result
      * @param value value to hash
      */
     public static void blake2(ByteBuffer buf, Address value) {
@@ -57,8 +71,9 @@ public class Hashing {
     }
 
     /**
-     * Hash with Blake2-128
+     * Hash with Blake2 128 bit
      *
+     * @param buf buffer to put the result
      * @param value value to hash
      */
     public static void blake2128(ByteBuffer buf, byte[] value) {
@@ -72,8 +87,9 @@ public class Hashing {
     }
 
     /**
-     * Hash address with Blake2-128. Uses Public Key for the hash input, i.e. Address Network is not included.
+     * Hash address with Blake2 128 bit. Uses Public Key for the hash input, i.e. Address Network is not included.
      *
+     * @param buf buffer to put the result
      * @param value value to hash
      */
     public static void blake2128(ByteBuffer buf, Address value) {
