@@ -17,7 +17,11 @@ import java.math.BigInteger;
 public class Signer {
 
     public static byte[] getPayload(ExtrinsicContext ctx, BalanceTransfer call) throws SignException {
-        SignaturePayloadWriter<BalanceTransfer> codec = new SignaturePayloadWriter<>(new BalanceTransferWriter());
+        return getPayload(ctx, call, true);
+    }
+
+    public static byte[] getPayload(ExtrinsicContext ctx, BalanceTransfer call, boolean asList) throws SignException {
+        SignaturePayloadWriter<BalanceTransfer> codec = new SignaturePayloadWriter<>(new BalanceTransferWriter(), asList);
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try (ScaleCodecWriter writer = new ScaleCodecWriter(result)) {
             writer.write(codec, new SignaturePayload<>(ctx, call));
@@ -33,7 +37,7 @@ public class Signer {
     }
 
     public static Hash512 sign(ExtrinsicContext ctx, BalanceTransfer call, Schnorrkel.KeyPair key) throws SignException {
-        byte[] payload = getPayload(ctx, call);
+        byte[] payload = getPayload(ctx, call, false);
         try {
             return new Hash512(Schnorrkel.sign(payload, key));
         } catch (SchnorrkelException e) {
@@ -42,7 +46,7 @@ public class Signer {
     }
 
     public static boolean isValid(ExtrinsicContext ctx, BalanceTransfer call, Hash512 signature, Address address) throws SignException {
-        byte[] payload = getPayload(ctx, call);
+        byte[] payload = getPayload(ctx, call, false);
         try {
             return Schnorrkel.verify(signature.getBytes(), payload, new Schnorrkel.PublicKey(address.getPubkey()));
         } catch (SchnorrkelException e) {
@@ -70,20 +74,30 @@ public class Signer {
 
     public static class SignaturePayloadWriter<CALL extends ExtrinsicCall> implements ScaleWriter<SignaturePayload<CALL>> {
 
-        //TODO figure it out
-        public static final int MAGIC_NUMBER = 6;
-
         private final ScaleWriter<CALL> callScaleWriter;
+        private final boolean callAsList;
 
-        public SignaturePayloadWriter(ScaleWriter<CALL> callScaleWriter) {
+        public SignaturePayloadWriter(ScaleWriter<CALL> callScaleWriter, boolean callAsList) {
             this.callScaleWriter = callScaleWriter;
+            this.callAsList = callAsList;
+        }
+
+        protected byte[] encodeCall(CALL call) throws IOException {
+            ByteArrayOutputStream callBuffer = new ByteArrayOutputStream();
+            ScaleCodecWriter callWriter = new ScaleCodecWriter(callBuffer);
+            callWriter.write(callScaleWriter, call);
+            callWriter.close();
+            return callBuffer.toByteArray();
         }
 
         @Override
         public void write(ScaleCodecWriter wrt, SignaturePayload<CALL> signPayload) throws IOException {
             ExtrinsicContext context = signPayload.getContext();
-            wrt.writeByte(MAGIC_NUMBER);
-            wrt.write(callScaleWriter, signPayload.getCall());
+            if (callAsList) {
+                wrt.writeAsList(encodeCall(signPayload.getCall()));
+            } else {
+                wrt.write(callScaleWriter, signPayload.getCall());
+            }
             wrt.write(ScaleCodecWriter.COMPACT_BIGINT, BigInteger.valueOf(context.getEra().birth(context.getEraHeight())));
             wrt.write(ScaleCodecWriter.COMPACT_BIGINT, BigInteger.valueOf(context.getNonce()));
             wrt.write(ScaleCodecWriter.COMPACT_BIGINT, context.getTip().getValue());

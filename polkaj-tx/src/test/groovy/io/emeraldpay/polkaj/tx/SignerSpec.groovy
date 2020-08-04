@@ -1,6 +1,7 @@
 package io.emeraldpay.polkaj.tx
 
 import io.emeraldpay.polkaj.scaletypes.BalanceTransfer
+import io.emeraldpay.polkaj.schnorrkel.Schnorrkel
 import io.emeraldpay.polkaj.types.Address
 import io.emeraldpay.polkaj.types.DotAmount
 import io.emeraldpay.polkaj.types.Hash256
@@ -10,60 +11,113 @@ import spock.lang.Specification
 
 class SignerSpec extends Specification {
 
-    def "Accept valid signature"() {
+    // Secret Key URI `//Alice` is account:
+    //  Network ID/version: substrate
+    //  Secret seed:        0xe5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a
+    //  Public key (hex):   0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
+    //  Account ID:         0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
+    //  SS58 Address:       5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+
+    // Secret Key URI `//Bob` is account:
+    //  Network ID/version: substrate
+    //  Secret seed:        0x398f0c28f98885e046333d4a41c19cee4c37368a9832c6502f6cfd182e2aef89
+    //  Public key (hex):   0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48
+    //  Account ID:         0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48
+    //  SS58 Address:       5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty
+
+    Schnorrkel.KeyPair aliceKey = Schnorrkel.generateKeyPairFromSeed(
+            Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
+    )
+    Address alice = Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")
+    Address bob = Address.from("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty")
+
+    def "Sign standard"() {
+        // PAYLOAD STRUCTURE:
+        // a4 <- encoded call size (omitted for signature)
+        // 0500 <- method
+        // 8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48 <- to
+        // 0b <- amount size
+        // 0b0030ef7dba02 <- amount
+        // 00 <- era
+        // 1c <- nonce
+        // 00 <- tip
+        // 12000000 <- runtime version
+        // 03000000 <- tx version
+        // 4c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122 <- genesis
+        // 4c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122 <- block
+
         setup:
         ExtrinsicContext extrinsic = ExtrinsicContext.newBuilder()
-            .genesis(Hash256.from("0x35170a58d341fd81c07ee349438da400ecfb625782cd25e29774203080a54f45"))
-            .nonce(3)
-            .build()
-        BalanceTransfer call = new BalanceTransfer(0, 0xff).tap {
-            destination = Address.from("5GHZtDpKVWipNuXSAPejAwQremYtRc5ThgSnwwEwZX4tD15W")
-            balance = DotAmount.fromDots(5)
+                .runtime(3, 0x12)
+                .genesis(Hash256.from("0x4c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"))
+                .nonce(7)
+                .build()
+        BalanceTransfer call = new BalanceTransfer(5, 0).tap {
+            destination = bob
+            balance = DotAmount.fromDots(3) // 02 ba 7d ef 30 00 -> 0030ef7dba02
         }
-        Hash512 signature = Hash512.from("c240525fafbfd8c518df651afae9cc7d429fc90090d5ebba5e2afefecfb57d3dc24f01d57a5ad29814892cc4aeb74474e89df9470557e5ad4c728c86d51ec68f")
-        //pub: 86a67224bcecf8f5d05009cdbda4189b678512533aac7a247477c2a18478021e
-        Address from = Address.from("5F7FidAQq26VgUYkNvXp3CuraVC36za9bpNaTVZyDs9TX5Q5")
         when:
-        def act = Signer.isValid(extrinsic, call, signature, from)
+        def payload = Signer.getPayload(extrinsic, call)
         then:
-        Hex.encodeHexString(Signer.getPayload(extrinsic, call)) == "0600ffbac048a77567add318d3b8c3b06b67203fcd9c8137fa2802253a3de95e92f3250b005039278c04000c00fe0000000100000035170a58d341fd81c07ee349438da400ecfb625782cd25e29774203080a54f4535170a58d341fd81c07ee349438da400ecfb625782cd25e29774203080a54f45"
-        act == true
+        Hex.encodeHexString(payload) == "a405008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b0030ef7dba02001c0012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"
+
+        when:
+        def valid = Signer.isValid(extrinsic, call,
+                Hash512.from("0x02151a3c8c0cea52ecfd5a56ca1dd29dc5ef3984023c8374a1b52a7ed8f3ac4949b7171ae2ee4aae6a28cad94a54cfb9c2154e03bd97a44db546eb69c0f2e98f"),
+                alice
+        )
+        then:
+        valid
     }
 
-    def "Do not accept invalid signature"() {
+    def "Sign small amount"() {
         setup:
         ExtrinsicContext extrinsic = ExtrinsicContext.newBuilder()
-                .genesis(Hash256.from("0x35170a58d341fd81c07ee349438da400ecfb625782cd25e29774203080a54f45"))
-                .nonce(3)
+                .runtime(3, 0x12)
+                .genesis(Hash256.from("0x4c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"))
+                .nonce(7)
                 .build()
-        BalanceTransfer call = new BalanceTransfer(0, 0xff).tap {
-            destination = Address.from("5GHZtDpKVWipNuXSAPejAwQremYtRc5ThgSnwwEwZX4tD15W")
-            balance = DotAmount.fromDots(5)
+        BalanceTransfer call = new BalanceTransfer(5, 0).tap {
+            destination = bob
+            balance = DotAmount.fromPlancks(1)
         }
-        Hash512 signature = Hash512.from("f240525fafbfd8c518df651afae9cc7d429fc90090d5ebba5e2afefecfb57d3dc24f01d57a5ad29814892cc4aeb74474e89df9470557e5ad4c728c86d51ec68f")
-        //pub: 86a67224bcecf8f5d05009cdbda4189b678512533aac7a247477c2a18478021e
-        Address from = Address.from("5F7FidAQq26VgUYkNvXp3CuraVC36za9bpNaTVZyDs9TX5Q5")
         when:
-        def act = Signer.isValid(extrinsic, call, signature, from)
+        def payload = Signer.getPayload(extrinsic, call)
         then:
-        act == false
+        Hex.encodeHexString(payload) == "8c05008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a4804001c0012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"
+
+        when:
+        def valid = Signer.isValid(extrinsic, call,
+                Hash512.from("0xa4f970f72a300871f79b9a062dfdc7f0d08c2bfb921f8caa6cbe5abf2b81ff50ca7a0c565031d983d3967bb0b42b67bd013f3ad22e97c9547965ecc81e6a3f80"),
+                alice
+        )
+        then:
+        valid
     }
 
-    def "Build payload"() {
+    def "Sign large nonce"() {
         setup:
         ExtrinsicContext extrinsic = ExtrinsicContext.newBuilder()
-                .genesis(Hash256.from("e9540f3b1a920b217847a06682d2ca1a2e416ed809c4ae709da0580edd56ee4b"))
-                .nonce(3)
+                .runtime(3, 0x12)
+                .genesis(Hash256.from("0x4c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"))
+                .nonce(1234567890)
                 .build()
-        BalanceTransfer call = new BalanceTransfer(0, 0xff).tap {
-            // pub: bac048a77567add318d3b8c3b06b67203fcd9c8137fa2802253a3de95e92f325
-            destination = Address.from("5GHZtDpKVWipNuXSAPejAwQremYtRc5ThgSnwwEwZX4tD15W")
-            balance = DotAmount.fromDots(5)
+        BalanceTransfer call = new BalanceTransfer(5, 0).tap {
+            destination = bob
+            balance = DotAmount.fromDots(1.23)
         }
         when:
-        def act = Signer.getPayload(extrinsic, call)
+        def payload = Signer.getPayload(extrinsic, call)
         then:
-        Hex.encodeHexString(act) == "0600ffbac048a77567add318d3b8c3b06b67203fcd9c8137fa2802253a3de95e92f3250b005039278c04000c00fe00000001000000e9540f3b1a920b217847a06682d2ca1a2e416ed809c4ae709da0580edd56ee4be9540f3b1a920b217847a06682d2ca1a2e416ed809c4ae709da0580edd56ee4b"
+        Hex.encodeHexString(payload) == "a405008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b008cb6611e010003d20296490012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"
+
+        when:
+        def valid = Signer.isValid(extrinsic, call,
+                Hash512.from("0x6a141ade40871c076f3eb32362f0204db49e4ae37e5dc7a68329f1a6768034556201432b1635637fc1d42ae6fce996fb25ef175ee1ae4015d2b8769436d89987"),
+                alice
+        )
+        then:
+        valid
     }
 
 }
