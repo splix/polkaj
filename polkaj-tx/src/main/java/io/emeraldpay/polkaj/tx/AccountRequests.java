@@ -115,36 +115,101 @@ public class AccountRequests {
 
     public static final class TransferBuilder {
         private Address from;
-        private Address to;
-        private DotAmount value;
         private Hash512 signature;
         private Long nonce;
 
-        private BalanceTransfer call;
+        private final BalanceTransfer call = new BalanceTransfer();
 
-        protected void init() {
-            BalanceTransfer call = new BalanceTransfer();
-            call.setBalance(value);
-            call.setDestination(to);
-            this.call = call;
+        /**
+         * Set call details
+         *
+         * @param moduleIndex module index
+         * @param callIndex call index in the module
+         * @return builder
+         */
+        public TransferBuilder module(int moduleIndex, int callIndex) {
+            call.setModuleIndex(moduleIndex);
+            call.setCallIndex(callIndex);
+            return this;
         }
 
+        /**
+         *
+         * @param from sender address
+         * @return builder
+         */
         public TransferBuilder from(Address from) {
             this.from = from;
             return this;
         }
 
+        /**
+         *
+         * @param to recipient address
+         * @return builder
+         */
         public TransferBuilder to(Address to) {
-            this.to = to;
+            this.call.setDestination(to);
             return this;
         }
 
+        /**
+         *
+         * @param amount amount to transfer
+         * @return builder
+         */
         public TransferBuilder amount(DotAmount amount) {
-            this.value = amount;
+            this.call.setBalance(amount);
             return this;
         }
 
+        /**
+         * (optional) Set once, if setting a presefined signature.
+         * Otherwise nonce is set during {@link #sign} operation
+         *
+         * @param nonce once to use
+         * @return builder
+         */
+        public TransferBuilder nonce(Long nonce) {
+            this.nonce = nonce;
+            return this;
+        }
+
+        /**
+         * (optional) Set once provided with the context, if setting a presefined signature.
+         * Otherwise nonce is set during {@link #sign} operation
+         *
+         * @param context context with once to use
+         * @return builder
+         */
+        public TransferBuilder nonce(ExtrinsicContext context) {
+            return nonce(context.getNonce());
+        }
+
+        /**
+         * Set a predefined signature. Either this method, or {@link #sign} must be called
+         *
+         * @param signature precalculated signature
+         * @return builder
+         */
+        public TransferBuilder signed(Hash512 signature) {
+            this.signature = signature;
+            return this;
+        }
+
+        /**
+         * Sign the transfer
+         *
+         * @param key sender key pair
+         * @param context signing context
+         * @return builder
+         * @throws SignException if signing is failed
+         * @throws IllegalStateException on data conflict
+         */
         public TransferBuilder sign(Schnorrkel.KeyPair key, ExtrinsicContext context) throws SignException {
+            if (this.nonce != null && this.nonce != context.getNonce()) {
+                throw new IllegalStateException("Trying to sign with context with different nonce. Reset nonce, or provide the same value");
+            }
             if (this.from != null) {
                 if (!Arrays.equals(this.from.getPubkey(), key.getPublicKey())) {
                     throw new SignException("Cannot sign transfer from " + this.from + " by pubkey of " + new Address(this.from.getNetwork(), key.getPublicKey()));
@@ -152,12 +217,14 @@ public class AccountRequests {
             } else {
                 this.from = new Address(SS58Type.Network.LIVE, key.getPublicKey());
             }
-            this.init();
-            this.nonce = context.getNonce();
-            this.signature = Signer.sign(context, this.call, key);
-            return this;
+            return this.nonce(context)
+                    .signed(Signer.sign(context, this.call, key));
         }
 
+        /**
+         *
+         * @return signed Transfer
+         */
         public Transfer build() {
             Extrinsic.TransactionInfo tx = new Extrinsic.TransactionInfo();
             tx.setNonce(this.nonce);
