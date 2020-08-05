@@ -335,8 +335,6 @@ public class Schnorrkel {
         Path target = dir.resolve(filename);
         Files.copy(lib, target);
 
-        System.out.println("Extract lib to " + target.toFile().getAbsolutePath());
-
         // setup JVM to delete files on exit, when possible
         target.toFile().deleteOnExit();
         dir.toFile().deleteOnExit();
@@ -352,15 +350,16 @@ public class Schnorrkel {
 
         // Update paths to search for native libraries
         System.setProperty(libraryPathProperty, userLibs);
-        // But since it may be already processed and cached we need to erase the current value
+        // But since it may be already processed and cached we need to update the current value
         try {
             MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(ClassLoader.class, MethodHandles.lookup());
-            VarHandle usrPathsField = lookup.findStaticVarHandle(ClassLoader.class, "usr_paths", String[].class);
-            MethodHandle initializePathMethod = lookup.findStatic(ClassLoader.class, "initializePath", MethodType.methodType(String[].class, String.class));
-            System.out.println("set new usr_paths");
+            VarHandle usrPathsField = lookup.findStaticVarHandle(ClassLoader.class,
+                    "usr_paths", String[].class);
+            MethodHandle initializePathMethod = lookup.findStatic(ClassLoader.class,
+                    "initializePath", MethodType.methodType(String[].class, String.class));
             usrPathsField.set(initializePathMethod.invoke(libraryPathProperty));
         } catch (Throwable e) {
-            System.err.println("Unable to update sys_paths field. " + e.getClass() + ":" + e.getMessage());
+            System.err.println("Unable to update usr_paths field. " + e.getClass() + ":" + e.getMessage());
         }
     }
 }
