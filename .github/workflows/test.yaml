@@ -9,6 +9,7 @@ on:
   pull_request:
     branches:
       - master
+      - feat/access-storage
 
 jobs:
   # Run unit tests and submit Coverage Report
@@ -26,7 +27,7 @@ jobs:
       - name: Check
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: check
+          arguments: check --max-workers 1 --no-parallel --no-build-cache --no-daemon --console=plain
 
       - name: Build Coverage Report
         uses: eskatos/gradle-command-action@v1
