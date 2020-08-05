@@ -24,15 +24,10 @@ jobs:
         with:
           java-version: 11
 
-      - name: Build
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: compileJava --no-daemon
-
       - name: Check
         uses: eskatos/gradle-command-action@v1
         with:
-          arguments: check --no-daemon
+          arguments: check
 
       - name: Build Coverage Report
         uses: eskatos/gradle-command-action@v1
@@ -61,17 +56,12 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
 
-      - name: Build
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: compileJava --no-daemon
-
       - name: Check
         uses: eskatos/gradle-command-action@v1
         with:
           # see https://github.com/eskatos/gradle-command-action/issues/24
           wrapper-cache-enabled: false
-          arguments: check --no-daemon
+          arguments: check
 
   # Formatter may behave differently on different locales, makes sure tests are not failing
   locale-test:
