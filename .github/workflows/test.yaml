@@ -71,7 +71,7 @@ jobs:
         with:
           # see https://github.com/eskatos/gradle-command-action/issues/24
           wrapper-cache-enabled: false
-          arguments: check  --no-daemon
+          arguments: check --no-daemon
 
   # Formatter may behave differently on different locales, makes sure tests are not failing
   locale-test:

@@ -332,6 +332,8 @@ public class Schnorrkel {
         Path target = dir.resolve(filename);
         Files.copy(lib, target);
 
+        System.out.println("Extract lib to " + target.toFile().getAbsolutePath());
+
         // setup JVM to delete files on exit, when possible
         target.toFile().deleteOnExit();
         dir.toFile().deleteOnExit();
@@ -351,6 +353,7 @@ public class Schnorrkel {
         try {
             MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(ClassLoader.class, MethodHandles.lookup());
             VarHandle sysPathsField = lookup.findStaticVarHandle(ClassLoader.class, "sys_paths", String[].class);
+            System.out.println("Erase sys_paths");
             sysPathsField.set(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             System.err.println("Unable to update sys_paths field. " + e.getClass() + ":" + e.getMessage());
