@@ -60,6 +60,7 @@ subprojects {
 
     test {
         jvmArgs '-ea'
+        systemProperty "java.library.path", file("${project.rootDir}/polkaj-schnorrkel/build/rust/release").absolutePath
         useJUnitPlatform()
         testLogging.showStandardStreams = true
         testLogging.exceptionFormat = 'full'
