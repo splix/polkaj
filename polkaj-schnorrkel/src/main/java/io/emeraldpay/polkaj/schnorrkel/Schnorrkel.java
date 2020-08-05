@@ -3,13 +3,16 @@ package io.emeraldpay.polkaj.schnorrkel;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.logging.MemoryHandler;
 
 /**
  * Schnorrkel implements Schnorr signature on Ristretto compressed Ed25519 points, as well as related protocols like
@@ -352,10 +355,11 @@ public class Schnorrkel {
         // But since it may be already processed and cached we need to erase the current value
         try {
             MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(ClassLoader.class, MethodHandles.lookup());
-            VarHandle sysPathsField = lookup.findStaticVarHandle(ClassLoader.class, "sys_paths", String[].class);
-            System.out.println("Erase sys_paths");
-            sysPathsField.set(null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+            VarHandle usrPathsField = lookup.findStaticVarHandle(ClassLoader.class, "usr_paths", String[].class);
+            MethodHandle initializePathMethod = lookup.findStatic(ClassLoader.class, "initializePath", MethodType.methodType(String[].class, String.class));
+            System.out.println("set new usr_paths");
+            usrPathsField.set(initializePathMethod.invoke(libraryPathProperty));
+        } catch (Throwable e) {
             System.err.println("Unable to update sys_paths field. " + e.getClass() + ":" + e.getMessage());
         }
     }
