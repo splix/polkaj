@@ -9,7 +9,6 @@ on:
   pull_request:
     branches:
       - master
-      - feat/access-storage
 
 jobs:
   # Run unit tests and submit Coverage Report
