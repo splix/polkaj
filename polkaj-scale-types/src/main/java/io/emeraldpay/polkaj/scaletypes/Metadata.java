@@ -3,6 +3,7 @@ package io.emeraldpay.polkaj.scaletypes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Runtime Metadata, which defines all available actions and types for the blockchain.
@@ -38,6 +39,20 @@ public class Metadata {
 
     public void setModules(List<Module> modules) {
         this.modules = modules;
+    }
+
+    public Optional<Module> findModule(String name) {
+        if (modules == null) {
+            return Optional.empty();
+        }
+        return getModules().stream()
+                .filter(it -> it.getName().equals(name))
+                .findAny();
+    }
+
+    public Optional<Call> findCall(String moduleName, String callName) {
+        return findModule(moduleName)
+                .flatMap((m) -> m.findCall(callName));
     }
 
     @Override
@@ -109,6 +124,15 @@ public class Metadata {
 
         public void setErrors(List<Error> errors) {
             this.errors = errors;
+        }
+
+        public Optional<Call> findCall(String name) {
+            if (calls == null) {
+                return Optional.empty();
+            }
+            return calls.stream()
+                    .filter(it -> it.getName().equals(name))
+                    .findAny();
         }
 
         @Override
@@ -451,9 +475,18 @@ public class Metadata {
     }
 
     public static class Call {
+        private int index;
         private String name;
         private List<Arg> arguments;
         private List<String> documentation;
+
+        public int getIndex() {
+            return index;
+        }
+
+        public void setIndex(int index) {
+            this.index = index;
+        }
 
         public String getName() {
             return name;
@@ -485,13 +518,14 @@ public class Metadata {
             if (!(o instanceof Call)) return false;
             Call call = (Call) o;
             return Objects.equals(name, call.name) &&
+                    Objects.equals(index, call.index) &&
                     Objects.equals(arguments, call.arguments) &&
                     Objects.equals(documentation, call.documentation);
         }
 
         @Override
         public final int hashCode() {
-            return Objects.hash(name, arguments, documentation);
+            return Objects.hash(name, index, arguments, documentation);
         }
 
         public static class Arg {

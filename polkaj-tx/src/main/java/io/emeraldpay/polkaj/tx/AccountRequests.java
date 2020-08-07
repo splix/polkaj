@@ -120,6 +120,11 @@ public class AccountRequests {
 
         private final BalanceTransfer call = new BalanceTransfer();
 
+        public TransferBuilder runtime(Metadata metadata) {
+            this.call.init(metadata);
+            return this;
+        }
+
         /**
          * Set call details
          *

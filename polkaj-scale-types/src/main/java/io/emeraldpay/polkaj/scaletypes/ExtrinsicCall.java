@@ -33,6 +33,21 @@ public abstract class ExtrinsicCall {
         this.callIndex = callIndex;
     }
 
+    public ExtrinsicCall(Metadata.Call call) {
+        this();
+        init(call);
+    }
+
+    /**
+     * Initialize call index from Runtime Metadata
+     *
+     * @param call Call details on current Runtime
+     */
+    public void init(Metadata.Call call) {
+        setModuleIndex(call.getIndex() >> 8);
+        setCallIndex(call.getIndex() & 0xff);
+    }
+
     public int getModuleIndex() {
         return moduleIndex;
     }

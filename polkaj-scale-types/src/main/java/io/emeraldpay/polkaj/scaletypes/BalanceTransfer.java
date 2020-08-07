@@ -11,7 +11,7 @@ import java.util.Objects;
 public class BalanceTransfer extends ExtrinsicCall {
 
     /**
-     * Destionation address
+     * Destination address
      */
     private Address destination;
     /**
@@ -20,11 +20,27 @@ public class BalanceTransfer extends ExtrinsicCall {
     private DotAmount balance;
 
     public BalanceTransfer() {
-        this(4, 0);
+        super();
     }
 
     public BalanceTransfer(int moduleIndex, int callIndex) {
         super(moduleIndex, callIndex);
+    }
+
+    public BalanceTransfer(Metadata metadata) {
+        this();
+        init(metadata);
+    }
+
+    /**
+     * Initialize call index from Runtime Metadata
+     *
+     * @param metadata current Runtime
+     */
+    public void init(Metadata metadata) {
+        Metadata.Call call = metadata.findCall("Balances", "transfer")
+                .orElseThrow(() -> new IllegalStateException("Call 'Balances.transfer' doesn't exist"));
+        init(call);
     }
 
     public Address getDestination() {

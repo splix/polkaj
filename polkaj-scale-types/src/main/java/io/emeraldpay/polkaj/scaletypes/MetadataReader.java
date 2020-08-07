@@ -6,6 +6,8 @@ import io.emeraldpay.polkaj.scale.reader.EnumReader;
 import io.emeraldpay.polkaj.scale.reader.ListReader;
 import io.emeraldpay.polkaj.scale.reader.UnionReader;
 
+import java.util.List;
+
 public class MetadataReader implements ScaleReader<Metadata> {
 
     public static final ListReader<Metadata.Module> MODULE_LIST_READER = new ListReader<>(new ModulesReader());
@@ -21,6 +23,18 @@ public class MetadataReader implements ScaleReader<Metadata> {
             throw new IllegalStateException("Unsupported metadata version: " + result.getVersion());
         }
         result.setModules(MODULE_LIST_READER.read(rdr));
+        List<Metadata.Module> modules = result.getModules();
+
+        int moduleIndex = 0;
+        for (Metadata.Module m: modules) {
+            List<Metadata.Call> calls = m.getCalls();
+            if (calls != null) {
+                for (int j = 0; j < calls.size(); j++) {
+                    calls.get(j).setIndex((moduleIndex << 8) + j);
+                }
+                moduleIndex++;
+            }
+        }
         return result;
     }
 

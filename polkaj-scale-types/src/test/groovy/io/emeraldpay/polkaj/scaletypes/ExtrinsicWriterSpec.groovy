@@ -22,7 +22,7 @@ class ExtrinsicWriterSpec extends Specification {
                         Hash512.from("0xbc11655de6e7461b0951353db25f4aaf67a58db547fa3a2f20cbcd7772ba715f8ccbe9d8bddf253c7f6e6f6acb83848a7da1f27de248afca10d3291de92ede8c")
                 )
             }
-            call = new BalanceTransfer().tap {
+            call = new BalanceTransfer(4, 0).tap {
                 destination = Address.from("ED3aw4s68wTDscCbWnCCw94qSrkA1D8HcUXC8ytaoM2X2xd")
                 balance = DotAmount.fromDots(0.03451)
             }

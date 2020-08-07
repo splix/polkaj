@@ -77,8 +77,26 @@ class MetadataReaderSpec extends Specification {
                     !iterable
                 }
             }
-
         }
+    }
+
+    def "Correct module index"() {
+        setup:
+        String hex = this.getClass().getClassLoader().getResourceAsStream("metadata-kusama.txt").text
+        byte[] data = Hex.decodeHex(hex.substring(2))
+        when:
+        def rdr = new ScaleCodecReader(data)
+        def act = rdr.read(new MetadataReader())
+        then:
+        act.findCall("System", "fill_block").get().index == 0x0000
+        act.findCall("System", "set_storage").get().index == 0x0006
+        act.findCall("Balances", "transfer").get().index == 0x0400
+        act.findCall("Balances", "force_transfer").get().index == 0x0402
+        act.findCall("Democracy", "propose").get().index == 0x0d00
+        act.findCall("Democracy", "fast_track").get().index == 0x0d08
+        act.findCall("Democracy", "enact_proposal").get().index == 0x0d1c
+        act.findCall("Vesting", "vest").get().index == 0x1c00
+        act.findCall("Vesting", "vested_transfer").get().index == 0x1c02
     }
 
 }

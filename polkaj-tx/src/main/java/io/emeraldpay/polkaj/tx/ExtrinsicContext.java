@@ -1,5 +1,6 @@
 package io.emeraldpay.polkaj.tx;
 
+import io.emeraldpay.polkaj.json.RuntimeVersionJson;
 import io.emeraldpay.polkaj.types.DotAmount;
 import io.emeraldpay.polkaj.types.Hash256;
 
@@ -154,6 +155,10 @@ public class ExtrinsicContext {
         private Era era = Era.IMMORTAL;
         private DotAmount tip = DotAmount.ZERO;
         private long eraHeight = 0;
+
+        public Builder runtime(RuntimeVersionJson version) {
+            return runtime(version.getTransactionVersion(), version.getSpecVersion());
+        }
 
         public Builder runtime(int txVersion, int runtimeVersion) {
             this.txVersion = txVersion;
