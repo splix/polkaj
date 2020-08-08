@@ -211,8 +211,13 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
         });
         execution.clear();
         subscriptions.clear();
+        control.shutdownNow();
         if (onClose != null) {
-            onClose.run();
+            try {
+                onClose.run();
+            } catch (Throwable t) {
+                System.err.println("Error during onClose call: " + t.getMessage());
+            }
         }
     }
 
@@ -355,7 +360,7 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
             if (executorService == null) {
                 ExecutorService executorService = Executors.newCachedThreadPool();
                 this.executorService = executorService;
-                onClose = executorService::shutdown;
+                onClose = executorService::shutdownNow;
             }
             if (objectMapper == null) {
                 objectMapper = new ObjectMapper();
