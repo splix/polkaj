@@ -1,0 +1,197 @@
+= Working with Account Balance
+
+== How it works
+
+With Polkadot you use Runtime to get value from storage or submit transactions (which are called _Extrinsics_).
+
+To read data from storage, you prepare a query encoded as a hex string, and the result is usually a SCALE encoded object.
+The encoded requests sent to `state_getStorage` (or related), and the response is a hex + SCALE encoded object.
+The actual request parameters and the response type are described in the current Runtime Metadata object.
+
+To send and execute an Extrinsic, is must be encoded as SCALE as well, signed, and submitted with `author_submitExtrinsic` (or related).
+
+Polkaj is designed to be Runtime agnostic, and any of such requests could be build using Polkaj provided modules:
+
+ - `polkaj-scale`, `polkaj-scale-types`
+ - `polkaj-api-http` or `polkaj-api-ws`
+ - `polkaj-schnorrkel`
+ - `polkaj-tx`, with _Hashing_ and _Signer_ classes specifically
+
+But Polkaj also provides Java-friendly wrappers to make some of the common operations, such as balance transfer (with `AccountRequests`).
+
+== Account specific requests
+
+`AccountRequests` class provides common operations for address and balance.
+There are two types of operations: _Storage Request_ and _Extrinsic Request_, with respective interfaces.
+
+.`StorageRequest` interface
+- provides `ByteData requestData()` method, as the RPC request query
+- and by itself it `extends Function<ByteData, T>` to convert RPC response to a Java object
+
+.`ExtrinsicRequest` interface
+- provides `ByteData requestData()` which encodes the transaction to send to RPC
+
+=== Get total amount of issued coins
+
+`totalIssuance()` method of `AccountRequests` class provides a functionality to request and process total amount of currently issues coins.
+For the query it encodes request to storage function `TotalIssuance` of the module `Balances` on the current Runtime.
+
+[source, java]
+----
+try (
+  PolkadotHttpApi client = PolkadotWsApi.newBuilder()
+        .connectTo("wss://cc3-5.kusama.network")
+        .build()
+) {
+    // totalIssuance reads the current amount of issued coins
+    AccountRequests.TotalIssuance requester = AccountRequests.totalIssuance();
+
+    // encode the request as RpcCall to state_getStorage
+    RpcCall call = RpcCall.create(
+            // the RPC returns hex-encoded bytes
+            ByteData.class,
+            // state_getStorage method
+            PolkadotMethod.STATE_GET_STORAGE,
+            // encoded query
+            requester.requestData()
+    );
+
+    // execute on RPC
+    DotAmount total = client.execute(call)
+        // apply conversion provided by AccountRequests.TotalIssuance
+        .thenApply(requester)
+        // get the value synchroniously
+        .get();
+
+    System.out.println(
+            "Total Issued: " + DotAmountFormatter.autoFormatter().format(total)
+    );
+}
+----
+
+=== Get balance
+
+`balanceOf(address)` method of `AccountRequests` class provides a functionality to request and process account info for the specified address.
+For the query it encodes request to storage function `System` of the module `Account` on the current Runtime.
+
+[source, java]
+----
+try (
+  PolkadotHttpApi client = PolkadotWsApi.newBuilder()
+        .connectTo("wss://cc3-5.kusama.network")
+        .build()
+) {
+    // request balance of Alice
+    Address alice = Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
+    AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(alice);
+
+    // encode the request as RpcCall to state_getStorage
+    RpcCall call = RpcCall.create(
+            // the RPC returns hex-encoded bytes
+            ByteData.class,
+            // state_getStorage method
+            PolkadotMethod.STATE_GET_STORAGE,
+            // encoded query
+            requester.requestData()
+    );
+
+    // execute on RPC
+    AccountInfo accountInfo = client.execute(call)
+        // convert
+        .thenApply(requestAccount)
+        // get the value synchroniously
+        .get();
+
+    System.out.println(
+            "Current balance: " + DotAmountFormatter.autoFormatter().format(accountInfo.getData().getFree())
+    );
+    System.out.println(
+            "Current nonce  : " + accountInfo.getNonce()
+    );
+}
+----
+
+=== Transfer balance
+
+Creating an _Extrinsic_, such as a balance transfer, is a bit more complex task, since it depends on the current Runtime state and other details of the current blockchain.
+So first you need to fetch all of them and use as part of the encoded value and a signature.
+
+`AccountRequests.transfer()` provides a _builder_ to prepare the extrinsic.
+But you also need to prepare `ExtrinsicContext` (build with `ExtrinsicContext.newBuilder()`) to sign the extrinsic.
+
+[source, java]
+----
+try (
+  PolkadotHttpApi client = PolkadotWsApi.newBuilder()
+        .connectTo("wss://cc3-5.kusama.network")
+        .build()
+) {
+
+    // First fetch all required info used to create a new extrinsic
+
+    // Current runtime version
+    RuntimeVersionJson runtimeVersion = client.execute(
+                StandardCommands.getInstance().getRuntimeVersion()
+            ).get();
+
+    // Current runtime meta
+    Metadata metadata = client.execute(
+                StandardCommands.getInstance().stateMetadata()
+            )
+            .thenApply(ByteData::getBytes)
+            .thenApply(ScaleExtract.fromBytes(new MetadataReader()))
+            .get();
+
+    // Blockchain genesis block
+    Hash256 genesis = client.execute(
+                StandardCommands.getInstance().getBlockHash(0)
+            ).get();
+
+    // Sender address info (for nonce)
+    AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(alice);
+    AccountInfo accountInfo = client.execute(
+                RpcCall.create(
+                        ByteData.class,
+                        PolkadotMethod.STATE_GET_STORAGE,
+                        requestAccount.requestData())
+            )
+            .thenApply(requestAccount).get();
+
+    // Now prepare the extrinsic
+
+    // Build a context for the execution
+    ExtrinsicContext context = ExtrinsicContext.newBuilder()
+            // genesis block
+            .genesis(genesis)
+            // runtime version
+            .runtime(runtimeVersion)
+            // current sender nonce
+            .nonce(nonce)
+            .build();
+
+    // And build actual call to the runtime method
+    AccountRequests.Transfer transfer = AccountRequests.transfer()
+            // get standard details from metadata (module and method id, etc)
+            .runtime(metadata)
+            // sender
+            .from(alice)
+            // recipient
+            .to(bob)
+            // amount to transfer
+            .amount(amount)
+            // sign with the context
+            .sign(aliceKey, context)
+            .build();
+
+    // Finally, submit to the blockchain
+    client.execute(
+                RpcCall.create(
+                        // in this example we accept just any object
+                        Object.class,
+                        // RPC method
+                        "author_submitExtrinsic",
+                        // RPC parameters
+                        transfer.requestData())
+            ).get();
+}
+----

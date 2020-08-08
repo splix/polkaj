@@ -96,6 +96,9 @@ public class DotAmountFormatter {
      * @return formatted amount
      */
     public String format(DotAmount value) {
+        if (value == null) {
+            return null;
+        }
         Context ctx = new Context(value);
         for (Formatter formatter: formatters) {
             formatter.apply(ctx);

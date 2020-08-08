@@ -20,7 +20,7 @@ The code of the interface is inspired by https://github.com/polkadot-js/wasm/[WA
 - https://github.com/polkadot-js/wasm/
 - https://polkadot.js.org/api/start/keyring.html
 
-== Generating Key Pair
+=== Generating Key Pair
 
 `Schnorrkel.generateKeyPair()` generates a new pair of Public and Secret Keys using default Secure Random source.
 
@@ -68,4 +68,145 @@ Address anotherAddress = new Address(SS58Type.Network.CANARY, derived.getPublicK
 // Prints new address: HPYy6BTtHu6eCsDxEWcQ8TX86cPQeCm7WBDd1tQkWw9mnAR
 System.out.println("   Address: " + anotherAddress);
 System.out.println("Public Key: " + Hex.encodeHexString(derived.getPublicKey()));
+----
+
+=== Sign Message
+
+Let's say Alice want to sign a message. First we need the private key:
+
+[source, java]
+----
+Schnorrkel.KeyPair aliceKey = Schnorrkel.generateKeyPairFromSeed(
+        Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
+);
+----
+
+And to sign an arbitrary bytes:
+
+[source, java]
+----
+byte[] message = Hex.decodeHex(
+        "8a3476995d076964c8c8517c8a1a504da91dc2b16ab36fb04ca22734e572619be108ee699592ccb9b1344835352e42c9"
+);
+
+byte[] signature = Schnorrkel.sign(message, aliceKey);
+System.out.println("Signature: " + Hex.encodeHexString(signature));
+----
+
+It would print:
+----
+Signature: e2525d278d3d4b32ca3372b6d2c32c1405f641a5c2309a94da416c32359ac76e485c6baa69baa66def1c3a46c76fc38fb58d88ee0312bfb0bc135b851df0928f
+----
+
+NOTE: The signature is going to be different each time you sign the message, even if the message and key are same
+
+=== Verify Message Signature
+
+Now we have the message and signature for it. The other side would want to verify that everything is correct.
+
+[source, java]
+----
+byte[] message = Hex.decodeHex(
+        "8a3476995d076964c8c8517c8a1a504da91dc2b16ab36fb04ca22734e572619be108ee699592ccb9b1344835352e42c9"
+);
+byte[] signature = Hex.decodeHex(
+        "e2525d278d3d4b32ca3372b6d2c32c1405f641a5c2309a94da416c32359ac76e485c6baa69baa66def1c3a46c76fc38fb58d88ee0312bfb0bc135b851df0928f"
+);
+----
+
+To verify the message you need only Public Key, which we can get directly from Key Pair:
+
+[source, java]
+----
+// Extract public key
+Schnorrkel.PublicKey signer = new Schnorrkel.PublicKey(aliceKey.getPublicKey());
+
+// Verify the signature
+boolean valid = Schnorrkel.verify(signature, message, signer);
+System.out.println("Valid: " + valid + " for pubkey " + Hex.encodeHexString(aliceKey.getPublicKey()));
+----
+
+Most likely you don't have the Key Pair, but you have the Address of the signer.
+Address in fact is a Public Key representation, so that's all you need to verify.
+
+[source, java]
+----
+// Alice's address
+Address alice = Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
+Schnorrkel.PublicKey signer = new Schnorrkel.PublicKey(alice.getPubkey());
+
+// Verify the signature
+boolean valid = Schnorrkel.verify(signature, message, signer);
+System.out.println("Valid: " + valid + " for address " + alice);
+----
+
+== Blake 2
+
+Blake 2 is a cryptographic hash function, used in many parts of Polkadot API.
+Polkaj provides a simple wrapper over https://www.bouncycastle.org/[Bouncy Castle Crypto API].
+You can use it directly, or use a wrapper for common operations.
+
+If you use it directly, the code would be:
+
+[source, java]
+----
+import org.bouncycastle.crypto.digests.Blake2bDigest;
+
+
+byte[] message = ....;
+// 256 is the length in bits of the output
+Blake2bDigest digest = new Blake2bDigest(256);
+digest.update(message, 0, message.length);
+
+byte[] hash = new byte[32];
+digest.doFinal(hash, 0);
+
+// `hash` now contains the Blake2 hash of the message
+System.out.println("Hash: " + Hex.encodeHexString(hash));
+----
+
+Or you can use `Hashing` utility class, which basically has the same code.
+
+[source, java]
+----
+import io.emeraldpay.polkaj.tx.Hashing;
+
+byte[] hash = Hashing.blake2(message);
+System.out.println("Hash: " + Hex.encodeHexString(hash));
+----
+
+In addition to that, the `Hashing` class provides standard implementation for some of common uses.
+For example, you often need to hash an Address with Blake2-128 hash.
+And usually you don't want to get a Byte Array (`byte[]`), but add the hash to an existing Byte Buffer (`ByteBuffer`).
+For example when you are making query to Polkadot Storage.
+
+[source, java]
+----
+import io.emeraldpay.polkaj.tx.Hashing;
+
+ByteBuffer buf = ...
+Hashing.blake2128(buf, Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"));
+----
+
+== xxHash
+
+xxHash is an extremely fast non-cryptographic hash algorithm.
+In general, it provides a 64-bit output, but in Polkadot a 128-bit value is used.
+Which is a concatenation of two 64-bit hashes of the same message, but with different seed numbers.
+
+Polkaj provides a wrapper around `net.openhft:zero-allocation-hashing` implementation, extended to give 128-bit result.
+It also works with `ByteBuffer`, because usually you need to concatenate multiple hashes.
+
+[source, java]
+----
+import io.emeraldpay.polkaj.tx.Hashing;
+
+// 3 hashes with 128-bit (16 bytes) each needs a buffer for 48 bytes
+ByteBuffer buffer = ByteBuffer.allocate(48);
+// add 128-bit xxHash of "Address" string
+Hashing.xxhash128(buffer, "Address");
+// add 128-bit xxHash of "Balance" string
+Hashing.xxhash128(buffer, "Balance");
+// add 128-bit Blake2 of the Address public key
+Hashing.blake2128(buffer, Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"));
 ----

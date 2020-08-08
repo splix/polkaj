@@ -40,6 +40,11 @@ public class DotAmount implements Comparable<DotAmount>{
             new Unit("KSM", 12)
     );
 
+    /**
+     * Zero Dots
+     */
+    public static final DotAmount ZERO = new DotAmount(BigInteger.ZERO);
+
     private static final Unit DOT_UNIT = Polkadots.getMain();
     private static final BigInteger DOT_MULTIPLIER = DOT_UNIT.getMultiplier();
     private static final BigDecimal DOT_MULTIPLIER_DECIMAL = new BigDecimal(DOT_MULTIPLIER);
@@ -72,6 +77,10 @@ public class DotAmount implements Comparable<DotAmount>{
 
     public static DotAmount fromPlancks(long amount) {
         return new DotAmount(BigInteger.valueOf(amount), Polkadots);
+    }
+
+    public static DotAmount fromPlancks(String amount) {
+        return new DotAmount(new BigInteger(amount), Polkadots);
     }
 
     public static DotAmount fromDots(long amount) {
