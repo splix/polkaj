@@ -2,6 +2,7 @@ import io.emeraldpay.polkaj.schnorrkel.Schnorrkel;
 import io.emeraldpay.polkaj.schnorrkel.SchnorrkelException;
 import io.emeraldpay.polkaj.ss58.SS58Type;
 import io.emeraldpay.polkaj.types.Address;
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 public class Keys {
@@ -33,14 +34,59 @@ public class Keys {
         System.out.println("Public Key (new): " + Hex.encodeHexString(derived.getPublicKey()));
     }
 
+    public static void sign() throws DecoderException, SchnorrkelException {
+        Schnorrkel.KeyPair aliceKey = Schnorrkel.generateKeyPairFromSeed(
+                Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
+        );
+        byte[] message = Hex.decodeHex(
+                "8a3476995d076964c8c8517c8a1a504da91dc2b16ab36fb04ca22734e572619be108ee699592ccb9b1344835352e42c9"
+        );
+        byte[] signature = Schnorrkel.sign(message, aliceKey);
+        System.out.println("Signature: " + Hex.encodeHexString(signature));
+    }
+
+    public static void verifyWithPubkey() throws DecoderException, SchnorrkelException {
+        Schnorrkel.KeyPair aliceKey = Schnorrkel.generateKeyPairFromSeed(
+                Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
+        );
+        byte[] message = Hex.decodeHex(
+                "8a3476995d076964c8c8517c8a1a504da91dc2b16ab36fb04ca22734e572619be108ee699592ccb9b1344835352e42c9"
+        );
+        byte[] signature = Hex.decodeHex("e2525d278d3d4b32ca3372b6d2c32c1405f641a5c2309a94da416c32359ac76e485c6baa69baa66def1c3a46c76fc38fb58d88ee0312bfb0bc135b851df0928f");
+
+        // We have both Private Key and Public Key for Alice here, but let's pretend we have only Public Key:
+        Schnorrkel.PublicKey signer = new Schnorrkel.PublicKey(aliceKey.getPublicKey());
+        // Verify the signature
+        boolean valid = Schnorrkel.verify(signature, message, signer);
+        System.out.println("Valid: " + valid + " for pubkey " + Hex.encodeHexString(aliceKey.getPublicKey()));
+    }
+
+    public static void verifyWithAddress() throws DecoderException, SchnorrkelException {
+        Address alice = Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
+        byte[] message = Hex.decodeHex(
+                "8a3476995d076964c8c8517c8a1a504da91dc2b16ab36fb04ca22734e572619be108ee699592ccb9b1344835352e42c9"
+        );
+        byte[] signature = Hex.decodeHex("e2525d278d3d4b32ca3372b6d2c32c1405f641a5c2309a94da416c32359ac76e485c6baa69baa66def1c3a46c76fc38fb58d88ee0312bfb0bc135b851df0928f");
+
+        // Public key actually is an Address. So lets say you have only address of the signer, like:
+        Schnorrkel.PublicKey signer = new Schnorrkel.PublicKey(alice.getPubkey());
+        // Verify the signature
+        boolean valid = Schnorrkel.verify(signature, message, signer);
+        System.out.println("Valid: " + valid + " for address " + alice);
+    }
+
     public static void main(String[] args) {
         try {
             createNewKey();
-            System.out.println("");
-            System.out.println("---");
-            System.out.println("");
+            System.out.println("\n---\n");
             derive();
-        } catch (SchnorrkelException e) {
+            System.out.println("\n---\n");
+            sign();
+            System.out.println("\n---\n");
+            verifyWithPubkey();
+            System.out.println("\n---\n");
+            verifyWithAddress();
+        } catch (SchnorrkelException | DecoderException e) {
             e.printStackTrace();
         }
     }

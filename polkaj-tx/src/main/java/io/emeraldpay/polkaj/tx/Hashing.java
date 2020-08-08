@@ -9,7 +9,7 @@ import java.nio.ByteOrder;
 
 /**
  * <ul>
- *     <li><a href="https://cyan4973.github.io/xxHash/">xsHash</a></li>
+ *     <li><a href="https://cyan4973.github.io/xxHash/">xxHash</a></li>
  *     <li><a href="https://github.com/OpenHFT/Zero-Allocation-Hashing">OpenHFT Zero-Allocation-Hashing</a></li>
  *     <li><a href="https://blake2.net/">Blake2</a></li>
  * </ul>
