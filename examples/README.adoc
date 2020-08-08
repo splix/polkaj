@@ -65,3 +65,19 @@ Generate Secret/Public Keys and Address
 cd keys
 ./gradlew run
 ----
+
+== Balance check and transfer
+
+Check account status and/or make a transfer of the balance to another address.
+
+.For the development network, transfer random amount for Alice to Bob
+----
+cd balance
+./gradlew run
+----
+
+.Transfer using real network (ex. Kusama)
+----
+cd balance
+./gradlew run --args="wss://cc3-5.kusama.network SENDER_KEY_SEED RECIPIENT_ADDRESS"
+----

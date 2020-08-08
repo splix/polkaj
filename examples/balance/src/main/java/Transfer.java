@@ -19,20 +19,34 @@ import java.util.Random;
 public class Transfer {
 
     public static void main(String[] args) throws Exception {
-        Schnorrkel.KeyPair aliceKey = Schnorrkel.generateKeyPairFromSeed(
-                Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
-        );
-        Address alice = new Address(SS58Type.Network.SUBSTRATE, aliceKey.getPublicKey());
-        System.out.println("Alice pubkey: " + Hex.encodeHexString(alice.getPubkey()));
-        Address bob =  Address.from("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty");
-        System.out.println("Bob pubkey  : " + Hex.encodeHexString(bob.getPubkey()));
+        String api = "ws://localhost:9944";
+        if (args.length >= 1) {
+            api = args[0];
+        }
+        System.out.println("Connect to: " + api);
+
+        Schnorrkel.KeyPair aliceKey;
+        Address alice;
+        Address bob;
+        if (args.length >= 3) {
+            System.out.println("Use provided addresses");
+            aliceKey = Schnorrkel.generateKeyPairFromSeed(Hex.decodeHex(args[1]));
+            bob =  Address.from(args[2]);
+        } else {
+            System.out.println("Use standard accounts for Alice and Bob, expected to run against development network");
+            aliceKey = Schnorrkel.generateKeyPairFromSeed(
+                    Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
+            );
+            bob =  Address.from("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty");
+        }
+        alice = new Address(SS58Type.Network.CANARY, aliceKey.getPublicKey());
 
         Random random = new Random();
         DotAmount amount = DotAmount.fromPlancks(
-                Math.abs(random.nextLong()) % DotAmount.fromDots(100).getValue().longValue()
+                Math.abs(random.nextLong()) % DotAmount.fromDots(0.002).getValue().longValue()
         );
 
-        try (PolkadotWsApi client = PolkadotWsApi.newBuilder().build()) {
+        try (PolkadotWsApi client = PolkadotWsApi.newBuilder().connectTo(api).build()) {
 
             System.out.println("Connected: " + client.connect().get());
 
@@ -63,12 +77,14 @@ public class Transfer {
             System.out.println("Use nonce  : " + nonce);
             System.out.println("Transfer " + DotAmountFormatter.autoFormatter().format(amount) + " from " + alice + " to " + bob);
 
+            // prepare context for execution
             ExtrinsicContext context = ExtrinsicContext.newBuilder()
                     .nonce(nonce)
                     .genesis(genesis)
                     .runtime(runtimeVersion)
                     .build();
 
+            // prepare call, and sign with sender Secret Key within the context
             AccountRequests.Transfer transfer = AccountRequests.transfer()
                     .runtime(metadata)
                     .from(alice)
@@ -78,7 +94,7 @@ public class Transfer {
                     .build();
 
             ByteData req = transfer.requestData();
-            System.out.println("Request: " + req);
+            System.out.println("RPC Request Payload: " + req);
             client.execute(
                     RpcCall.create(Object.class, "author_submitExtrinsic", req)
             ).get();
