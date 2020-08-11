@@ -249,4 +249,73 @@ class StandardCommandsSpec extends Specification {
         ]
         act.getResultType(typeFactory).getRawClass() == Long.class
     }
+
+    def "Author Submit Extrinsic"() {
+        when:
+        def act = StandardCommands.getInstance().authorSubmitExtrinsic(ByteData.from("0x0011223344"))
+        then:
+        act.method == "author_submitExtrinsic"
+        act.params.toList() == [
+                ByteData.from("0x0011223344")
+        ]
+        act.getResultType(typeFactory).getRawClass() == Hash256.class
+
+        when:
+        StandardCommands.getInstance().authorSubmitExtrinsic(null)
+        then:
+        thrown(NullPointerException)
+
+        when:
+        StandardCommands.getInstance().authorSubmitExtrinsic(ByteData.empty())
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    def "Author Pending Extrinsics"() {
+        when:
+        def act = StandardCommands.getInstance().authorPendingExtrinsics()
+        then:
+        act.method == "author_pendingExtrinsics"
+        act.params.toList() == []
+        act.getResultType(typeFactory).toCanonical() == "java.util.List<io.emeraldpay.polkaj.types.ByteData>"
+    }
+
+    def "Author Remove Extrinsic"() {
+        when:
+        def act = StandardCommands.getInstance().authorRemoveExtrinsic(
+                Hash256.from("0xa65ccbdb5ee9b6ff39f9e1869e891430f1040db9a8130aa3b7f412e50f80b60a")
+        )
+        then:
+        act.method == "author_removeExtrinsic"
+        act.params.toList() == [
+                Hash256.from("0xa65ccbdb5ee9b6ff39f9e1869e891430f1040db9a8130aa3b7f412e50f80b60a")
+        ]
+        act.getResultType(typeFactory).toCanonical() == "java.util.List<io.emeraldpay.polkaj.types.Hash256>"
+
+        when:
+        act = StandardCommands.getInstance().authorRemoveExtrinsic(
+                Hash256.from("0xa65ccbdb5ee9b6ff39f9e1869e891430f1040db9a8130aa3b7f412e50f80b60a"),
+                Hash256.from("0x430f1040db9a8130aa3b7f412e50f80b60aa65ccbdb5ee9b6ff39f9e1869e891")
+        )
+        then:
+        act.method == "author_removeExtrinsic"
+        act.params.toList() == [
+                Hash256.from("0xa65ccbdb5ee9b6ff39f9e1869e891430f1040db9a8130aa3b7f412e50f80b60a"),
+                Hash256.from("0x430f1040db9a8130aa3b7f412e50f80b60aa65ccbdb5ee9b6ff39f9e1869e891")
+        ]
+        act.getResultType(typeFactory).toCanonical() == "java.util.List<io.emeraldpay.polkaj.types.Hash256>"
+
+        when:
+        act = StandardCommands.getInstance().authorRemoveExtrinsic(
+                ByteData.from("0xa65ccbdb5ee9b6ff39f9e1869e8914"),
+                ByteData.from("0x430f1040db9a8130aa3b7f412e50f80b60")
+        )
+        then:
+        act.method == "author_removeExtrinsic"
+        act.params.toList() == [
+                ByteData.from("0xa65ccbdb5ee9b6ff39f9e1869e8914"),
+                ByteData.from("0x430f1040db9a8130aa3b7f412e50f80b60")
+        ]
+        act.getResultType(typeFactory).toCanonical() == "java.util.List<io.emeraldpay.polkaj.types.Hash256>"
+    }
 }

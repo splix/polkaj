@@ -6,6 +6,7 @@ import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.Hash256;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -357,6 +358,52 @@ public class StandardCommands {
             return contractsRentProjection(address);
         }
         return RpcCall.create(Long.class, "contracts_rentProjection", address, at);
+    }
+
+    /**
+     * Returns all pending extrinsics
+     *
+     * @return command
+     */
+    public RpcCall<List<ByteData>> authorPendingExtrinsics() {
+        return RpcCall.create(ByteData.class, PolkadotMethod.AUTHOR_PENDING_EXTRINSICS).expectList();
+    }
+
+    /**
+     * Submit a fully formatted extrinsic for block inclusion
+     *
+     * @param extrinsic encoded extrinsic
+     * @return command, returns hash of the submitted extrinsic
+     */
+    public RpcCall<Hash256> authorSubmitExtrinsic(ByteData extrinsic) {
+        if (extrinsic == null) {
+            throw new NullPointerException("Extrinsic cannot be null");
+        }
+        if (extrinsic.getBytes().length == 0) {
+            throw new IllegalArgumentException("Empty extrinsic");
+        }
+        return RpcCall.create(Hash256.class, PolkadotMethod.AUTHOR_SUBMIT_EXTRINSIC, extrinsic);
+    }
+
+
+    /**
+     * Remove given extrinsic(s) from the pool and temporarily ban it to prevent reimporting
+     *
+     * @param hash tx hash
+     * @return command
+     */
+    public RpcCall<List<Hash256>> authorRemoveExtrinsic(Hash256 ... hash) {
+        return RpcCall.create(Hash256.class, PolkadotMethod.AUTHOR_REMOVE_EXTRINSIC, Arrays.asList(hash)).expectList();
+    }
+
+    /**
+     * Remove given extrinsic(s) from the pool and temporarily ban it to prevent reimporting
+     *
+     * @param extrinsic raw extrinsic to remove
+     * @return command
+     */
+    public RpcCall<List<Hash256>> authorRemoveExtrinsic(ByteData ... extrinsic) {
+        return RpcCall.create(Hash256.class, PolkadotMethod.AUTHOR_REMOVE_EXTRINSIC, Arrays.asList(extrinsic)).expectList();
     }
 
 }

@@ -275,4 +275,22 @@ public class PolkadotMethod {
      * Returns the roles the node is running as.
      */
     public static final String SYSTEM_NODE_ROLES = "system_nodeRoles";
+
+    // ----- AUTHOR ----
+
+    /**
+     * Returns all pending extrinsics
+     */
+    public static final String AUTHOR_PENDING_EXTRINSICS = "author_pendingExtrinsics";
+
+    /**
+     * Submit a fully formatted extrinsic for block inclusion
+     *
+     */
+    public static final String AUTHOR_SUBMIT_EXTRINSIC = "author_submitExtrinsic";
+
+    /**
+     * Remove given extrinsic from the pool and temporarily ban it to prevent reimporting
+     */
+    public static final String AUTHOR_REMOVE_EXTRINSIC = "author_removeExtrinsic";
 }

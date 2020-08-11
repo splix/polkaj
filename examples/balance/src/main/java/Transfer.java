@@ -95,9 +95,10 @@ public class Transfer {
 
             ByteData req = transfer.requestData();
             System.out.println("RPC Request Payload: " + req);
-            client.execute(
-                    RpcCall.create(Object.class, "author_submitExtrinsic", req)
+            Hash256 txid = client.execute(
+                    StandardCommands.getInstance().authorSubmitExtrinsic(req)
             ).get();
+            System.out.println("Tx Hash: " + txid);
         }
     }
 }
