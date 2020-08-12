@@ -372,4 +372,15 @@ class StandardCommandsSpec extends Specification {
         act.params.toList() == []
         act.getResultType(typeFactory).getRawClass() == ByteData
     }
+
+    def "Account Next Index"() {
+        when:
+        def act = StandardCommands.getInstance().accountNextIndex(Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"))
+        then:
+        act.method == "account_nextIndex"
+        act.params.toList() == [
+                Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")
+        ]
+        act.getResultType(typeFactory).getRawClass() == Integer
+    }
 }

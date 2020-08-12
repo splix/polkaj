@@ -313,4 +313,11 @@ public class PolkadotMethod {
      * Generate new session keys and returns the corresponding public keys.
      */
     public static final String AUTHOR_ROTATE_KEYS = "author_rotateKeys";
+
+    // ----- ACCOUNT ----
+
+    /**
+     * Next index for an address
+     */
+    public static final String ACCOUNT_NEXT_INDEX = "account_nextIndex";
 }

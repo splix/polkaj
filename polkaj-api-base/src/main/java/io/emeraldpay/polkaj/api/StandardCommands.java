@@ -447,4 +447,15 @@ public class StandardCommands {
     public RpcCall<ByteData> authorRotateKeys() {
         return RpcCall.create(ByteData.class, PolkadotMethod.AUTHOR_ROTATE_KEYS);
     }
+
+    /**
+     * Next index for the address
+     *
+     * @param address address
+     * @return command
+     */
+    public RpcCall<Integer> accountNextIndex(Address address) {
+        return RpcCall.create(Integer.class, PolkadotMethod.ACCOUNT_NEXT_INDEX, address);
+    }
+
 }
