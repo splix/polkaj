@@ -406,4 +406,45 @@ public class StandardCommands {
         return RpcCall.create(Hash256.class, PolkadotMethod.AUTHOR_REMOVE_EXTRINSIC, Arrays.asList(extrinsic)).expectList();
     }
 
+    /**
+     * Returns true if the keystore has private keys for the given public key and key type.
+     *
+     * @param address public key
+     * @param keyType key type
+     * @return command
+     */
+    public RpcCall<Boolean> authorHasKey(Address address, String keyType) {
+        return RpcCall.create(Boolean.class, PolkadotMethod.AUTHOR_HAS_KEY, new ByteData(address.getPubkey()), keyType);
+    }
+
+    /**
+     * Returns true if the keystore has private keys for the given session public keys
+     *
+     * @param keys public keys
+     * @return command
+     */
+    public RpcCall<Boolean> authorHasSessionKeys(ByteData keys) {
+        return RpcCall.create(Boolean.class, PolkadotMethod.AUTHOR_HAS_SESSION_KEYS, keys);
+    }
+
+    /**
+     * Insert a key into the keystore.
+     *
+     * @param keyType key type
+     * @param suri SURI
+     * @param address public key
+     * @return command
+     */
+    public RpcCall<ByteData> authorInsertKey(String keyType, String suri, Address address) {
+        return RpcCall.create(ByteData.class, PolkadotMethod.AUTHOR_INSERT_KEY, keyType, suri, new ByteData(address.getPubkey()));
+    }
+
+    /**
+     * Generate new session keys and returns the corresponding public keys
+     *
+     * @return command
+     */
+    public RpcCall<ByteData> authorRotateKeys() {
+        return RpcCall.create(ByteData.class, PolkadotMethod.AUTHOR_ROTATE_KEYS);
+    }
 }

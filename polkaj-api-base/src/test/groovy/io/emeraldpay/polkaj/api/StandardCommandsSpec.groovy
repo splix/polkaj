@@ -318,4 +318,58 @@ class StandardCommandsSpec extends Specification {
         ]
         act.getResultType(typeFactory).toCanonical() == "java.util.List<io.emeraldpay.polkaj.types.Hash256>"
     }
+
+    def "Author Has Key"() {
+        when:
+        def act = StandardCommands.getInstance().authorHasKey(
+                Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"),
+                "test"
+        )
+        then:
+        act.method == "author_hasKey"
+        act.params.toList() == [
+                ByteData.from("0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"),
+                "test"
+        ]
+        act.getResultType(typeFactory).getRawClass() == Boolean
+    }
+
+    def "Author Has Session Keys"() {
+        when:
+        def act = StandardCommands.getInstance().authorHasSessionKeys(
+                ByteData.from("0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")
+        )
+        then:
+        act.method == "author_hasSessionKeys"
+        act.params.toList() == [
+                ByteData.from("0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"),
+        ]
+        act.getResultType(typeFactory).getRawClass() == Boolean
+    }
+
+    def "Author Insert Key"() {
+        when:
+        def act = StandardCommands.getInstance().authorInsertKey(
+                "test",
+                "foobar",
+                Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"),
+        )
+        then:
+        act.method == "author_insertKey"
+        act.params.toList() == [
+                "test",
+                "foobar",
+                ByteData.from("0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"),
+        ]
+        act.getResultType(typeFactory).getRawClass() == ByteData
+    }
+
+    def "Author Rotate Keys"() {
+        when:
+        def act = StandardCommands.getInstance().authorRotateKeys()
+        then:
+        act.method == "author_rotateKeys"
+        act.params.toList() == []
+        act.getResultType(typeFactory).getRawClass() == ByteData
+    }
 }

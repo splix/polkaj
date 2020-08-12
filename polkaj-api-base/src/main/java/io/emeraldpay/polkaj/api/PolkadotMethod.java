@@ -293,4 +293,24 @@ public class PolkadotMethod {
      * Remove given extrinsic from the pool and temporarily ban it to prevent reimporting
      */
     public static final String AUTHOR_REMOVE_EXTRINSIC = "author_removeExtrinsic";
+
+    /**
+     * Returns true if the keystore has private keys for the given public key and key type.
+     */
+    public static final String AUTHOR_HAS_KEY = "author_hasKey";
+
+    /**
+     * Returns true if the keystore has private keys for the given session public keys.
+     */
+    public static final String AUTHOR_HAS_SESSION_KEYS = "author_hasSessionKeys";
+
+    /**
+     *  Insert a key into the keystore.
+     */
+    public static final String AUTHOR_INSERT_KEY = "author_insertKey";
+
+    /**
+     * Generate new session keys and returns the corresponding public keys.
+     */
+    public static final String AUTHOR_ROTATE_KEYS = "author_rotateKeys";
 }
