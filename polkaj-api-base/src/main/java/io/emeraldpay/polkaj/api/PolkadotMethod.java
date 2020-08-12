@@ -320,4 +320,11 @@ public class PolkadotMethod {
      * Next index for an address
      */
     public static final String ACCOUNT_NEXT_INDEX = "account_nextIndex";
+
+    // ----- PAYMENT ----
+
+    /**
+     * Retrieves the fee information for an encoded extrinsic
+     */
+    public static final String PAYMENT_QUERY_INFO = "payment_queryInfo";
 }

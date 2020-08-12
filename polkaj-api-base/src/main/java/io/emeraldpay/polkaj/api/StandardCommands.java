@@ -458,4 +458,25 @@ public class StandardCommands {
         return RpcCall.create(Integer.class, PolkadotMethod.ACCOUNT_NEXT_INDEX, address);
     }
 
+    /**
+     * Retrieves the fee information for an encoded extrinsic
+     *
+     * @param extrinsic encoded extrinsic
+     * @return command
+     */
+    public RpcCall<RuntimeDispatchInfoJson> paymentQueryInfo(ByteData extrinsic) {
+        return RpcCall.create(RuntimeDispatchInfoJson.class, PolkadotMethod.PAYMENT_QUERY_INFO, extrinsic);
+    }
+
+    /**
+     * Retrieves the fee information for an encoded extrinsic
+     *
+     * @param extrinsic encoded extrinsic
+     * @param block target block
+     * @return
+     */
+    public RpcCall<RuntimeDispatchInfoJson> paymentQueryInfo(ByteData extrinsic, Hash256 block) {
+        return RpcCall.create(RuntimeDispatchInfoJson.class, PolkadotMethod.PAYMENT_QUERY_INFO, extrinsic, block);
+    }
+
 }

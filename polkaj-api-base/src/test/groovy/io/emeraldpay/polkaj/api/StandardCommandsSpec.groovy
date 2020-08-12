@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory
 import io.emeraldpay.polkaj.json.ContractCallRequestJson
 import io.emeraldpay.polkaj.json.ContractExecResultJson
 import io.emeraldpay.polkaj.json.MethodsJson
+import io.emeraldpay.polkaj.json.RuntimeDispatchInfoJson
 import io.emeraldpay.polkaj.json.RuntimeVersionJson
 import io.emeraldpay.polkaj.json.SystemHealthJson
 import io.emeraldpay.polkaj.types.Address
@@ -382,5 +383,31 @@ class StandardCommandsSpec extends Specification {
                 Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")
         ]
         act.getResultType(typeFactory).getRawClass() == Integer
+    }
+
+    def "Payment Query Info"() {
+        when:
+        def act = StandardCommands.getInstance().paymentQueryInfo(
+                ByteData.from("0x12345678")
+        )
+        then:
+        act.method == "payment_queryInfo"
+        act.params.toList() == [
+                ByteData.from("0x12345678")
+        ]
+        act.getResultType(typeFactory).getRawClass() == RuntimeDispatchInfoJson
+
+        when:
+        act = StandardCommands.getInstance().paymentQueryInfo(
+                ByteData.from("0x12345678"),
+                Hash256.from("0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")
+        )
+        then:
+        act.method == "payment_queryInfo"
+        act.params.toList() == [
+                ByteData.from("0x12345678"),
+                Hash256.from("0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")
+        ]
+        act.getResultType(typeFactory).getRawClass() == RuntimeDispatchInfoJson
     }
 }
