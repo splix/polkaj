@@ -473,7 +473,7 @@ public class StandardCommands {
      *
      * @param extrinsic encoded extrinsic
      * @param block target block
-     * @return
+     * @return command
      */
     public RpcCall<RuntimeDispatchInfoJson> paymentQueryInfo(ByteData extrinsic, Hash256 block) {
         return RpcCall.create(RuntimeDispatchInfoJson.class, PolkadotMethod.PAYMENT_QUERY_INFO, extrinsic, block);

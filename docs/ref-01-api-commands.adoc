@@ -7,6 +7,14 @@
 == RPC Commands
 :shortcut-base: StandardCommands.getInstance()
 
+* Author
+- <<author_submitExtrinsic>>
+- <<author_pendingExtrinsics>>
+- <<author_removeExtrinsic>>
+- <<author_hasKey>>
+- <<author_hasSessionKeys>>
+- <<author_insertKey>>
+- <<author_rotateKeys>>
 * Chain
 - <<getBlock>>
 - <<chainGetBlockHash>>
@@ -30,6 +38,78 @@
 - <<systemVersion>>
 * Other
 - <<methods>>
+- <<paymentQueryInfo>>
+- <<accountNextIndex>>
+
+[#author_submitExtrinsic]
+=== Submit Extrinsic (`author_submitExtrinsic`)
+
+Submit a fully formatted extrinsic for block inclusion
+
+Shortcut:: `{shortcut-base}.authorSubmitExtrinsic(ByteData)`
+Command:: `author_submitExtrinsic`
+Parameters:: encoded extrinsic
+Java Object:: `Hash256`
+
+[#author_pendingExtrinsics]
+=== List Pending Extrinsics (`author_pendingExtrinsics`)
+
+Returns all pending extrinsics
+
+Shortcut:: `{shortcut-base}.authorPendingExtrinsics()`
+Command:: `author_pendingExtrinsics`
+Parameters:: none
+Java Object:: `List<ByteData>`
+
+[#author_removeExtrinsic]
+=== Remove Extrinsic (`author_removeExtrinsic`)
+
+Remove given extrinsic(s) from the pool and temporarily ban it to prevent reimporting
+
+Shortcut:: `{shortcut-base}.authorRemoveExtrinsic()`
+Command:: `author_removeExtrinsic`
+Parameters:: extrinsic(s) hash(es) or original extrinsic(s)
+Java Object:: `List<Hash256>`
+
+[#author_hasKey]
+=== Has Key (`author_hasKey`)
+
+Returns true if the keystore has private keys for the given public key and key type.
+
+Shortcut:: `{shortcut-base}.authorHasKey()`
+Command:: `author_hasKey`
+Parameters:: address/public key, key type
+Java Object:: `Boolean`
+
+[#author_hasSessionKeys]
+=== Has Session Keys (`author_hasSessionKeys`)
+
+Returns true if the keystore has private keys for the given session public keys.
+
+Shortcut:: `{shortcut-base}.authorHasSessionKeys()`
+Command:: `author_hasSessionKeys`
+Parameters:: bytes
+Java Object:: `Boolean`
+
+[#author_insertKey]
+=== Insert Key (`author_insertKey`)
+
+Insert a key into the keystore.
+
+Shortcut:: `{shortcut-base}.authorInsertKey()`
+Command:: `author_insertKey`
+Parameters:: key type, suri, address/public key
+Java Object:: `ByteData`
+
+[#author_rotateKeys]
+=== Rotate Keys (`author_rotateKeys`)
+
+Generate new session keys and returns the corresponding public keys.
+
+Shortcut:: `{shortcut-base}.authorRotateKeys()`
+Command:: `author_rotateKeys`
+Parameters:: none
+Java Object:: `ByteData`
 
 [#getBlock]
 === Get Block (`chain_getBlock`)
@@ -255,6 +335,26 @@ Java Object:: `MethodsJson`
 .MethodsJson Properties
 - `Integer getVersion()` - version of RPC
 - `List<String> getMethods()` - list of methods
+
+[#paymentQueryInfo]
+=== Payment Query (`payment_queryInfo`)
+
+Retrieves the fee information for an encoded extrinsic
+
+Shortcut:: `{shortcut-base}.paymentQueryInfo()`
+Command:: `payment_queryInfo`
+Parameters:: extrinsic, (optional) block hash
+Java Object:: `RuntimeDispatchInfoJson`
+
+[#accountNextIndex]
+=== Account Next Index (`account_nextIndex`)
+
+Next index for the address
+
+Shortcut:: `{shortcut-base}.accountNextIndex()`
+Command:: `account_nextIndex`
+Parameters:: address
+Java Object:: `Integer`
 
 [#subsriptions]
 == Subscriptions
