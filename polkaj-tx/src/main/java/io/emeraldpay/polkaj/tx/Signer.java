@@ -39,7 +39,7 @@ public class Signer {
     public static Hash512 sign(ExtrinsicContext ctx, BalanceTransfer call, Schnorrkel.KeyPair key) throws SignException {
         byte[] payload = getPayload(ctx, call, false);
         try {
-            return new Hash512(Schnorrkel.sign(payload, key));
+            return new Hash512(Schnorrkel.getInstance().sign(payload, key));
         } catch (SchnorrkelException e) {
             throw new SignException("Failed to sign", e);
         }
@@ -48,7 +48,7 @@ public class Signer {
     public static boolean isValid(ExtrinsicContext ctx, BalanceTransfer call, Hash512 signature, Address address) throws SignException {
         byte[] payload = getPayload(ctx, call, false);
         try {
-            return Schnorrkel.verify(signature.getBytes(), payload, new Schnorrkel.PublicKey(address.getPubkey()));
+            return Schnorrkel.getInstance().verify(signature.getBytes(), payload, new Schnorrkel.PublicKey(address.getPubkey()));
         } catch (SchnorrkelException e) {
             throw new SignException("Failed to verify", e);
         }

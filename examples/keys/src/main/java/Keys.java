@@ -10,10 +10,10 @@ public class Keys {
     public static void createNewKey() throws SchnorrkelException {
         System.out.println("Generate a new Root Key + derive a `demo` address from that key");
         System.out.println("");
-        Schnorrkel.KeyPair rootKey = Schnorrkel.generateKeyPair();
+        Schnorrkel.KeyPair rootKey = Schnorrkel.getInstance().generateKeyPair();
         System.out.println("  Root Key: " + Hex.encodeHexString(rootKey.getSecretKey()));
         System.out.println("");
-        Schnorrkel.KeyPair key = Schnorrkel.deriveKeyPair(rootKey, Schnorrkel.ChainCode.from("demo".getBytes()));
+        Schnorrkel.KeyPair key = Schnorrkel.getInstance().deriveKeyPair(rootKey, Schnorrkel.ChainCode.from("demo".getBytes()));
 
         Address address = new Address(SS58Type.Network.CANARY, key.getPublicKey());
         System.out.println("   Address: " + address);
@@ -28,25 +28,25 @@ public class Keys {
         System.out.println("  Address (curr): " + address);
         Schnorrkel.PublicKey publicKey = new Schnorrkel.PublicKey(address.getPubkey());
 
-        Schnorrkel.PublicKey derived = Schnorrkel.derivePublicKeySoft(publicKey, Schnorrkel.ChainCode.from("demo".getBytes()));
+        Schnorrkel.PublicKey derived = Schnorrkel.getInstance().derivePublicKeySoft(publicKey, Schnorrkel.ChainCode.from("demo".getBytes()));
         Address anotherAddress = new Address(SS58Type.Network.CANARY, derived.getPublicKey());
         System.out.println("   Address (new): " + anotherAddress);
         System.out.println("Public Key (new): " + Hex.encodeHexString(derived.getPublicKey()));
     }
 
     public static void sign() throws DecoderException, SchnorrkelException {
-        Schnorrkel.KeyPair aliceKey = Schnorrkel.generateKeyPairFromSeed(
+        Schnorrkel.KeyPair aliceKey = Schnorrkel.getInstance().generateKeyPairFromSeed(
                 Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
         );
         byte[] message = Hex.decodeHex(
                 "8a3476995d076964c8c8517c8a1a504da91dc2b16ab36fb04ca22734e572619be108ee699592ccb9b1344835352e42c9"
         );
-        byte[] signature = Schnorrkel.sign(message, aliceKey);
+        byte[] signature = Schnorrkel.getInstance().sign(message, aliceKey);
         System.out.println("Signature: " + Hex.encodeHexString(signature));
     }
 
     public static void verifyWithPubkey() throws DecoderException, SchnorrkelException {
-        Schnorrkel.KeyPair aliceKey = Schnorrkel.generateKeyPairFromSeed(
+        Schnorrkel.KeyPair aliceKey = Schnorrkel.getInstance().generateKeyPairFromSeed(
                 Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
         );
         byte[] message = Hex.decodeHex(
@@ -57,7 +57,7 @@ public class Keys {
         // We have both Private Key and Public Key for Alice here, but let's pretend we have only Public Key:
         Schnorrkel.PublicKey signer = new Schnorrkel.PublicKey(aliceKey.getPublicKey());
         // Verify the signature
-        boolean valid = Schnorrkel.verify(signature, message, signer);
+        boolean valid = Schnorrkel.getInstance().verify(signature, message, signer);
         System.out.println("Valid: " + valid + " for pubkey " + Hex.encodeHexString(aliceKey.getPublicKey()));
     }
 
@@ -71,7 +71,7 @@ public class Keys {
         // Public key actually is an Address. So lets say you have only address of the signer, like:
         Schnorrkel.PublicKey signer = new Schnorrkel.PublicKey(alice.getPubkey());
         // Verify the signature
-        boolean valid = Schnorrkel.verify(signature, message, signer);
+        boolean valid = Schnorrkel.getInstance().verify(signature, message, signer);
         System.out.println("Valid: " + valid + " for address " + alice);
     }
 

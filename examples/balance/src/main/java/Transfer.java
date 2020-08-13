@@ -30,11 +30,11 @@ public class Transfer {
         Address bob;
         if (args.length >= 3) {
             System.out.println("Use provided addresses");
-            aliceKey = Schnorrkel.generateKeyPairFromSeed(Hex.decodeHex(args[1]));
+            aliceKey = Schnorrkel.getInstance().generateKeyPairFromSeed(Hex.decodeHex(args[1]));
             bob =  Address.from(args[2]);
         } else {
             System.out.println("Use standard accounts for Alice and Bob, expected to run against development network");
-            aliceKey = Schnorrkel.generateKeyPairFromSeed(
+            aliceKey = Schnorrkel.getInstance().generateKeyPairFromSeed(
                     Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
             );
             bob =  Address.from("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty");

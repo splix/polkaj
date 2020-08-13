@@ -12,24 +12,41 @@ Additionally, it allows for native multisignature through signature aggregation.
 
 The names Schnorrkel and Ristretto come from the two Rust libraries that implement this scheme, the Schnorrkel library for Schnorr signatures and the Ristretto library that makes it possible to use cofactor-8 curves like Curve25519.
 
-PolkaJ provide a Java wrapper around Rust library with JNI.
-The code of the interface is inspired by https://github.com/polkadot-js/wasm/[WASM implementation.]
-
 .Links
 - https://github.com/w3f/schnorrkel
 - https://github.com/polkadot-js/wasm/
 - https://polkadot.js.org/api/start/keyring.html
 
+PolkaJ provide a Java wrapper around Rust library with JNI.
+The code of the interface is inspired by https://github.com/polkadot-js/wasm/[WASM implementation.]
+To get standard implementation for the current platform use `Schnorrkel.getInstance()`;
+
+[source, java]
+----
+import io.emeraldpay.polkaj.schnorrkel.Schnorrkel;
+
+Schnorrkel schnorrkel = Schnorrkel.getInstance();
+----
+
+The interface provides following methods:
+
+- `sign(byte[] message, Schnorrkel.KeyPair keypair)` - sign message
+- `verify(byte[] signature, byte[] message, Schnorrkel.PublicKey publicKey)` - verify signature
+- `generateKeyPair()`, `generateKeyPair(SecureRandom random)`, and `generateKeyPairFromSeed(byte[] seed)` - generate a new Key Pair
+- `deriveKeyPair(Schnorrkel.KeyPair base, Schnorrkel.ChainCode chainCode)`,
+   and `deriveKeyPairSoft(Schnorrkel.KeyPair base, Schnorrkel.ChainCode chainCode)` - derive a new Key Pair
+- `derivePublicKeySoft(Schnorrkel.PublicKey base, Schnorrkel.ChainCode chainCode)` - derive a new Public Key
+
 === Generating Key Pair
 
-`Schnorrkel.generateKeyPair()` generates a new pair of Public and Secret Keys using default Secure Random source.
+`Schnorrkel.getInstance().generateKeyPair()` generates a new pair of Public and Secret Keys using default Secure Random source.
 
 .Generate a Key Pair
 [source, java]
 ----
 import io.emeraldpay.polkaj.schnorrkel.Schnorrkel;
 
-Schnorrkel.KeyPair rootKey = Schnorrkel.generateKeyPair();
+Schnorrkel.KeyPair rootKey = Schnorrkel.getInstance().generateKeyPair();
 ----
 
 .To derive a new Key Pair from the Root Key:
@@ -37,7 +54,7 @@ Schnorrkel.KeyPair rootKey = Schnorrkel.generateKeyPair();
 ----
 import io.emeraldpay.polkaj.schnorrkel.Schnorrkel;
 
-Schnorrkel.KeyPair key = Schnorrkel.deriveKeyPair(rootKey, Schnorrkel.ChainCode.from("//Alice".getBytes()));
+Schnorrkel.KeyPair key = Schnorrkel.getInstance().deriveKeyPair(rootKey, Schnorrkel.ChainCode.from("//Alice".getBytes()));
 ----
 
 .The generated Key Pair can be used to build an Address
@@ -57,7 +74,7 @@ Address address = Address.from("HhjZogQpUMuQEu8ChSAQUWj9UCnqAmCkogitYjqzCqD7xrq"
 Schnorrkel.PublicKey publicKey = new Schnorrkel.PublicKey(address.getPubkey());
 
 // Derive a new public key
-Schnorrkel.PublicKey derived = Schnorrkel.derivePublicKeySoft(
+Schnorrkel.PublicKey derived = Schnorrkel.getInstance().derivePublicKeySoft(
         publicKey,
         // using derivation path "//Bob"
         Schnorrkel.ChainCode.from("//Bob".getBytes())
@@ -76,7 +93,7 @@ Let's say Alice want to sign a message. First we need the private key:
 
 [source, java]
 ----
-Schnorrkel.KeyPair aliceKey = Schnorrkel.generateKeyPairFromSeed(
+Schnorrkel.KeyPair aliceKey = Schnorrkel.getInstance().generateKeyPairFromSeed(
         Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
 );
 ----
@@ -89,7 +106,7 @@ byte[] message = Hex.decodeHex(
         "8a3476995d076964c8c8517c8a1a504da91dc2b16ab36fb04ca22734e572619be108ee699592ccb9b1344835352e42c9"
 );
 
-byte[] signature = Schnorrkel.sign(message, aliceKey);
+byte[] signature = Schnorrkel.getInstance().sign(message, aliceKey);
 System.out.println("Signature: " + Hex.encodeHexString(signature));
 ----
 
@@ -122,7 +139,7 @@ To verify the message you need only Public Key, which we can get directly from K
 Schnorrkel.PublicKey signer = new Schnorrkel.PublicKey(aliceKey.getPublicKey());
 
 // Verify the signature
-boolean valid = Schnorrkel.verify(signature, message, signer);
+boolean valid = Schnorrkel.getInstance().verify(signature, message, signer);
 System.out.println("Valid: " + valid + " for pubkey " + Hex.encodeHexString(aliceKey.getPublicKey()));
 ----
 
@@ -136,7 +153,7 @@ Address alice = Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")
 Schnorrkel.PublicKey signer = new Schnorrkel.PublicKey(alice.getPubkey());
 
 // Verify the signature
-boolean valid = Schnorrkel.verify(signature, message, signer);
+boolean valid = Schnorrkel.getInstance().verify(signature, message, signer);
 System.out.println("Valid: " + valid + " for address " + alice);
 ----
 

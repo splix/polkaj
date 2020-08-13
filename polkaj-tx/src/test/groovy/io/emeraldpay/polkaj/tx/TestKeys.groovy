@@ -20,7 +20,7 @@ class TestKeys {
     //  Account ID:         0x8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48
     //  SS58 Address:       5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty
 
-    public static final Schnorrkel.KeyPair aliceKey = Schnorrkel.generateKeyPairFromSeed(
+    public static final Schnorrkel.KeyPair aliceKey = Schnorrkel.getInstance().generateKeyPairFromSeed(
             Hex.decodeHex("e5be9a5092b81bca64be81d212e7f2f9eba183bb7a90954f7b76361f6edb5c0a")
     )
     public static final Address alice = Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")

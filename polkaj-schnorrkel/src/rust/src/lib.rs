@@ -94,7 +94,7 @@ pub fn derive_pubkey_soft(pubkey: &[u8], cc: &[u8]) -> Result<Vec<u8>, String> {
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_sign
+pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_SchnorrkelNative_sign
     (env: JNIEnv, _class: JClass, pubkey: jbyteArray, sk: jbyteArray, message: jbyteArray) -> jbyteArray {
 
     let message = env.convert_byte_array(message)
@@ -120,7 +120,7 @@ pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_sign
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_verify
+pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_SchnorrkelNative_verify
 (env: JNIEnv, _class: JClass, signature: jbyteArray, message: jbyteArray, pubkey: jbyteArray) -> jboolean {
 
     let message = env.convert_byte_array(message)
@@ -144,7 +144,7 @@ pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_verify
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_keypairFromSeed
+pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_SchnorrkelNative_keypairFromSeed
 (env: JNIEnv, _class: JClass, seed: jbyteArray) -> jbyteArray {
 
     let seed = env.convert_byte_array(seed)
@@ -166,7 +166,7 @@ pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_keypairFr
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_deriveHard
+pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_SchnorrkelNative_deriveHard
 (env: JNIEnv, _class: JClass, keypair: jbyteArray, cc: jbyteArray) -> jbyteArray {
 
     let keypair = env.convert_byte_array(keypair)
@@ -190,7 +190,7 @@ pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_deriveHar
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_deriveSoft
+pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_SchnorrkelNative_deriveSoft
 (env: JNIEnv, _class: JClass, keypair: jbyteArray, cc: jbyteArray) -> jbyteArray {
 
     let keypair = env.convert_byte_array(keypair)
@@ -214,7 +214,7 @@ pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_deriveSof
 }
 
 #[no_mangle]
-pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_Schnorrkel_derivePublicKeySoft
+pub extern "system" fn Java_io_emeraldpay_polkaj_schnorrkel_SchnorrkelNative_derivePublicKeySoft
 (env: JNIEnv, _class: JClass, pubkey: jbyteArray, cc: jbyteArray) -> jbyteArray {
 
     let pubkey = env.convert_byte_array(pubkey)
