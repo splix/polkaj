@@ -95,9 +95,9 @@ So first you need to fetch all of them and use as part of the encoded value and 
 `AccountRequests.transfer()` provides a _builder_ to prepare the extrinsic.
 But you also need to prepare `ExtrinsicContext` to sign the extrinsic.
 
-There are two way to prepare such context: manual and automatic from current RPC.
-To build it manually use `ExtrinsicContext.newBuilder()` and set all values (genesis, runtime version, and nonce).
-The other way it to use `ExtrinsicContext.newAutoBuilder()` and fetch all those values from RPC.
+There are two ways to prepare such context: manual and automatic from current RPC.
+To build it manually, use `ExtrinsicContext.newBuilder()` and set all values (genesis, runtime version, and nonce).
+The other way is to use `ExtrinsicContext.newAutoBuilder()` and fetch all those values from RPC.
 
 .Manual context
 [source, java]
@@ -156,8 +156,7 @@ try (
     Metadata metadata = client.execute(
                 StandardCommands.getInstance().stateMetadata()
             )
-            .thenApply(ByteData::getBytes)
-            .thenApply(ScaleExtract.fromBytes(new MetadataReader()))
+            .thenApply(ScaleExtract.fromBytesData(new MetadataReader()))
             .get();
 
     // And build an actual call to the runtime method

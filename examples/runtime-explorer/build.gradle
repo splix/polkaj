@@ -16,6 +16,7 @@ repositories {
 apply from: '../common.gradle'
 
 dependencies {
+    implementation "io.emeraldpay.polkaj:polkaj-api-base:$polkajVersion"
     implementation "io.emeraldpay.polkaj:polkaj-api-http:$polkajVersion"
     implementation "io.emeraldpay.polkaj:polkaj-api-ws:$polkajVersion"
     implementation "io.emeraldpay.polkaj:polkaj-json-types:$polkajVersion"

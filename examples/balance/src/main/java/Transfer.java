@@ -53,8 +53,7 @@ public class Transfer {
             Metadata metadata = client.execute(
                         StandardCommands.getInstance().stateMetadata()
                     )
-                    .thenApply(ByteData::getBytes)
-                    .thenApply(ScaleExtract.fromBytes(new MetadataReader()))
+                    .thenApply(ScaleExtract.fromBytesData(new MetadataReader()))
                     .get();
 
             // prepare context for execution

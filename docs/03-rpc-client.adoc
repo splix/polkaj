@@ -242,12 +242,10 @@ Here is an example of how you handle it and decode the data to a Java object.
 
 ----
 Future<Metadata> metadataFuture = client.execute(StandardCommands.getInstance().stateMetadata()) // <1>
-        .thenApply(ByteData::getBytes) // <2>
-        .thenApply(ScaleExtract.fromBytes(new MetadataReader())); // <3>
+        .thenApply(ScaleExtract.fromBytesData(new MetadataReader())); // <2>
 ----
 <1> Requesting Runtime Metadata which describes all configured modules and storages for the blockchain
-<2> Since the response is Hex string (handled by `ByteData` class) we convert it to actual bytes
-<3> And then apply ScaleReader implemented with class `MetadataReader`
+<2> And then apply ScaleReader implemented with class `MetadataReader`
 
 The `Metadata` class, as well as `MetadataReader` are provided by the module `io.emeraldpay.polkaj:polkaj-scale-types:{lib-version}`
 

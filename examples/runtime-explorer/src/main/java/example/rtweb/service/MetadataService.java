@@ -6,7 +6,6 @@ import io.emeraldpay.polkaj.apihttp.PolkadotHttpApi;
 import io.emeraldpay.polkaj.scale.ScaleExtract;
 import io.emeraldpay.polkaj.scaletypes.Metadata;
 import io.emeraldpay.polkaj.scaletypes.MetadataReader;
-import io.emeraldpay.polkaj.types.ByteData;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
@@ -25,8 +24,7 @@ public class MetadataService {
     public Metadata get() {
         try {
             return api.execute(StandardCommands.getInstance().stateMetadata())
-                    .thenApply(ByteData::getBytes)
-                    .thenApply(ScaleExtract.fromBytes(new MetadataReader()))
+                    .thenApply(ScaleExtract.fromBytesData(new MetadataReader()))
                     .get(5, TimeUnit.SECONDS);
         } catch (Exception e) {
             e.printStackTrace();
