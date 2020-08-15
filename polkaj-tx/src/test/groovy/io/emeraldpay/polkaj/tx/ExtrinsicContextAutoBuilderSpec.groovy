@@ -16,7 +16,7 @@ class ExtrinsicContextAutoBuilderSpec extends Specification {
         AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(TestKeys.alice);
         def api = Mock(PolkadotApi) {
             1 * execute(
-                    StandardCommands.getInstance().stateGetStorage(requestAccount.requestData())
+                    StandardCommands.getInstance().stateGetStorage(requestAccount.encodeRequest())
             ) >> CompletableFuture.completedFuture(
                     // 1,000,000.00 Dot, nonce = 1
                     ByteData.from("0x010000000019e4759db3b6e00d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")

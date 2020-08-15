@@ -1,10 +1,7 @@
-import io.emeraldpay.polkaj.api.PolkadotMethod;
-import io.emeraldpay.polkaj.api.RpcCall;
 import io.emeraldpay.polkaj.apihttp.PolkadotHttpApi;
 import io.emeraldpay.polkaj.scaletypes.AccountInfo;
 import io.emeraldpay.polkaj.tx.AccountRequests;
 import io.emeraldpay.polkaj.types.Address;
-import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.DotAmount;
 import io.emeraldpay.polkaj.types.DotAmountFormatter;
 
@@ -14,13 +11,7 @@ public class Balance {
         try (PolkadotHttpApi client = PolkadotHttpApi.newBuilder().build()) {
             DotAmountFormatter formatter = DotAmountFormatter.autoFormatter();
 
-            AccountRequests.TotalIssuance reqIssuance = AccountRequests.totalIssuance();
-
-            DotAmount total = client.execute(
-                    RpcCall.create(ByteData.class, PolkadotMethod.STATE_GET_STORAGE, reqIssuance.requestData())
-            ).thenApply(reqIssuance).get();
-
-
+            DotAmount total = AccountRequests.totalIssuance().execute(client).get();
             System.out.println(
                     "Total Issued: " +
                             formatter.format(total)
@@ -28,12 +19,8 @@ public class Balance {
 
             Address address = Address.from("5C7f75bEAaDkpMAW12S9rPraTmWc7U36jS9rBkYvYugygD2C");
             System.out.println("Address: " + address);
-            AccountRequests.AddressBalance reqAddress = AccountRequests.balanceOf(address);
 
-            AccountInfo balance = client.execute(
-                    RpcCall.create(ByteData.class, PolkadotMethod.STATE_GET_STORAGE, reqAddress.requestData())
-            ).thenApply(reqAddress).get();
-
+            AccountInfo balance = AccountRequests.balanceOf(address).execute(client).get();
             if (balance == null) {
                 System.out.println("NO BALANCE");
                 return;

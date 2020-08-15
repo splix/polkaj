@@ -63,10 +63,7 @@ public class Transfer {
                     .build();
 
             // get current balance to show, optional
-            AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(alice);
-            AccountInfo accountInfo = client.execute(
-                    RpcCall.create(ByteData.class, PolkadotMethod.STATE_GET_STORAGE, requestAccount.requestData())
-            ).thenApply(requestAccount).get();
+            AccountInfo accountInfo = AccountRequests.balanceOf(alice).execute(client).get();
 
             System.out.println("Using genesis : " + context.getGenesis());
             System.out.println("Using runtime : " + context.getTxVersion() + ", " + context.getRuntimeVersion());
@@ -84,7 +81,7 @@ public class Transfer {
                     .sign(aliceKey, context)
                     .build();
 
-            ByteData req = transfer.requestData();
+            ByteData req = transfer.encodeRequest();
             System.out.println("RPC Request Payload: " + req);
             Hash256 txid = client.execute(
                     StandardCommands.getInstance().authorSubmitExtrinsic(req)

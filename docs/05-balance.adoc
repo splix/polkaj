@@ -25,11 +25,12 @@ But Polkaj also provides Java-friendly wrappers to make some of the common opera
 There are two types of operations: _Storage Request_ and _Extrinsic Request_, with respective interfaces.
 
 .`StorageRequest` interface
-- provides `ByteData requestData()` method, as the RPC request query
-- and by itself it `extends Function<ByteData, T>` to convert RPC response to a Java object
+- provides `execute(PolkadotApi)` method to fetch the data
+- or `ByteData encodeRequest()` method, as the RPC request query if you want to fetch manually
+- by itself it `extends Function<ByteData, T>` to convert RPC response to a Java object, you need it when you make a manual request
 
 .`ExtrinsicRequest` interface
-- provides `ByteData requestData()` which encodes the transaction to send to RPC
+- provides `ByteData encodeRequest()` which encodes the transaction to send to RPC
 
 === Get total amount of issued coins
 
@@ -43,16 +44,9 @@ try (
         .connectTo("wss://cc3-5.kusama.network")
         .build()
 ) {
-    // totalIssuance reads the current amount of issued coins
-    AccountRequests.TotalIssuance requester = AccountRequests.totalIssuance();
-
-    // encode the request as RpcCall to state_getStorage
-    RpcCall call = StandardCommands.getInstance().stateGetStorage(requester.requestData());
-
-    // execute on RPC
-    DotAmount total = client.execute(call)
-        // apply conversion provided by AccountRequests.TotalIssuance
-        .thenApply(requester)
+    DotAmount total = AccountRequests.totalIssuance()
+        // execute on RPC
+        .execute(client)
         // get the value synchroniously
         .get();
 
@@ -76,23 +70,19 @@ try (
 ) {
     // request balance of Alice
     Address alice = Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
-    AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(alice);
-
-    // encode the request as RpcCall to state_getStorage
-    RpcCall call = StandardCommands.getInstance().stateGetStorage(requester.requestData());
 
     // execute on RPC
-    AccountInfo accountInfo = client.execute(call)
-        // convert
-        .thenApply(requestAccount)
-        // get the value synchroniously
+    AccountInfo accountInfo = AccountRequests.balanceOf(alice)
+        .execute(client)
         .get();
 
     System.out.println(
-            "Current balance: " + DotAmountFormatter.autoFormatter().format(accountInfo.getData().getFree())
+            "Current balance: " +
+            DotAmountFormatter.autoFormatter().format(accountInfo.getData().getFree())
     );
     System.out.println(
-            "Current nonce  : " + accountInfo.getNonce()
+            "Current nonce  : " +
+            accountInfo.getNonce()
     );
 }
 ----
@@ -103,8 +93,53 @@ Creating an _Extrinsic_, such as a balance transfer, is a bit more complex task,
 So first you need to fetch all of them and use as part of the encoded value and a signature.
 
 `AccountRequests.transfer()` provides a _builder_ to prepare the extrinsic.
-But you also need to prepare `ExtrinsicContext` (build with `ExtrinsicContext.newBuilder()`) to sign the extrinsic.
+But you also need to prepare `ExtrinsicContext` to sign the extrinsic.
 
+There are two way to prepare such context: manual and automatic from current RPC.
+To build it manually use `ExtrinsicContext.newBuilder()` and set all values (genesis, runtime version, and nonce).
+The other way it to use `ExtrinsicContext.newAutoBuilder()` and fetch all those values from RPC.
+
+.Manual context
+[source, java]
+----
+// Current runtime version
+RuntimeVersionJson runtimeVersion = client.execute(
+            StandardCommands.getInstance().getRuntimeVersion()
+        ).get();
+
+// Blockchain genesis block
+Hash256 genesis = client.execute(
+            StandardCommands.getInstance().getBlockHash(0)
+        ).get();
+
+// Sender address info
+AccountInfo accountInfo =  AccountRequests.balanceOf(alice)
+        .execute(client)
+        .get();
+
+// Build a context for the execution
+ExtrinsicContext context = ExtrinsicContext.newAutoBuilder(alice)
+        // genesis block
+        .genesis(genesis)
+        // runtime version
+        .runtime(runtimeVersion)
+        // current sender nonce
+        .nonce(accountInfo.getNonce())
+        .build();
+----
+
+.Automatic context
+[source, java]
+----
+ExtrinsicContext context = ExtrinsicContext.newAutoBuilder(alice, client)
+        // synchronious
+        .get()
+        .build();
+----
+
+Automatic context builder is easier to use, but with the manual builder you can save few RPC requests when you make multiple transfers.
+
+.Full example
 [source, java]
 ----
 try (
@@ -112,13 +147,10 @@ try (
         .connectTo("wss://cc3-5.kusama.network")
         .build()
 ) {
-
-    // First fetch all required info used to create a new extrinsic
-
-    // Current runtime version
-    RuntimeVersionJson runtimeVersion = client.execute(
-                StandardCommands.getInstance().getRuntimeVersion()
-            ).get();
+    // Build a context for the execution
+    ExtrinsicContext context = ExtrinsicContext.newAutoBuilder(alice, client)
+            .get()
+            .build();
 
     // Current runtime meta
     Metadata metadata = client.execute(
@@ -128,31 +160,7 @@ try (
             .thenApply(ScaleExtract.fromBytes(new MetadataReader()))
             .get();
 
-    // Blockchain genesis block
-    Hash256 genesis = client.execute(
-                StandardCommands.getInstance().getBlockHash(0)
-            ).get();
-
-    // Sender address info (for nonce)
-    AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(alice);
-    AccountInfo accountInfo = client.execute(
-                StandardCommands.getInstance().stateGetStorage(requestAccount.requestData())
-            )
-            .thenApply(requestAccount).get();
-
-    // Now prepare the extrinsic
-
-    // Build a context for the execution
-    ExtrinsicContext context = ExtrinsicContext.newBuilder()
-            // genesis block
-            .genesis(genesis)
-            // runtime version
-            .runtime(runtimeVersion)
-            // current sender nonce
-            .nonce(nonce)
-            .build();
-
-    // And build actual call to the runtime method
+    // And build an actual call to the runtime method
     AccountRequests.Transfer transfer = AccountRequests.transfer()
             // get standard details from metadata (module and method id, etc)
             .runtime(metadata)
@@ -167,14 +175,9 @@ try (
             .build();
 
     // Finally, submit to the blockchain
-    client.execute(
-                RpcCall.create(
-                        // in this example we accept just any object
-                        Object.class,
-                        // RPC method
-                        "author_submitExtrinsic",
-                        // RPC parameters
-                        transfer.requestData())
+     Hash256 txid = client.execute(
+                    StandardCommands.getInstance()
+                        .authorSubmitExtrinsic(transfer.encodeRequest())
             ).get();
 }
 ----

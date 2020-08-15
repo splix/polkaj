@@ -1,19 +1,15 @@
 package io.emeraldpay.polkaj.tx;
 
 import io.emeraldpay.polkaj.api.PolkadotApi;
-import io.emeraldpay.polkaj.api.PolkadotMethod;
-import io.emeraldpay.polkaj.api.RpcCall;
 import io.emeraldpay.polkaj.api.StandardCommands;
 import io.emeraldpay.polkaj.json.RuntimeVersionJson;
 import io.emeraldpay.polkaj.scaletypes.AccountInfo;
 import io.emeraldpay.polkaj.types.Address;
-import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.DotAmount;
 import io.emeraldpay.polkaj.types.Hash256;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 /**
  * Context to execute an Extrinsic
@@ -227,10 +223,7 @@ public class ExtrinsicContext {
         }
 
         public CompletableFuture<Builder> fetch(PolkadotApi api) {
-            AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(sender);
-            CompletableFuture<AccountInfo> accountInfo = api.execute(
-                    StandardCommands.getInstance().stateGetStorage(requestAccount.requestData())
-            ).thenApply(requestAccount);
+            CompletableFuture<AccountInfo> accountInfo = AccountRequests.balanceOf(sender).execute(api);
             CompletableFuture<Hash256> genesis = api.execute(
                     StandardCommands.getInstance().getBlockHash(0)
             );

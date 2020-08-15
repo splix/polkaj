@@ -43,10 +43,10 @@ public class AccountRequests {
         return new TransferBuilder();
     }
 
-    public static class TotalIssuance implements StorageRequest<DotAmount> {
+    public static class TotalIssuance extends StorageRequest<DotAmount> {
 
         @Override
-        public ByteData requestData() {
+        public ByteData encodeRequest() {
             String key1 = "Balances";
             String key2 = "TotalIssuance";
             int len = 16 + 16;
@@ -62,7 +62,7 @@ public class AccountRequests {
         }
     }
 
-    public static class AddressBalance implements StorageRequest<AccountInfo> {
+    public static class AddressBalance extends StorageRequest<AccountInfo> {
 
         private final Address address;
 
@@ -71,7 +71,7 @@ public class AccountRequests {
         }
 
         @Override
-        public ByteData requestData() {
+        public ByteData encodeRequest() {
             String key1 = "System";
             String key2 = "Account";
             int len = 16 + 16 + 16 + 32;
@@ -104,7 +104,7 @@ public class AccountRequests {
         }
 
         @Override
-        public ByteData requestData() throws IOException {
+        public ByteData encodeRequest() throws IOException {
             ByteArrayOutputStream buf = new ByteArrayOutputStream();
             ScaleCodecWriter writer = new ScaleCodecWriter(buf);
             writer.write(CODEC, extrinsic);
