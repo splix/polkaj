@@ -47,14 +47,9 @@ public class Transfer {
         );
 
         try (PolkadotWsApi client = PolkadotWsApi.newBuilder().connectTo(api).build()) {
-
             System.out.println("Connected: " + client.connect().get());
 
-            RuntimeVersionJson runtimeVersion = client.execute(
-                    StandardCommands.getInstance().getRuntimeVersion()
-            ).get();
-            System.out.println("Using runtime : " + runtimeVersion.getTransactionVersion() + ", " + runtimeVersion.getSpecVersion());
-
+            // get current runtime metadata to correctly build the extrinsic
             Metadata metadata = client.execute(
                         StandardCommands.getInstance().stateMetadata()
                     )
@@ -62,27 +57,23 @@ public class Transfer {
                     .thenApply(ScaleExtract.fromBytes(new MetadataReader()))
                     .get();
 
-            Hash256 genesis = client.execute(
-                    StandardCommands.getInstance().getBlockHash(0)
-            ).get();
-            System.out.println("Using genesis : " + genesis);
+            // prepare context for execution
+            ExtrinsicContext context = ExtrinsicContext.newAutoBuilder(alice, client)
+                    .get()
+                    .build();
 
+            // get current balance to show, optional
             AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(alice);
             AccountInfo accountInfo = client.execute(
                     RpcCall.create(ByteData.class, PolkadotMethod.STATE_GET_STORAGE, requestAccount.requestData())
             ).thenApply(requestAccount).get();
 
-            long nonce = accountInfo.getNonce();
+            System.out.println("Using genesis : " + context.getGenesis());
+            System.out.println("Using runtime : " + context.getTxVersion() + ", " + context.getRuntimeVersion());
+            System.out.println("Using nonce   : " + context.getNonce());
+            System.out.println("------");
             System.out.println("Currently available: " + DotAmountFormatter.autoFormatter().format(accountInfo.getData().getFree()));
-            System.out.println("Use nonce  : " + nonce);
             System.out.println("Transfer " + DotAmountFormatter.autoFormatter().format(amount) + " from " + alice + " to " + bob);
-
-            // prepare context for execution
-            ExtrinsicContext context = ExtrinsicContext.newBuilder()
-                    .nonce(nonce)
-                    .genesis(genesis)
-                    .runtime(runtimeVersion)
-                    .build();
 
             // prepare call, and sign with sender Secret Key within the context
             AccountRequests.Transfer transfer = AccountRequests.transfer()

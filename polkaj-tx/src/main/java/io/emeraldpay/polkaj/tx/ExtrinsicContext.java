@@ -1,10 +1,19 @@
 package io.emeraldpay.polkaj.tx;
 
+import io.emeraldpay.polkaj.api.PolkadotApi;
+import io.emeraldpay.polkaj.api.PolkadotMethod;
+import io.emeraldpay.polkaj.api.RpcCall;
+import io.emeraldpay.polkaj.api.StandardCommands;
 import io.emeraldpay.polkaj.json.RuntimeVersionJson;
+import io.emeraldpay.polkaj.scaletypes.AccountInfo;
+import io.emeraldpay.polkaj.types.Address;
+import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.DotAmount;
 import io.emeraldpay.polkaj.types.Hash256;
 
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 /**
  * Context to execute an Extrinsic
@@ -59,6 +68,17 @@ public class ExtrinsicContext {
      */
     public static Builder newBuilder() {
         return new Builder();
+    }
+
+    /**
+     * Automatic asynchronous configuration based on current state of the blockchain
+     *
+     * @param sender sender
+     * @param api client to current blockchain
+     * @return future for the builder
+     */
+    public static CompletableFuture<Builder> newAutoBuilder(Address sender, PolkadotApi api) {
+        return new AutoBuilder(sender).fetch(api);
     }
 
     public int getTxVersion() {
@@ -195,6 +215,36 @@ public class ExtrinsicContext {
             context.setTip(tip);
             context.setEraHeight(eraHeight);
             return context;
+        }
+    }
+
+    public static final class AutoBuilder {
+
+        private final Address sender;
+
+        public AutoBuilder(Address sender) {
+            this.sender = sender;
+        }
+
+        public CompletableFuture<Builder> fetch(PolkadotApi api) {
+            AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(sender);
+            CompletableFuture<AccountInfo> accountInfo = api.execute(
+                    StandardCommands.getInstance().stateGetStorage(requestAccount.requestData())
+            ).thenApply(requestAccount);
+            CompletableFuture<Hash256> genesis = api.execute(
+                    StandardCommands.getInstance().getBlockHash(0)
+            );
+            CompletableFuture<RuntimeVersionJson> runtimeVersion = api.execute(
+                    StandardCommands.getInstance().getRuntimeVersion()
+            );
+
+            return CompletableFuture.allOf(accountInfo, genesis, runtimeVersion)
+                    .thenApply((ignore) ->
+                        new Builder()
+                            .runtime(runtimeVersion.join())
+                            .nonce(accountInfo.join().getNonce())
+                            .genesis(genesis.join())
+                    );
         }
     }
 }

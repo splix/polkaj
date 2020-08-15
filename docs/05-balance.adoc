@@ -47,14 +47,7 @@ try (
     AccountRequests.TotalIssuance requester = AccountRequests.totalIssuance();
 
     // encode the request as RpcCall to state_getStorage
-    RpcCall call = RpcCall.create(
-            // the RPC returns hex-encoded bytes
-            ByteData.class,
-            // state_getStorage method
-            PolkadotMethod.STATE_GET_STORAGE,
-            // encoded query
-            requester.requestData()
-    );
+    RpcCall call = StandardCommands.getInstance().stateGetStorage(requester.requestData());
 
     // execute on RPC
     DotAmount total = client.execute(call)
@@ -86,14 +79,7 @@ try (
     AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(alice);
 
     // encode the request as RpcCall to state_getStorage
-    RpcCall call = RpcCall.create(
-            // the RPC returns hex-encoded bytes
-            ByteData.class,
-            // state_getStorage method
-            PolkadotMethod.STATE_GET_STORAGE,
-            // encoded query
-            requester.requestData()
-    );
+    RpcCall call = StandardCommands.getInstance().stateGetStorage(requester.requestData());
 
     // execute on RPC
     AccountInfo accountInfo = client.execute(call)
@@ -150,10 +136,7 @@ try (
     // Sender address info (for nonce)
     AccountRequests.AddressBalance requestAccount = AccountRequests.balanceOf(alice);
     AccountInfo accountInfo = client.execute(
-                RpcCall.create(
-                        ByteData.class,
-                        PolkadotMethod.STATE_GET_STORAGE,
-                        requestAccount.requestData())
+                StandardCommands.getInstance().stateGetStorage(requestAccount.requestData())
             )
             .thenApply(requestAccount).get();
 
