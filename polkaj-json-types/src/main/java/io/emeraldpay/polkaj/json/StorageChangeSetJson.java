@@ -1,5 +1,6 @@
 package io.emeraldpay.polkaj.json;
 
+import com.fasterxml.jackson.annotation.JacksonAnnotation;
 import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.Hash256;
 
@@ -42,14 +43,14 @@ public class StorageChangeSetJson {
     }
 
     public static class KeyValueOption {
-        private Hash256 key;
+        private ByteData key;
         private ByteData data;
 
-        public Hash256 getKey() {
+        public ByteData getKey() {
             return key;
         }
 
-        public void setKey(Hash256 key) {
+        public void setKey(ByteData key) {
             this.key = key;
         }
 

@@ -1,6 +1,8 @@
 package io.emeraldpay.polkaj.apiws
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.emeraldpay.polkaj.json.StorageChangeSetJson
+import io.emeraldpay.polkaj.types.ByteData
 import io.emeraldpay.polkaj.types.Hash256
 import io.emeraldpay.polkaj.json.BlockJson
 import io.emeraldpay.polkaj.json.jackson.PolkadotModule
@@ -194,6 +196,45 @@ class DecodeResponseSpec extends Specification {
             parentHash == Hash256.from("0xbe9110f6da6a19ac645a27472e459dcca6eaf4ee4b0b12700ca5d566eea9a638")
             digest != null
             digest.logs.size() == 2
+        }
+    }
+
+    def "Decode subscription response to storage"() {
+        setup:
+        def json = '{' +
+                '"jsonrpc":"2.0",' +
+                '"method":"state_storage",' +
+                '"params":{' +
+                '   "result":{' +
+                '       "block":"0xdad79f2e141ea3396c4171a600ed1224871a7383dc874e8aa8c8beddda77babd",' +
+                '       "changes":[' +
+                '           [' +
+                '               "0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9de1e86a9a8c739864cf3cc5ec2bea59fd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d",' +
+                '               "0x04000000004b02987fb3b6e00d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"' +
+                '           ]' +
+                '       ]' +
+                '   },' +
+                '   "subscription":"EKMIn5gSrVmo1cgU"' +
+                '}}'
+        def mapping = Mock(DecodeResponse.TypeMapping) {
+            1 * get("EKMIn5gSrVmo1cgU") >> objectMapper.typeFactory.constructType(StorageChangeSetJson.class)
+        }
+        when:
+        def decoder = new DecodeResponse(objectMapper, Stub(DecodeResponse.TypeMapping), mapping)
+        def act = decoder.decode(json)
+        then:
+        act.type == WsResponse.Type.SUBSCRIPTION
+        PolkadotWsApi.SubscriptionResponse event = act.asEvent()
+        event.method == "state_storage"
+        event.id == "EKMIn5gSrVmo1cgU"
+        event.value instanceof StorageChangeSetJson
+        with((StorageChangeSetJson)event.value) {
+            block == Hash256.from("0xdad79f2e141ea3396c4171a600ed1224871a7383dc874e8aa8c8beddda77babd")
+            changes.size() == 1
+            with(changes[0]) {
+                key == ByteData.from("0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9de1e86a9a8c739864cf3cc5ec2bea59fd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d")
+                data == ByteData.from("0x04000000004b02987fb3b6e00d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+            }
         }
     }
 }

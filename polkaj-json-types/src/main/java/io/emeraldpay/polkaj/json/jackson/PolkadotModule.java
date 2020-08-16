@@ -1,6 +1,7 @@
 package io.emeraldpay.polkaj.json.jackson;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import io.emeraldpay.polkaj.json.StorageChangeSetJson;
 import io.emeraldpay.polkaj.types.Address;
 import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.DotAmount;
@@ -18,5 +19,8 @@ public class PolkadotModule extends SimpleModule {
         addSerializer(Address.class, new AddressSerializer());
         addDeserializer(DotAmount.class, new DotAmountDeserializer());
         addSerializer(DotAmount.class, new DotAmountSerializer());
+
+        addDeserializer(StorageChangeSetJson.KeyValueOption.class,
+                new StorageChangeSetDeserializer.KeyValueOptionDeserializer());
     }
 }
