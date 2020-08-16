@@ -56,12 +56,9 @@ class StandardSubscriptionsSpec extends Specification {
         act.getResultType(typeFactory).getRawClass() == StorageChangeSetJson.class
 
         when:
-        act = StandardSubscriptions.getInstance().storage(null)
+        StandardSubscriptions.getInstance().storage(null)
         then:
-        act.method == "state_subscribeStorage"
-        act.params.size() == 0
-        act.unsubscribe == "state_unsubscribeStorage"
-        act.getResultType(typeFactory).getRawClass() == StorageChangeSetJson.class
+        thrown(NullPointerException)
 
         when:
         act = StandardSubscriptions.getInstance().storage([])
@@ -73,6 +70,14 @@ class StandardSubscriptionsSpec extends Specification {
 
         when:
         act = StandardSubscriptions.getInstance().storage([ByteData.from("0x00")])
+        then:
+        act.method == "state_subscribeStorage"
+        act.params.toList() == [[ByteData.from("0x00")]]
+        act.unsubscribe == "state_unsubscribeStorage"
+        act.getResultType(typeFactory).getRawClass() == StorageChangeSetJson.class
+
+        when:
+        act = StandardSubscriptions.getInstance().storage(ByteData.from("0x00"))
         then:
         act.method == "state_subscribeStorage"
         act.params.toList() == [[ByteData.from("0x00")]]
