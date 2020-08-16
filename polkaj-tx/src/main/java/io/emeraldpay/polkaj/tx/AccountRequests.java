@@ -222,8 +222,9 @@ public class AccountRequests {
             } else {
                 this.from = new Address(SS58Type.Network.LIVE, key.getPublicKey());
             }
+            ExtrinsicSigner<BalanceTransfer> signer = new ExtrinsicSigner<>(new BalanceTransferWriter());
             return this.nonce(context)
-                    .signed(Signer.sign(context, this.call, key));
+                    .signed(signer.sign(context, this.call, key));
         }
 
         /**

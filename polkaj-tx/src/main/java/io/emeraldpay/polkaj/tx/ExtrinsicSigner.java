@@ -14,17 +14,42 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 
-public class Signer {
+/**
+ * Extrinsic signer and signature verifier. Created with provided SCALE writer for the call type it support, which is
+ * used to create a payload for signature.
+ *
+ * @param <CALL> supported type of the Extrinsic Call
+ */
+public class ExtrinsicSigner<CALL extends ExtrinsicCall> {
 
-    public static byte[] getPayload(ExtrinsicContext ctx, BalanceTransfer call) throws SignException {
+    private final SignaturePayloadWriter<CALL> codec;
+    private final SignaturePayloadWriter<CALL> codecAsList;
+
+    /**
+     *
+     * @param callScaleWriter SCALE coded for the CALL type
+     */
+    public ExtrinsicSigner(ScaleWriter<CALL> callScaleWriter) {
+        this.codec = new SignaturePayloadWriter<>(callScaleWriter, false);
+        this.codecAsList = new SignaturePayloadWriter<>(callScaleWriter, true);
+    }
+
+    /**
+     * Generate a payload for the call
+     *
+     * @param ctx call context
+     * @param call call details
+     * @return signature payload
+     * @throws SignException if failed to encode call
+     */
+    public byte[] getPayload(ExtrinsicContext ctx, CALL call) throws SignException {
         return getPayload(ctx, call, true);
     }
 
-    public static byte[] getPayload(ExtrinsicContext ctx, BalanceTransfer call, boolean asList) throws SignException {
-        SignaturePayloadWriter<BalanceTransfer> codec = new SignaturePayloadWriter<>(new BalanceTransferWriter(), asList);
+    protected byte[] getPayload(ExtrinsicContext ctx, CALL call, boolean asList) throws SignException {
         ByteArrayOutputStream result = new ByteArrayOutputStream();
         try (ScaleCodecWriter writer = new ScaleCodecWriter(result)) {
-            writer.write(codec, new SignaturePayload<>(ctx, call));
+            writer.write(asList ? codecAsList : codec, new SignaturePayload<>(ctx, call));
         } catch (IOException e) {
             throw new SignException("Failed to encode signature payload", e);
         }
@@ -36,7 +61,16 @@ public class Signer {
         }
     }
 
-    public static Hash512 sign(ExtrinsicContext ctx, BalanceTransfer call, Schnorrkel.KeyPair key) throws SignException {
+    /**
+     * Create signature for the call
+     *
+     * @param ctx call context
+     * @param call call details
+     * @param key key pair
+     * @return signature
+     * @throws SignException if invalid key or failed to encode
+     */
+    public Hash512 sign(ExtrinsicContext ctx, CALL call, Schnorrkel.KeyPair key) throws SignException {
         byte[] payload = getPayload(ctx, call, false);
         try {
             return new Hash512(Schnorrkel.getInstance().sign(payload, key));
@@ -45,7 +79,17 @@ public class Signer {
         }
     }
 
-    public static boolean isValid(ExtrinsicContext ctx, BalanceTransfer call, Hash512 signature, Address address) throws SignException {
+    /**
+     * Verify an existing signature agains provided call
+     *
+     * @param ctx context used to sign call
+     * @param call expected call
+     * @param signature signature of call
+     * @param address signed address
+     * @return true if signature is valid under specified context for specified address
+     * @throws SignException if invalid key or failed to encode
+     */
+    public boolean isValid(ExtrinsicContext ctx, CALL call, Hash512 signature, Address address) throws SignException {
         byte[] payload = getPayload(ctx, call, false);
         try {
             return Schnorrkel.getInstance().verify(signature.getBytes(), payload, new Schnorrkel.PublicKey(address.getPubkey()));
