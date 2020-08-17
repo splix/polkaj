@@ -1,5 +1,5 @@
 = RPC Client
-:lib-version: 0.2.0
+:lib-version: 0.3.0
 :examples-dir: ../examples
 :examples-encoding: {examples-dir}/rpc/src/main/java
 

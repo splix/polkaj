@@ -1,6 +1,6 @@
 = PolkaJ - Polkadot Java Client
-:lib-version: 0.2.3
-:lib-version-dev: 0.3.0-SNAPSHOT
+:lib-version: 0.3.0
+:lib-version-dev: 0.4.0-SNAPSHOT
 
 image:https://github.com/emeraldpay/polkaj/workflows/Tests/badge.svg["Unit Tests"]
 image:https://codecov.io/gh/emeraldpay/polkaj/branch/master/graph/badge.svg["Coverage",link="https://codecov.io/gh/emeraldpay/polkaj"]
@@ -19,14 +19,14 @@ WARNING: UNDER DEVELOPMENT
 
 - `io.emeraldpay.polkaj:polkaj-scale:{lib-version}` - SCALE codec implementation
 - `io.emeraldpay.polkaj:polkaj-scale-types:{lib-version}` - SCALE mapping for standard Polkadot types
-- `io.emeraldpay.polkaj:polkaj-schnorrkel:{lib-version-dev}` - Schnorrkel for Java
+- `io.emeraldpay.polkaj:polkaj-schnorrkel:{lib-version}` - Schnorrkel for Java
 - `io.emeraldpay.polkaj:polkaj-ss58:{lib-version}` - SS58 codec to encode/decode addresses and pubkeys
 - `io.emeraldpay.polkaj:polkaj-common-types:{lib-version}` - common types (Address, DotAmount, Hash256, etc)
 - `io.emeraldpay.polkaj:polkaj-json-types:{lib-version}` - JSON RPC mapping to Java classes
 - `io.emeraldpay.polkaj:polkaj-api-base:{lib-version}` - RPC base classes
 - `io.emeraldpay.polkaj:polkaj-api-http:{lib-version}` - JSON RPC HTTP client
 - `io.emeraldpay.polkaj:polkaj-api-ws:{lib-version}` - JSON RPC WebSocket client
-- `io.emeraldpay.polkaj:polkaj-tx:{lib-version-dev}` - Storage access and Extrinsics
+- `io.emeraldpay.polkaj:polkaj-tx:{lib-version}` - Storage access and Extrinsics
 
 == Usage
 
