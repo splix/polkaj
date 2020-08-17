@@ -1,0 +1,108 @@
+= Working with Account Balance
+
+Polkaj provides Java-friendly wrappers to make some common operations.
+`AccountRequests` class provides common operations for address and balance.
+
+== Get total amount of issued coins
+
+`totalIssuance()` method of `AccountRequests` class provides a functionality to request and process total amount of currently issues coins.
+For the query it encodes request to storage function `TotalIssuance` of the module `Balances` on the current Runtime.
+
+[source, java]
+----
+try (
+  PolkadotHttpApi client = PolkadotWsApi.newBuilder()
+        .connectTo("wss://cc3-5.kusama.network")
+        .build()
+) {
+    DotAmount total = AccountRequests.totalIssuance()
+        // execute on RPC
+        .execute(client)
+        // get the value synchroniously
+        .get();
+
+    System.out.println(
+            "Total Issued: " + DotAmountFormatter.autoFormatter().format(total)
+    );
+}
+----
+
+== Get balance
+
+`balanceOf(address)` method of `AccountRequests` class provides a functionality to request and process account info for the specified address.
+For the query it encodes request to storage function `System` of the module `Account` on the current Runtime.
+
+[source, java]
+----
+try (
+  PolkadotHttpApi client = PolkadotWsApi.newBuilder()
+        .connectTo("wss://cc3-5.kusama.network")
+        .build()
+) {
+    // request balance of Alice
+    Address alice = Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY");
+
+    // execute on RPC
+    AccountInfo accountInfo = AccountRequests.balanceOf(alice)
+        .execute(client)
+        .get();
+
+    System.out.println(
+            "Current balance: " +
+            DotAmountFormatter.autoFormatter().format(accountInfo.getData().getFree())
+    );
+    System.out.println(
+            "Current nonce  : " +
+            accountInfo.getNonce()
+    );
+}
+----
+
+== Transfer balance
+
+`AccountRequests.transfer()` provides a _builder_ to prepare the extrinsic.
+Use it to set values, such as _from_, _to_, and _amount_ to transfer.
+
+To make a valid extrinsic, it also needs the current Runtime Metadata and Extrinsic Context with Key Pari to make a signature.
+
+.Example
+[source, java]
+----
+try (
+  PolkadotHttpApi client = PolkadotWsApi.newBuilder()
+        .connectTo("wss://cc3-5.kusama.network")
+        .build()
+) {
+    // Build a context for the execution
+    ExtrinsicContext context = ExtrinsicContext.newAutoBuilder(alice, client)
+            .get()
+            .build();
+
+    // Current runtime meta
+    Metadata metadata = client.execute(
+                StandardCommands.getInstance().stateMetadata()
+            )
+            .thenApply(ScaleExtract.fromBytesData(new MetadataReader()))
+            .get();
+
+    // And build an actual call to the runtime method
+    AccountRequests.Transfer transfer = AccountRequests.transfer()
+            // get standard details from metadata (module and method id, etc)
+            .runtime(metadata)
+            // sender
+            .from(alice)
+            // recipient
+            .to(bob)
+            // amount to transfer
+            .amount(amount)
+            // sign with the context
+            .sign(aliceKey, context)
+            .build();
+
+    // Finally, submit to the blockchain
+     Hash256 txid = client.execute(
+                    StandardCommands.getInstance()
+                        .authorSubmitExtrinsic(transfer.encodeRequest())
+            ).get();
+}
+----

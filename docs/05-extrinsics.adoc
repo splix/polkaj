@@ -1,0 +1,94 @@
+= Extrinsics and Storage
+
+== How it works
+
+With Polkadot you use Runtime to get value from storage or submit transactions (which are called _Extrinsics_).
+
+To read data from storage, you prepare a query encoded as a hex string, and the result is usually a SCALE encoded object.
+The encoded requests sent to `state_getStorage` (or related), and the response is a hex + SCALE encoded object.
+The actual request parameters and the response type are described in the current Runtime Metadata object.
+
+To send and execute an Extrinsic, is must be encoded as SCALE as well, signed, and submitted with `author_submitExtrinsic` (or related).
+
+Polkaj is designed to be Runtime agnostic, and any of such requests could be build using Polkaj provided modules:
+
+- `polkaj-scale`, `polkaj-scale-types`
+- `polkaj-api-http` or `polkaj-api-ws`
+- `polkaj-schnorrkel`
+- `polkaj-tx`, with _Hashing_ and _ExtrinsicSigner_ classes specifically
+
+== Storage Request
+
+.`StorageRequest` interface
+- provides `execute(PolkadotApi)` method to fetch the data
+- or `ByteData encodeRequest()` method, as the RPC request query if you want to fetch manually
+- methods `boolean isKeyEqualTo(ByteData key)` allows to verify the storage response, when used together with `state_subscribeStorage` RPC Subscription
+- it `extends Function<ByteData, T>` to convert RPC response to a Java object, you may need it if you make a manual request
+
+== Extrinsic Context
+
+_Extrinsic_ details depend on the current Runtime state and other details of the current blockchain, such as height and genesis.
+To create an Extrinsic you need to have all of them and use as a part of the encoded value and a signature.
+It's all container by `ExtrinsicContext` class, which you have to prepare to sign an extrinsic.
+
+There are two ways to prepare such context: manual and automatic from current RPC.
+
+To build it manually, use `ExtrinsicContext.newBuilder()` and set all values (genesis, runtime version, and nonce).
+The other way is to use `ExtrinsicContext.newAutoBuilder()` and fetch all those values from RPC.
+
+.Manual context
+[source, java]
+----
+// Current runtime version
+RuntimeVersionJson runtimeVersion = client.execute(
+            StandardCommands.getInstance().getRuntimeVersion()
+        ).get();
+
+// Blockchain genesis block
+Hash256 genesis = client.execute(
+            StandardCommands.getInstance().getBlockHash(0)
+        ).get();
+
+// Sender address info
+AccountInfo accountInfo =  AccountRequests.balanceOf(alice)
+        .execute(client)
+        .get();
+
+// Build a context for the execution
+ExtrinsicContext context = ExtrinsicContext.newAutoBuilder(alice)
+        // genesis block
+        .genesis(genesis)
+        // runtime version
+        .runtime(runtimeVersion)
+        // current sender nonce
+        .nonce(accountInfo.getNonce())
+        .build();
+----
+
+.Automatic context
+[source, java]
+----
+ExtrinsicContext context = ExtrinsicContext.newAutoBuilder(alice, client)
+        // synchronious
+        .get()
+        .build();
+----
+
+Automatic context builder is easier to use, but with the manual builder you can save few RPC requests when you make multiple transfers.
+
+
+== Extrinsic Signer
+
+Class `ExtrinsicSigner` provides methdos for making a signature, or signature verification.
+It's typed with a `Call` to sign, and supposed to be created with a SCALE writer for the call type it support.
+
+.There're two main methods:
+- `Hash512 sign(ExtrinsicContext ctx, CALL call, Schnorrkel.KeyPair key)` to sign the call under provided call context
+- and `boolean isValid(ExtrinsicContext ctx, CALL call, Hash512 signature, Address address)` to verify an existing signature
+
+== Extrinsic Request
+
+Extrinsic Request class combines _Call Data_ and _Signature_ and prepares a payload to broadcast to the blockchain.
+
+.`ExtrinsicRequest` interface
+- provides `ByteData encodeRequest()` which encodes the transaction to send to RPC

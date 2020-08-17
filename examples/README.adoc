@@ -76,8 +76,12 @@ cd balance
 ./gradlew run
 ----
 
+NOTE: To run a development network use: `polkadot --dev`
+
 .Transfer using real network (ex. Kusama)
 ----
 cd balance
 ./gradlew run --args="wss://cc3-5.kusama.network SENDER_KEY_SEED RECIPIENT_ADDRESS"
 ----
+
+WARNING: If you use on a real network please be aware that it executes the transfer without any additional convirmation from you

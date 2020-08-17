@@ -26,6 +26,7 @@ WARNING: UNDER DEVELOPMENT
 - `io.emeraldpay.polkaj:polkaj-api-base:{lib-version}` - RPC base classes
 - `io.emeraldpay.polkaj:polkaj-api-http:{lib-version}` - JSON RPC HTTP client
 - `io.emeraldpay.polkaj:polkaj-api-ws:{lib-version}` - JSON RPC WebSocket client
+- `io.emeraldpay.polkaj:polkaj-tx:{lib-version-dev}` - Storage access and Extrinsics
 
 == Usage
 

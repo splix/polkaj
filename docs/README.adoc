@@ -6,7 +6,8 @@
 . link:02-encoding.adoc[Encoding and Decoding (SCALE, SS58)]
 . link:03-rpc-client.adoc[RPC Client]
 . link:04-cryptography.adoc[Cryptography and Keys]
-. link:05-balance.adoc[Working with Account Balance]
+. link:05-extrinsics.adoc[Extrinsics and Storage]
+. link:06-balance.adoc[Working with Account Balance]
 
 == Reference
 
