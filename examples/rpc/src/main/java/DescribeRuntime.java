@@ -15,8 +15,7 @@ public class DescribeRuntime {
     public static void main(String[] args) throws Exception {
         PolkadotHttpApi client = PolkadotHttpApi.newBuilder().build();
         Future<Metadata> metadataFuture = client.execute(StandardCommands.getInstance().stateMetadata())
-                .thenApply(ByteData::getBytes)
-                .thenApply(ScaleExtract.fromBytes(new MetadataReader()));
+                .thenApply(ScaleExtract.fromBytesData(new MetadataReader()));
 
         System.out.println("Runtime Metadata:");
         Metadata metadata = metadataFuture.get();
