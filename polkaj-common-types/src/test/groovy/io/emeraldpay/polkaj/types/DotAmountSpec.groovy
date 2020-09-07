@@ -33,13 +33,13 @@ class DotAmountSpec extends Specification {
         when:
         def act = DotAmount.fromDots(123.456789)
         then:
-        act.value.toString() == "123456789000000"
+        act.value.toString() == "1234567890000"
         act.units.main.name == "Dot"
 
         when:
         act = DotAmount.fromDots(123L)
         then:
-        act.value.toString() == "123000000000000"
+        act.value.toString() == "1230000000000"
         act.units.main.name == "Dot"
     }
 
@@ -50,7 +50,7 @@ class DotAmountSpec extends Specification {
                 .add(DotAmount.fromDots(0.000456))
 
         then:
-        act.value.toString() == "15123456000000"
+        act.value.toString() == "151234560000"
     }
 
     def "Cannot add different units"() {
@@ -68,7 +68,7 @@ class DotAmountSpec extends Specification {
                 .substract(DotAmount.fromDots(5.123))
 
         then:
-        act.value.toString() == "4877000000000"
+        act.value.toString() == "48770000000"
     }
 
     def "Cannot substract different units"() {
@@ -85,7 +85,7 @@ class DotAmountSpec extends Specification {
         def act = DotAmount.fromDots(10.125)
                 .multiply(2)
         then:
-        act.value.toString() == "20250000000000"
+        act.value.toString() == "202500000000"
     }
 
     def "Division works"() {
@@ -93,7 +93,7 @@ class DotAmountSpec extends Specification {
         def act = DotAmount.fromDots(20.250)
                 .divide(2)
         then:
-        act.value.toString() == "10125000000000"
+        act.value.toString() == "101250000000"
     }
 
     def "Cannot division by zero"() {
@@ -110,15 +110,15 @@ class DotAmountSpec extends Specification {
         DotAmount.fromDots(dots).toString() == str
         where:
         dots            | str
-        0.1             |    "100000000000 DOT"
-        100.0           | "100000000000000 DOT"
-        0.123456789123  |    "123456789123 DOT"
+        0.1             |    "1000000000 DOT"
+        100.0           | "1000000000000 DOT"
+        0.1234567891    |    "1234567891 DOT"
     }
 
     def "Same amounts are equal"() {
         when:
         def amount1 = DotAmount.fromDots(10)
-        def amount2 = new DotAmount(BigInteger.valueOf(10000000000000))
+        def amount2 = new DotAmount(BigInteger.valueOf(100000000000))
 
         then:
         amount1.equals(amount2)
@@ -127,7 +127,7 @@ class DotAmountSpec extends Specification {
     def "Different amounts are not equal"() {
         when:
         def amount1 = DotAmount.fromDots(10)
-        def amount2 = new DotAmount(BigInteger.valueOf(50000000000000))
+        def amount2 = new DotAmount(BigInteger.valueOf(500000000000))
 
         then:
         !amount1.equals(amount2)
@@ -136,7 +136,7 @@ class DotAmountSpec extends Specification {
     def "Same amounts but different units are not equal"() {
         when:
         def amount1 = DotAmount.fromDots(10)
-        def amount2 = new DotAmount(BigInteger.valueOf(10000000000000), DotAmount.Kusamas)
+        def amount2 = new DotAmount(BigInteger.valueOf(100000000000), DotAmount.Kusamas)
 
         then:
         !amount1.equals(amount2)
@@ -163,7 +163,7 @@ class DotAmountSpec extends Specification {
     def "Same hashcodes for same values"() {
         when:
         def amount1 = DotAmount.fromDots(10)
-        def amount2 = new DotAmount(BigInteger.valueOf(10000000000000))
+        def amount2 = new DotAmount(BigInteger.valueOf(100000000000))
 
         then:
         amount1.hashCode() == amount2.hashCode()
@@ -172,7 +172,7 @@ class DotAmountSpec extends Specification {
     def "Different hashcodes for different values"() {
         when:
         def amount1 = DotAmount.fromDots(50)
-        def amount2 = new DotAmount(BigInteger.valueOf(10000000000000))
+        def amount2 = new DotAmount(BigInteger.valueOf(100000000000))
 
         then:
         amount1.hashCode() != amount2.hashCode()
@@ -235,28 +235,28 @@ class DotAmountSpec extends Specification {
         100         | "Planck"
         500         | "Planck"
         999         | "Planck"
+        1000        | "Planck"
+        5000        | "Planck"
+        9999        | "Planck"
 
-        1000        | "Point"
-        5000        | "Point"
-        10000       | "Point"
-        50000       | "Point"
-        999_999     | "Point"
-
+        10_000       | "Microdot"
+        100_000      | "Microdot"
         1_000_000    | "Microdot"
         5_000_000    | "Microdot"
 
-        1_000_000_000    | "Millidot"
-        5_000_000_000    | "Millidot"
+        10_000_000     | "Millidot"
+        50_000_000     | "Millidot"
+        99_000_000     | "Millidot"
 
-        1_000_000_000_000   | "Dot"
-        5_000_000_000_000   | "Dot"
-        10_000_000_000_000  | "Dot"
+        10_000_000_000   | "Dot"
+        50_000_000_000   | "Dot"
+        100_000_000_000  | "Dot"
     }
 
     def "Get minimal with limit"() {
         when:
         def act = DotAmount
-                .fromPlancks(1_000_000) //ideal is micro
+                .fromPlancks(10_000) //ideal is micro
                 .getMinimalUnit(Units.Millidot) //but should stop at milli
         then:
         act == Units.Millidot
@@ -278,22 +278,6 @@ class DotAmountSpec extends Specification {
         0                   | "0"
     }
 
-    def "Get value in points"() {
-        expect:
-        DotAmount.fromPlancks(amount)
-                .getValue(Units.Point)
-                .toString() == result
-        where:
-        amount              | result
-        10_000_000_000_000  | "10000000000"
-        12_345_678_123_456  | "12345678123.456"
-            20_900_800_700  |    "20900800.7"
-                30_900_800  |       "30900.8"
-                    40_900  |          "40.9"
-                        50  |           "0.05"
-                        00  |           "0"
-    }
-
     def "Get value in micro"() {
         expect:
         DotAmount.fromPlancks(amount)
@@ -301,13 +285,13 @@ class DotAmountSpec extends Specification {
                 .toString() == result
         where:
         amount              | result
-        10_000_000_000_000  | "10000000"
-        12_345_678_123_456  | "12345678.123456"
-            20_900_800_700  |    "20900.8007"
-                30_900_800  |       "30.9008"
-                    40_900  |        "0.0409"
-                        50  |        "0.00005"
-                        00  |        "0"
+        10_000_000_000_000  | "1000000000"
+        12_345_678_123_456  | "1234567812.3456"
+            20_900_800_700  |    "2090080.07"
+                30_900_800  |       "3090.08"
+                    40_900  |          "4.09"
+                        50  |          "0.005"
+                        00  |          "0"
     }
 
     def "Get value in milli"() {
@@ -317,13 +301,13 @@ class DotAmountSpec extends Specification {
                 .toPlainString() == result
         where:
         amount              | result
-        10_000_000_000_000  | "10000"
-        12_345_678_123_456  | "12345.678123456"
-            20_900_800_700  |    "20.9008007"
-                30_900_800  |     "0.0309008"
-                    40_900  |     "0.0000409"
-                        50  |     "0.00000005"
-                        00  |     "0"
+        10_000_000_000_000  | "1000000"
+        12_345_678_123_456  | "1234567.8123456"
+            20_900_800_700  |    "2090.08007"
+                30_900_800  |       "3.09008"
+                    40_900  |       "0.00409"
+                        50  |       "0.000005"
+                        00  |       "0"
     }
 
     def "Get value in dot"() {
@@ -333,12 +317,20 @@ class DotAmountSpec extends Specification {
                 .toPlainString() == result
         where:
         amount              | result
-        10_000_000_000_000  | "10"
-        12_345_678_123_456  | "12.345678123456"
-            20_900_800_700  |  "0.0209008007"
-                30_900_800  |  "0.0000309008"
-                    40_900  |  "0.0000000409"
-                        50  |  "0.00000000005"
-                        00  |  "0"
+        10_000_000_000_000  | "1000"
+        12_345_678_123_456  | "1234.5678123456"
+            20_900_800_700  |    "2.09008007"
+                30_900_800  |    "0.00309008"
+                    40_900  |    "0.00000409"
+                        50  |    "0.000000005"
+                        00  |    "0"
+    }
+
+    def "Uses denomination examples"() {
+        when:
+        def act = DotAmount.fromPlancks(1_000_000_000_000)
+                .getValue(Units.Dot)
+        then:
+        act == BigDecimal.valueOf(100)
     }
 }

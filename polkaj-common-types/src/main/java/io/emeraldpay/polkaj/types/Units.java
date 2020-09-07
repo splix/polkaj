@@ -15,10 +15,9 @@ import java.util.Objects;
 public class Units {
 
     public static final Unit Planck = new Unit("Planck", 0);
-    public static final Unit Point = new Unit("Point", 3);
-    public static final Unit Microdot = new Unit("Microdot", "uDOT", 6);
-    public static final Unit Millidot = new Unit("Millidot", "mDOT", 9);
-    public static final Unit Dot = new Unit("Dot", "DOT", 12);
+    public static final Unit Microdot = new Unit("Microdot", "uDOT", 4);
+    public static final Unit Millidot = new Unit("Millidot", "mDOT", 7);
+    public static final Unit Dot = new Unit("Dot", "DOT", 10);
 
     private final Unit[] units;
 

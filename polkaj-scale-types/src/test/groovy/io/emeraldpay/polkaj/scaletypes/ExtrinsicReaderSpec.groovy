@@ -34,7 +34,7 @@ class ExtrinsicReaderSpec extends Specification {
             moduleIndex == 4
             callIndex == 0
             destination == Address.from("ED3aw4s68wTDscCbWnCCw94qSrkA1D8HcUXC8ytaoM2X2xd")
-            balance == DotAmount.fromDots(0.03451)
+            balance == DotAmount.fromDots(3.451)
         }
     }
 }

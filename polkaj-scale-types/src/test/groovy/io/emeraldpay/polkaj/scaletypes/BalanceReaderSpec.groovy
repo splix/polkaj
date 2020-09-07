@@ -15,7 +15,7 @@ class BalanceReaderSpec extends Specification {
         where:
         hex                                 | balance
         "f70af5f6f3c843050000000000000000"  | DotAmount.fromPlancks("379367743775116023")
-        "0000c52ebca2b1000000000000000000"  | DotAmount.fromDots(50000)
+        "0000c52ebca2b1000000000000000000"  | DotAmount.fromDots(5000000)
         "00000000000000000000000000000000"  | DotAmount.ZERO
     }
 }

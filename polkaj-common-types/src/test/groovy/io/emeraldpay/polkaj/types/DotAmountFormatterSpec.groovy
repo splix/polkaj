@@ -63,8 +63,13 @@ class DotAmountFormatterSpec extends Specification {
         DotAmountFormatter.autoFormatter().format(value) == exp
         where:
         amount              | exp
-        5_123_456_789_000   | forLocale("5.12 Dot")
-               56_789_000   | forLocale("56.79 Microdot")
+        5_123_456_789_000   | forLocale("512.35 Dot")
+           23_456_789_000   | forLocale("2.35 Dot")
+            3_456_789_000   | forLocale("345.68 Millidot")
+               56_789_000   | forLocale("5.68 Millidot")
+                6_789_000   | forLocale("678.90 Microdot")
+                   89_000   | forLocale("8.90 Microdot")
+                    9_000   | forLocale("9,000.00 Planck")
     }
 
     def "Standard short"() {
@@ -73,8 +78,10 @@ class DotAmountFormatterSpec extends Specification {
         DotAmountFormatter.autoShortFormatter().format(value) == exp
         where:
         amount              | exp
-        5_123_456_789_000   | forLocale("5.12 DOT")
-               56_789_000   | forLocale("56.79 uDOT")
+        5_123_456_789_000   | forLocale("512.35 DOT")
+               56_789_000   | forLocale("5.68 mDOT")
+                   89_000   | forLocale("8.90 uDOT")
+                    9_000   | forLocale("9,000.00 Planck")
     }
 
     def "With group separator"() {
@@ -101,7 +108,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount1)
         then:
-        act == forLocale("5.12 Dot")
+        act == forLocale("512.35 Dot")
     }
 
     def "Converted with decimal part"() {
@@ -115,13 +122,13 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount2)
         then:
-        act == forLocale("123.46 Millidot")
+        act == forLocale("12,345.68 Millidot")
     }
 
     def "Converted large with decimal part"() {
         setup:
         def fmt = DotAmountFormatter.newBuilder()
-                .usingUnit(Units.Point)
+                .usingUnit(Units.Planck)
                 .fullNumber("#,##0.00")
                 .exactString(" ")
                 .fullUnit()
@@ -129,7 +136,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount1)
         then:
-        act == forLocale("5,123,456,789.00 Point")
+        act == forLocale("5,123,456,789,000.00 Planck")
     }
 
     def "Using short unit"() {
@@ -143,7 +150,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount2)
         then:
-        act == forLocale("123.457 mDOT")
+        act == forLocale("12,345.679 mDOT")
     }
 
     def "Using auto unit"() {
@@ -157,7 +164,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount5)
         then:
-        act == forLocale("456.79 uDOT")
+        act == forLocale("45.68 mDOT")
     }
 
     def "Using auto with limit unit"() {
@@ -171,7 +178,7 @@ class DotAmountFormatterSpec extends Specification {
         when:
         def act = fmt.format(amount8)
         then:
-        act == forLocale("0.000789 mDOT")
+        act == forLocale("0.078900 mDOT")
     }
 
     def "Gives null on null input"() {

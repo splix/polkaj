@@ -27,7 +27,7 @@ address = new Address(SS58Type.Network.LIVE, getPubKey());
 // create amount of 100,000 Plancks
 DotAmount amount = DotAmount.fromPlancks(100_000);
 
-// create 4.25 Dots, which is 4.25 * 10^12 == 4250000000000 Plancks
+// create 4.25 Dots, which is 4.25 * 10^10 == 42500000000 Plancks
 amount = DotAmount.fromDots(4.25);
 ----
 
@@ -54,7 +54,7 @@ Not the auto formatter chooses Millidots as the optimal unit to display the valu
 ----
 amount = amount
         .divide(1000)
-        .add(DotAmount.fromDots(0.0012));
+        .add(DotAmount.fromDots(0.00112));
 
 System.out.println(
         DotAmountFormatter.autoFormatter().format(amount)
@@ -85,7 +85,7 @@ System.out.println(
 It would print:
 
 ----
-12345600000 Planck
+123456000 Planck
 ----
 
 If you don't want to see such large values in Plancks, you can use `autoFormatter` which will find an optimal size for the passed value:
@@ -152,7 +152,7 @@ System.out.println(
 Which would print:
 
 ----
-12,345,600,000.0000 (of uDOT)
+123,456,000.0000 (of uDOT)
 ----
 
 == Hash256 and Hash512

@@ -17,11 +17,10 @@ public class DotAmount implements Comparable<DotAmount>{
     /**
      * Standard units for DOT token
      *
-     * Planck -&gt; Point -&gt; Microdot -&gt; Millidot -&gt; Dot
+     * Planck -&gt; Microdot -&gt; Millidot -&gt; Dot
      */
     public static final Units Polkadots = new Units(
             Units.Planck,
-            Units.Point,
             Units.Microdot,
             Units.Millidot,
             Units.Dot
@@ -144,7 +143,7 @@ public class DotAmount implements Comparable<DotAmount>{
 
     /**
      * Finds a minimal unit for which a value represented in that unit has a whole part.
-     * For example for 0.100 Dots the unit is Millidot (100 Millidots), for 0.000075 its Microdot (75 Microdots), and so on.
+     * For example for 0.100 Dots the unit is Millidot (100 Millidots), for 0.000075 it's Microdot (75 Microdots), and so on.
      *
      * @return a minimal unit
      */
@@ -154,7 +153,7 @@ public class DotAmount implements Comparable<DotAmount>{
 
     /**
      * Finds a minimal unit, down to specified limit, for which a value represented in that unit has a whole part.
-     * For example for 0.100 Dots the unit is Millidot (100 Millidots), for 0.000075 its Microdot (75 Microdots), and so on.
+     * For example for 0.100 Dots the unit is Millidot (100 Millidots), for 0.000075 it's Microdot (75 Microdots), and so on.
      *
      * @param limit the limit that stop further decrease of the unit
      * @return a minimal unit
