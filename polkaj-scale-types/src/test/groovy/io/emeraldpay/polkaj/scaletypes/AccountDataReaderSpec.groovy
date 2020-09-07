@@ -18,7 +18,7 @@ class AccountDataReaderSpec extends Specification {
         act != null
         act.free == DotAmount.fromPlancks(379367743775116023)
         act.reserved == DotAmount.ZERO
-        act.feeFrozen == DotAmount.fromDots(50000)
-        act.miscFrozen == DotAmount.fromDots(50000)
+        act.feeFrozen == DotAmount.fromDots(5000000)
+        act.miscFrozen == DotAmount.fromDots(5000000)
     }
 }

@@ -47,8 +47,8 @@ class AccountRequestsSpec extends Specification {
         with(act.data) {
             free == DotAmount.fromPlancks(379367743775116023)
             reserved == DotAmount.ZERO
-            feeFrozen == DotAmount.fromDots(50000)
-            miscFrozen == DotAmount.fromDots(50000)
+            feeFrozen == DotAmount.fromDots(5000000)
+            miscFrozen == DotAmount.fromDots(5000000)
         }
     }
 
@@ -59,7 +59,7 @@ class AccountRequestsSpec extends Specification {
             .from(Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"))
             .to(Address.from("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"))
             .nonce(1234567890)
-            .amount(DotAmount.fromDots(1.23))
+            .amount(DotAmount.fromDots(123))
             .signed(Hash512.from("0x6a141ade40871c076f3eb32362f0204db49e4ae37e5dc7a68329f1a6768034556201432b1635637fc1d42ae6fce996fb25ef175ee1ae4015d2b8769436d89987"))
             .build()
         def act = transfer.encodeRequest()
@@ -78,7 +78,7 @@ class AccountRequestsSpec extends Specification {
                 .module(5, 0)
                 .from(Address.from("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"))
                 .to(Address.from("5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"))
-                .amount(DotAmount.fromDots(1.23))
+                .amount(DotAmount.fromDots(123))
                 .sign(TestKeys.aliceKey, context)
                 .build()
         def act = transfer.encodeRequest()

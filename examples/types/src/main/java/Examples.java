@@ -16,7 +16,7 @@ public class Examples {
         // create amount of 100,000 Plancks
         DotAmount amount = DotAmount.fromPlancks(100_000);
 
-        // create 4.25 Dots, which is 4.25 * 10^12 == 4250000000000 Plancks
+        // create 4.25 Dots, which is 4.25 * 10^10 == 42,500,000,000 Plancks
         amount = DotAmount.fromDots(4.25);
 
         // print formatted value
@@ -31,7 +31,7 @@ public class Examples {
         // and then add 0.00112 Dot (or 1.12 Millidot)
         amount = amount
                 .divide(1000)
-                .add(DotAmount.fromDots(0.0012));
+                .add(DotAmount.fromDots(0.00112));
 
         // and print the result
         // prints:
@@ -47,7 +47,7 @@ public class Examples {
         DotAmountFormatter formatter = DotAmountFormatter.fullFormatter();
 
         // Prints:
-        // 12345600000 Planck
+        // 123456000 Planck
         System.out.println(
                 formatter.format(DotAmount.fromDots(0.0123456))
         );
@@ -85,7 +85,7 @@ public class Examples {
                 .build();
 
         // Prints
-        // 12,345,600,000.0000 (of uDOT)
+        // 123,456,000.0000 (of uDOT)
         System.out.println(
                 formatter.format(DotAmount.fromDots(0.0123456))
         );

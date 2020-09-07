@@ -33,7 +33,7 @@ class ExtrinsicSignerSpec extends Specification {
                 .build()
         BalanceTransfer call = new BalanceTransfer(5, 0).tap {
             destination = TestKeys.bob
-            balance = DotAmount.fromDots(3) // 02 ba 7d ef 30 00 -> 0030ef7dba02
+            balance = DotAmount.fromDots(300) // 02 ba 7d ef 30 00 -> 0030ef7dba02
         }
         ExtrinsicSigner signer = new ExtrinsicSigner<>(new BalanceTransferWriter())
         when:
@@ -85,7 +85,7 @@ class ExtrinsicSignerSpec extends Specification {
                 .build()
         BalanceTransfer call = new BalanceTransfer(5, 0).tap {
             destination = TestKeys.bob
-            balance = DotAmount.fromDots(1.23)
+            balance = DotAmount.fromDots(123)
         }
         ExtrinsicSigner signer = new ExtrinsicSigner<>(new BalanceTransferWriter())
         when:
