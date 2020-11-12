@@ -56,5 +56,10 @@ class CompactBigIntWriterSpec extends Specification {
         encoded         | value
         "0300000040"    | "40_00_00_00"
         "0370605040"    | "40_50_60_70"
+        "03000000ff"    | "ff_00_00_00"
+        "030000ffff"    | "ff_ff_00_00"
+        "03ffffffff"    | "ff_ff_ff_ff"
+        "0700ffffffff"  | "ff_ff_ff_ff_00"
+        "07ffffffffff"  | "ff_ff_ff_ff_ff"
     }
 }

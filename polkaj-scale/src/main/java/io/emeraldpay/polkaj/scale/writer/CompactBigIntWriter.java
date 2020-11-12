@@ -16,6 +16,7 @@ public class CompactBigIntWriter implements ScaleWriter<BigInteger> {
         CompactMode mode = CompactMode.forNumber(value);
 
         byte[] data = value.toByteArray();
+        int length = data.length;
         int pos = data.length-1;
         int limit = 0;
 
@@ -24,8 +25,14 @@ public class CompactBigIntWriter implements ScaleWriter<BigInteger> {
             return;
         }
 
-        wrt.directWrite(((data.length - 4) << 2) + mode.getValue());
-        while (pos >= 0) {
+        // skip the first byte if it's 0
+        if (data[0]==0x00) {
+            length--;
+            limit++;
+        }
+
+        wrt.directWrite(((length - 4) << 2) + mode.getValue());
+        while (pos >= limit) {
             wrt.directWrite(data[pos]);
             pos--;
         }
