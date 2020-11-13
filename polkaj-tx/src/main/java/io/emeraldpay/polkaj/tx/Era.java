@@ -6,6 +6,8 @@ public interface Era {
 
     public byte[] encode();
 
+    public Integer toInteger();
+
     /**
      * Get the block number of the start of the era whose properties this object
      * describes that `current` belongs to.
@@ -50,6 +52,11 @@ public interface Era {
         @Override
         public byte[] encode() {
             return new byte[] {0};
+        }
+
+        @Override
+        public Integer toInteger() {
+            return 0;
         }
 
         @Override
@@ -107,6 +114,12 @@ public interface Era {
                     (byte)((result >> 8) & 0xff),
                     (byte)(result & 0xff),
             };
+        }
+
+        @Override
+        public Integer toInteger() {
+            byte[] encoded = this.encode();
+            return Byte.toUnsignedInt(encoded[0]) << 8 | Byte.toUnsignedInt(encoded[1]);
         }
 
         @Override

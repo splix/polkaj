@@ -142,7 +142,7 @@ public class ExtrinsicSigner<CALL extends ExtrinsicCall> {
             } else {
                 wrt.write(callScaleWriter, signPayload.getCall());
             }
-            wrt.write(ScaleCodecWriter.COMPACT_BIGINT, BigInteger.valueOf(context.getEra().birth(context.getEraHeight())));
+            wrt.write(ScaleCodecWriter.ERA, context.getEra().toInteger());
             wrt.write(ScaleCodecWriter.COMPACT_BIGINT, BigInteger.valueOf(context.getNonce()));
             wrt.write(ScaleCodecWriter.COMPACT_BIGINT, context.getTip().getValue());
             wrt.writeUint32(context.getRuntimeVersion());

@@ -102,6 +102,33 @@ class ExtrinsicSignerSpec extends Specification {
         valid
     }
 
+    def "Sign mortal era"() {
+        setup:
+        ExtrinsicContext extrinsic = ExtrinsicContext.newBuilder()
+                .runtime(3, 0x12)
+                .era(new Era.Mortal(32768, 20000))
+                .eraBlockHash(Hash256.from("0x4baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d"))
+                .genesis(Hash256.from("0x4c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"))
+                .nonce(7)
+                .build()
+        BalanceTransfer call = new BalanceTransfer(5, 0).tap {
+            destination = TestKeys.bob
+            balance = DotAmount.fromDots(300)
+        }
+        ExtrinsicSigner signer = new ExtrinsicSigner<>(new BalanceTransferWriter())
+        when:
+        def payload = signer.getPayload(extrinsic, call)
+        then:
+        Hex.encodeHexString(payload) == "a405008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b0030ef7dba024e9c1c0012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d"
+        when:
+        def valid = signer.isValid(extrinsic, call,
+                Hash512.from("0x3caed1957dd8be455376317867a4841639d608d235323d427eee0e2fed83bd34bfa4f87a6d54b622dfd4f63bfabc800646ae74b608af06b4a331d6a0ce993184"),
+                TestKeys.alice
+        )
+        then:
+        valid
+    }
+
     def "Validate own signature"() {
         setup:
         ExtrinsicSigner signer = new ExtrinsicSigner<>(new BalanceTransferWriter())

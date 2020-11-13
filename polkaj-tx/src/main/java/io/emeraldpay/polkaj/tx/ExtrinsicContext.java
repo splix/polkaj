@@ -190,8 +190,18 @@ public class ExtrinsicContext {
             return this;
         }
 
+        public Builder eraBlockHash(Hash256 eraBlockHash) {
+            this.eraBlockHash = eraBlockHash;
+            return this;
+        }
+
         public Builder nonce(long nonce) {
             this.nonce = nonce;
+            return this;
+        }
+
+        public Builder era(Era era) {
+            this.era = era;
             return this;
         }
 

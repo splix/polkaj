@@ -35,6 +35,13 @@ class EraSpec extends Specification {
         Hex.encodeHexString(act) == "00"
     }
 
+    def "Immortal to integer"() {
+        when:
+        def act = new Era.Immortal().toInteger()
+        then:
+        act == 0
+    }
+
     def "Decode mortal"() {
         when:
         def act = Era.decode(0x9c4e)
@@ -52,6 +59,13 @@ class EraSpec extends Specification {
         def act = new Era.Mortal(32768, 20000).encode()
         then:
         Hex.encodeHexString(act) == "9c4e"
+    }
+
+    def "Mortal to integer"() {
+        when:
+        def act = new Era.Mortal(32768, 20000).toInteger()
+        then:
+        act == 0x9c4e
     }
 
     @Unroll

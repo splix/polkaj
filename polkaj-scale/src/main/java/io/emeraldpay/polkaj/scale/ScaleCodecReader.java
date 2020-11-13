@@ -17,6 +17,7 @@ public class ScaleCodecReader {
     public static final Int32Reader INT32 = new Int32Reader();
     public static final CompactUIntReader COMPACT_UINT = new CompactUIntReader();
     public static final CompactBigIntReader COMPACT_BIGINT = new CompactBigIntReader();
+    public static final EraReader ERA = new EraReader();
     public static final BoolReader BOOL = new BoolReader();
     public static final BoolOptionalReader BOOL_OPTIONAL = new BoolOptionalReader();
     public static final StringReader STRING = new StringReader();
@@ -102,6 +103,10 @@ public class ScaleCodecReader {
 
     public int readCompactInt() {
         return COMPACT_UINT.read(this);
+    }
+
+    public int readEra() {
+        return ERA.read(this);
     }
 
     public boolean readBoolean() {
