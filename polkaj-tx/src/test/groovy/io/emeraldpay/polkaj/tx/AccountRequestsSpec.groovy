@@ -38,7 +38,7 @@ class AccountRequestsSpec extends Specification {
     def "Decode balance response"() {
         setup:
         def req = AccountRequests.balanceOf(Address.from("1WG3jyNqniQMRZGQUc7QD2kVLT8hkRPGMSqAb5XYQM1UDxN"))
-        def result = ByteData.from("0x1100000003f70af5f6f3c843050000000000000000000000000000000000000000000000000000c52ebca2b10000000000000000000000c52ebca2b1000000000000000000")
+        def result = ByteData.from("0x1100000003000000f70af5f6f3c843050000000000000000000000000000000000000000000000000000c52ebca2b10000000000000000000000c52ebca2b1000000000000000000")
         when:
         def act = req.apply(result)
         then:

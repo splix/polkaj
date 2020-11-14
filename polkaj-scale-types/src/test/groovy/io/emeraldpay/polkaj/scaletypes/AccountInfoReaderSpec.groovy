@@ -11,7 +11,7 @@ class AccountInfoReaderSpec extends Specification {
 
     def "Read value"() {
         setup:
-        def value = Hex.decodeHex("1100000003f70af5f6f3c843050000000000000000000000000000000000000000000000000000c52ebca2b10000000000000000000000c52ebca2b1000000000000000000")
+        def value = Hex.decodeHex("1100000003000000f70af5f6f3c843050000000000000000000000000000000000000000000000000000c52ebca2b10000000000000000000000c52ebca2b1000000000000000000")
         when:
         def act = new ScaleCodecReader(value).read(reader)
         then:
