@@ -19,20 +19,18 @@ public class MetadataReader implements ScaleReader<Metadata> {
         Metadata result = new Metadata();
         result.setMagic(ScaleCodecReader.INT32.read(rdr));
         result.setVersion(rdr.readUByte());
-        if (result.getVersion() != 11) {
+        if (result.getVersion() != 12) {
             throw new IllegalStateException("Unsupported metadata version: " + result.getVersion());
         }
         result.setModules(MODULE_LIST_READER.read(rdr));
         List<Metadata.Module> modules = result.getModules();
 
-        int moduleIndex = 0;
         for (Metadata.Module m: modules) {
             List<Metadata.Call> calls = m.getCalls();
             if (calls != null) {
                 for (int j = 0; j < calls.size(); j++) {
-                    calls.get(j).setIndex((moduleIndex << 8) + j);
+                    calls.get(j).setIndex((m.getIndex() << 8) + j);
                 }
-                moduleIndex++;
             }
         }
         return result;
@@ -55,6 +53,7 @@ public class MetadataReader implements ScaleReader<Metadata> {
             rdr.readOptional(EVENT_LIST_READER).ifPresent(result::setEvents);
             result.setConstants(CONSTANT_LIST_READER.read(rdr));
             result.setErrors(ERROR_LIST_READER.read(rdr));
+            result.setIndex(rdr.readUByte());
             return result;
         }
     }
