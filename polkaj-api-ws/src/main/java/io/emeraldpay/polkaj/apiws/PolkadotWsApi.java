@@ -178,7 +178,7 @@ public class PolkadotWsApi extends AbstractPolkadotApi implements AutoCloseable,
         try {
             if (response.getError() != null) {
                 f.getHandler().completeExceptionally(new CompletionException(
-                        new RpcException(response.getError().getCode(), response.getError().getMessage())
+                        new RpcException(response.getError().getCode(), response.getError().getMessage(), response.getError().getData())
                 ));
             } else {
                 f.getHandler().complete(response.getResult());

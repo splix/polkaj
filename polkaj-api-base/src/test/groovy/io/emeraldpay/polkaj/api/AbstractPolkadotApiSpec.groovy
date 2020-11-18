@@ -84,7 +84,7 @@ class AbstractPolkadotApiSpec extends Specification {
         setup:
         def response = '{\n' +
                 '  "jsonrpc": "2.0",\n' +
-                '  "error": {"code": 100, "message": "Test error", "details": 1},\n' +
+                '  "error": {"code": 100, "message": "Test error", "data": "Test data"},\n' +
                 '  "id": 0\n' +
                 '}'
         when:
@@ -92,9 +92,11 @@ class AbstractPolkadotApiSpec extends Specification {
         then:
         def t = thrown(CompletionException)
         t.cause instanceof RpcException
+        t.message == "io.emeraldpay.polkaj.api.RpcException: RPC Exception 100: Test error (Test data)"
         with((RpcException)t.cause) {
             code == 100
             rpcMessage == "Test error"
+            rpcData == "Test data"
         }
     }
 
@@ -110,6 +112,12 @@ class AbstractPolkadotApiSpec extends Specification {
         then:
         def t = thrown(CompletionException)
         t.cause instanceof RpcException
+        t.message == "io.emeraldpay.polkaj.api.RpcException: RPC Exception -32603: Server returned invalid id: 1 != 0"
+        with((RpcException)t.cause) {
+            code == -32603
+            rpcMessage == "Server returned invalid id: 1 != 0"
+            rpcData == null
+        }
     }
 
     def "Fail to decode if invalid json"() {
@@ -120,6 +128,12 @@ class AbstractPolkadotApiSpec extends Specification {
         then:
         def t = thrown(CompletionException)
         t.cause instanceof RpcException
+        t.message == "io.emeraldpay.polkaj.api.RpcException: RPC Exception -32603: Server returned invalid JSON"
+        with((RpcException)t.cause) {
+            code == -32603
+            rpcMessage == "Server returned invalid JSON"
+            rpcData == null
+        }
     }
 
     class TestingPolkadotApi extends AbstractPolkadotApi {

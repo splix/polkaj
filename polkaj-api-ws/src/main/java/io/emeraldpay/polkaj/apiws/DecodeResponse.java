@@ -92,6 +92,7 @@ public class DecodeResponse {
     protected RpcResponseError decodeError(JsonParser parser) throws IOException {
         int code = 0;
         String message = null;
+        String data = null;
         while (parser.nextToken() != JsonToken.END_OBJECT) {
             if (parser.currentToken() == null) {
                 break;
@@ -101,9 +102,11 @@ public class DecodeResponse {
                 code = decodeNumber(parser);
             } else if ("message".equals(field)) {
                 message = parser.getValueAsString();
+            } else if ("data".equals(field)) {
+                data = parser.getValueAsString();
             }
         }
-        return new RpcResponseError(code, message);
+        return new RpcResponseError(code, message, data);
 
     }
 

@@ -55,7 +55,7 @@ public abstract class AbstractPolkadotApi implements PolkadotApi {
         }
         if (response.getError() != null) {
             throw new CompletionException(
-                    new RpcException(response.getError().getCode(), response.getError().getMessage())
+                    new RpcException(response.getError().getCode(), response.getError().getMessage(), response.getError().getData())
             );
         }
         return response.getResult();
