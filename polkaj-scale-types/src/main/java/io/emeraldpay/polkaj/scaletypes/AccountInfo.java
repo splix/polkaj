@@ -5,7 +5,7 @@ import java.util.Objects;
 public class AccountInfo {
 
     private Long nonce;
-    private Integer refcount;
+    private Long refcount;
     private AccountData data;
 
     public Long getNonce() {
@@ -16,11 +16,11 @@ public class AccountInfo {
         this.nonce = nonce;
     }
 
-    public Integer getRefcount() {
+    public Long getRefcount() {
         return refcount;
     }
 
-    public void setRefcount(Integer refcount) {
+    public void setRefcount(Long refcount) {
         this.refcount = refcount;
     }
 

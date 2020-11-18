@@ -136,7 +136,7 @@ class PolkadotWsClientSpec extends Specification {
 
     def "Fail to subscribe with invalid command"() {
         when:
-        server.onNextReply('{"jsonrpc":"2.0","error":{"code": -1, "message": "Test"},"id":0}')
+        server.onNextReply('{"jsonrpc":"2.0","error":{"code": -1, "message": "Test", "data": "Test data"},"id":0}')
         def f = client.subscribe(SubscribeCall.create(Hash256.class, "test_subscribeNone", "test_unsubscribeNone"))
         f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
@@ -145,6 +145,7 @@ class PolkadotWsClientSpec extends Specification {
         with((RpcException)t.cause) {
             code == -1
             rpcMessage == "Test"
+            rpcData == "Test data"
         }
     }
 

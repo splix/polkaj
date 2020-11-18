@@ -77,6 +77,7 @@ public class Metadata {
         private List<Event> events;
         private List<Constant> constants;
         private List<Error> errors;
+        private Integer index;
 
         public String getName() {
             return name;
@@ -126,6 +127,14 @@ public class Metadata {
             this.errors = errors;
         }
 
+        public Integer getIndex() {
+            return index;
+        }
+
+        public void setIndex(Integer index) {
+            this.index = index;
+        }
+
         public Optional<Call> findCall(String name) {
             if (calls == null) {
                 return Optional.empty();
@@ -145,12 +154,13 @@ public class Metadata {
                     Objects.equals(calls, module.calls) &&
                     Objects.equals(events, module.events) &&
                     Objects.equals(constants, module.constants) &&
-                    Objects.equals(errors, module.errors);
+                    Objects.equals(errors, module.errors) &&
+                    Objects.equals(index, module.index);
         }
 
         @Override
         public final int hashCode() {
-            return Objects.hash(name, storage, calls, events, constants, errors);
+            return Objects.hash(name, storage, calls, events, constants, errors, index);
         }
     }
 

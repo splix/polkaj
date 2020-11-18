@@ -60,6 +60,10 @@ class CompactBigIntReaderSpec extends Specification {
         where:
         encoded         | value
         "0300000040"    | 0x40_00_00_00
+        "0370605040"    | 0x40_50_60_70
+        "03000000ff"    | 0xff_00_00_00
+        "030000ffff"    | 0xff_ff_00_00
+        "03ffffffff"    | 0xff_ff_ff_ff
     }
 
     def "Reads bigint"() {
@@ -71,6 +75,8 @@ class CompactBigIntReaderSpec extends Specification {
 
         where:
         encoded                                 | value
+        "0700ffffffff"                          | "ffffffff00"
+        "07ffffffffff"                          | "ffffffffff"
         "33aabbccddeeff00112233445566778899"    | "99887766554433221100ffeeddccbbaa"
     }
 }

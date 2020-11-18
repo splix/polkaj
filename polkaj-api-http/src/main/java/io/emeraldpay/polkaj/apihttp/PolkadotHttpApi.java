@@ -44,14 +44,14 @@ public class PolkadotHttpApi extends AbstractPolkadotApi implements AutoCloseabl
     private final HttpRequest.Builder request;
     private boolean closed = false;
 
-    private PolkadotHttpApi(URI target, HttpClient httpClient, String basicAuth, Runnable onClose, ObjectMapper objectMapper) {
+    private PolkadotHttpApi(URI target, HttpClient httpClient, String basicAuth, Runnable onClose, ObjectMapper objectMapper, Duration timeout) {
         super(objectMapper);
         this.httpClient = httpClient;
         this.onClose = onClose;
 
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(target)
-                .timeout(Duration.ofMinutes(1))
+                .timeout(timeout)
                 .header("User-Agent", "Polkaj/0.3") //TODO generate version during compilation
                 .header("Content-Type", APPLICATION_JSON);
 
@@ -148,6 +148,7 @@ public class PolkadotHttpApi extends AbstractPolkadotApi implements AutoCloseabl
         private HttpClient httpClient;
         private Runnable onClose;
         private ObjectMapper objectMapper;
+        private Duration timeout;
 
 
         /**
@@ -228,6 +229,17 @@ public class PolkadotHttpApi extends AbstractPolkadotApi implements AutoCloseabl
             return this;
         }
 
+        /**
+         * Override the default timeout with a custom duration.
+         *
+         * @param timeout Duration
+         * @return builder
+         */
+        public Builder timeout(Duration timeout) {
+            this.timeout = timeout;
+            return this;
+        }
+
         protected void initDefaults() {
             if (httpClient == null && target == null) {
                 try {
@@ -242,6 +254,9 @@ public class PolkadotHttpApi extends AbstractPolkadotApi implements AutoCloseabl
             if (objectMapper == null) {
                 objectMapper = new ObjectMapper();
                 objectMapper.registerModule(new PolkadotModule());
+            }
+            if (timeout == null) {
+                timeout = Duration.ofMinutes(1);
             }
         }
 
@@ -261,7 +276,7 @@ public class PolkadotHttpApi extends AbstractPolkadotApi implements AutoCloseabl
                         .build();
             }
 
-            return new PolkadotHttpApi(target, httpClient, basicAuth, onClose, objectMapper);
+            return new PolkadotHttpApi(target, httpClient, basicAuth, onClose, objectMapper, timeout);
         }
 
     }

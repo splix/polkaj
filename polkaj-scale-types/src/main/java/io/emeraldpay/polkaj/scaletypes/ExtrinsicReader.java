@@ -62,7 +62,7 @@ public class ExtrinsicReader<CALL extends ExtrinsicCall> implements ScaleReader<
             Extrinsic.TransactionInfo result = new Extrinsic.TransactionInfo();
             result.setSender(new Address(network, rdr.readUint256()));
             result.setSignature(rdr.read(SIGNATURE_READER).getValue());
-            result.setEra(rdr.readCompactInt());
+            result.setEra(rdr.readEra());
             result.setNonce(rdr.read(ScaleCodecReader.COMPACT_BIGINT).longValueExact());
             result.setTip(new DotAmount(rdr.read(ScaleCodecReader.COMPACT_BIGINT)));
             return result;

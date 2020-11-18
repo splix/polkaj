@@ -5,13 +5,16 @@ import io.emeraldpay.polkaj.types.Hash256
 import io.emeraldpay.polkaj.api.RpcException
 import io.emeraldpay.polkaj.json.BlockResponseJson
 import org.mockserver.integration.ClientAndServer
+import org.mockserver.model.Delay
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
 import org.mockserver.model.MediaType
 import spock.lang.Shared
 import spock.lang.Specification
 
+import java.net.http.HttpTimeoutException
 import java.nio.charset.Charset
+import java.time.Duration
 import java.util.concurrent.ExecutionException
 
 class PolkadotHttpClientSpec extends Specification {
@@ -24,6 +27,7 @@ class PolkadotHttpClientSpec extends Specification {
     def setup() {
         client = PolkadotHttpApi.newBuilder()
             .connectTo("http://localhost:18080")
+            .timeout(Duration.ofSeconds(1))
             .build()
         mockServer = ClientAndServer.startClientAndServer(18080)
     }
@@ -77,6 +81,28 @@ class PolkadotHttpClientSpec extends Specification {
         then:
         def t = thrown(ExecutionException)
         t.cause instanceof IllegalStateException
+
+    }
+
+    def "Timeouts in one second"() {
+        setup:
+        def response = '{\n' +
+                '  "jsonrpc": "2.0",\n' +
+                '  "result": "0x5d83f66b61701da4cbd7a60137db89c69469a4f798b62aba9176ab253b423828",\n' +
+                '  "id": 0\n' +
+                '}'
+        mockServer.when(
+                HttpRequest.request()
+        ).respond(
+                HttpResponse.response(response).withContentType(MediaType.APPLICATION_JSON).withDelay(Delay.seconds(2))
+        )
+
+        when:
+        client.execute(RpcCall.create(String, "chain_getFinalisedHead")).get()
+
+        then:
+        def t = thrown(ExecutionException)
+        t.cause instanceof HttpTimeoutException
 
     }
 

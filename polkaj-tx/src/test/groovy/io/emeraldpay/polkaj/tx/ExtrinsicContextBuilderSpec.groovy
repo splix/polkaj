@@ -50,6 +50,15 @@ class ExtrinsicContextBuilderSpec extends Specification {
         act.runtimeVersion == 34
     }
 
+    def "Set eraBlockHash"() {
+        when:
+        def act = ExtrinsicContext.newBuilder()
+                .eraBlockHash(Hash256.from("0x35170a58d341fd81c07ee349438da400ecfb625782cd25e29774203080a54f45"))
+                .build()
+        then:
+        act.eraBlockHash == Hash256.from("0x35170a58d341fd81c07ee349438da400ecfb625782cd25e29774203080a54f45")
+    }
+
     def "Set nonce"() {
         when:
         def act = ExtrinsicContext.newBuilder()
@@ -57,6 +66,16 @@ class ExtrinsicContextBuilderSpec extends Specification {
                 .build()
         then:
         act.nonce == 50161
+    }
+
+    def "Set era"() {
+        when:
+        def act = ExtrinsicContext.newBuilder()
+                .era(new Era.Mortal(32768, 20000))
+                .build()
+        then:
+        !act.era.immortal
+        act.era.toInteger() == 0x9c4e
     }
 
     def "Set tip"() {
