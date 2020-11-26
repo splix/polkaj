@@ -12,7 +12,6 @@ public class ScaleCodecWriter implements Closeable {
 
     public static final CompactUIntWriter COMPACT_UINT = new CompactUIntWriter();
     public static final CompactBigIntWriter COMPACT_BIGINT = new CompactBigIntWriter();
-    public static final EraWriter ERA = new EraWriter();
     public static final UInt16Writer UINT16 = new UInt16Writer();
     public static final UInt32Writer UINT32 = new UInt32Writer();
     public static final UInt128Writer UINT128 = new UInt128Writer();
@@ -83,10 +82,6 @@ public class ScaleCodecWriter implements Closeable {
 
     public void writeByte(byte value) throws IOException {
         directWrite(value);
-    }
-
-    public void writeEra(int value) throws IOException {
-        ERA.write(this, value);
     }
 
     public void writeUint16(int value) throws IOException {
