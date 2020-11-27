@@ -5,6 +5,7 @@ import io.emeraldpay.polkaj.scale.ScaleWriter;
 import io.emeraldpay.polkaj.scaletypes.BalanceTransfer;
 import io.emeraldpay.polkaj.scaletypes.BalanceTransferWriter;
 import io.emeraldpay.polkaj.scaletypes.ExtrinsicCall;
+import io.emeraldpay.polkaj.scaletypes.EraWriter;
 import io.emeraldpay.polkaj.schnorrkel.Schnorrkel;
 import io.emeraldpay.polkaj.schnorrkel.SchnorrkelException;
 import io.emeraldpay.polkaj.types.Address;
@@ -118,6 +119,8 @@ public class ExtrinsicSigner<CALL extends ExtrinsicCall> {
 
     public static class SignaturePayloadWriter<CALL extends ExtrinsicCall> implements ScaleWriter<SignaturePayload<CALL>> {
 
+        private static final EraWriter ERA_WRITER = new EraWriter();
+
         private final ScaleWriter<CALL> callScaleWriter;
         private final boolean callAsList;
 
@@ -142,7 +145,7 @@ public class ExtrinsicSigner<CALL extends ExtrinsicCall> {
             } else {
                 wrt.write(callScaleWriter, signPayload.getCall());
             }
-            wrt.write(ScaleCodecWriter.ERA, context.getEra().toInteger());
+            wrt.write(ERA_WRITER, context.getEra().toInteger());
             wrt.write(ScaleCodecWriter.COMPACT_BIGINT, BigInteger.valueOf(context.getNonce()));
             wrt.write(ScaleCodecWriter.COMPACT_BIGINT, context.getTip().getValue());
             wrt.writeUint32(context.getRuntimeVersion());

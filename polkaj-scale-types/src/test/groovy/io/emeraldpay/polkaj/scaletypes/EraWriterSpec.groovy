@@ -1,4 +1,4 @@
-package io.emeraldpay.polkaj.scale.writer
+package io.emeraldpay.polkaj.scaletypes
 
 import io.emeraldpay.polkaj.scale.ScaleCodecWriter
 import org.apache.commons.codec.binary.Hex

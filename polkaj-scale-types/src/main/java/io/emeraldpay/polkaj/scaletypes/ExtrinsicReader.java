@@ -50,6 +50,7 @@ public class ExtrinsicReader<CALL extends ExtrinsicCall> implements ScaleReader<
                     new UnsupportedReader<>("ECDSA signatures are not supported")
                 )
         );
+        private static final EraReader ERA_READER = new EraReader();
 
         private final SS58Type.Network network;
 
@@ -62,7 +63,7 @@ public class ExtrinsicReader<CALL extends ExtrinsicCall> implements ScaleReader<
             Extrinsic.TransactionInfo result = new Extrinsic.TransactionInfo();
             result.setSender(new Address(network, rdr.readUint256()));
             result.setSignature(rdr.read(SIGNATURE_READER).getValue());
-            result.setEra(rdr.readEra());
+            result.setEra(rdr.read(ERA_READER));
             result.setNonce(rdr.read(ScaleCodecReader.COMPACT_BIGINT).longValueExact());
             result.setTip(new DotAmount(rdr.read(ScaleCodecReader.COMPACT_BIGINT)));
             return result;
