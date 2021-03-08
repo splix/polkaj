@@ -1,5 +1,6 @@
 package io.emeraldpay.polkaj.scaletypes;
 
+import io.emeraldpay.polkaj.scale.UnionValue;
 import io.emeraldpay.polkaj.types.Address;
 import io.emeraldpay.polkaj.types.DotAmount;
 import io.emeraldpay.polkaj.types.Hash512;
@@ -88,7 +89,7 @@ public class Extrinsic<CALL extends ExtrinsicCall> {
         /**
          * Sender
          */
-        private Address sender;
+        private UnionValue<MultiAddress> sender;
         /**
          * Signature
          */
@@ -106,12 +107,16 @@ public class Extrinsic<CALL extends ExtrinsicCall> {
          */
         private DotAmount tip = DotAmount.ZERO;
 
-        public Address getSender() {
+        public UnionValue<MultiAddress> getSender() {
             return sender;
         }
 
-        public void setSender(Address sender) {
+        public void setSender(UnionValue<MultiAddress> sender) {
             this.sender = sender;
+        }
+
+        public void setSender(Address value) {
+            this.sender = MultiAddress.AccountID.from(value);
         }
 
         public SR25519Signature getSignature() {

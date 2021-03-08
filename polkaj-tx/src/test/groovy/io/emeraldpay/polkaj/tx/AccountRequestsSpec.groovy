@@ -64,7 +64,7 @@ class AccountRequestsSpec extends Specification {
             .build()
         def act = transfer.encodeRequest()
         then:
-        act.toString() == "0x490284d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d016a141ade40871c076f3eb32362f0204db49e4ae37e5dc7a68329f1a6768034556201432b1635637fc1d42ae6fce996fb25ef175ee1ae4015d2b8769436d899870003d20296490005008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b008cb6611e01"
+        act.toString() == "0x51028400d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d016a141ade40871c076f3eb32362f0204db49e4ae37e5dc7a68329f1a6768034556201432b1635637fc1d42ae6fce996fb25ef175ee1ae4015d2b8769436d899870003d2029649000500008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b008cb6611e01"
     }
 
     def "Sign and encode transfer"() {
@@ -83,6 +83,6 @@ class AccountRequestsSpec extends Specification {
                 .build()
         def act = transfer.encodeRequest()
         then:
-        act.bytes.length == 148
+        act.bytes.length == 150
     }
 }

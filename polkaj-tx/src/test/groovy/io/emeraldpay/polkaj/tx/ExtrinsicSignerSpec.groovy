@@ -39,11 +39,11 @@ class ExtrinsicSignerSpec extends Specification {
         when:
         def payload = signer.getPayload(extrinsic, call)
         then:
-        Hex.encodeHexString(payload) == "a405008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b0030ef7dba02001c0012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"
+        Hex.encodeHexString(payload) == "a80500008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b0030ef7dba02001c0012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"
 
         when:
         def valid = signer.isValid(extrinsic, call,
-                Hash512.from("0x02151a3c8c0cea52ecfd5a56ca1dd29dc5ef3984023c8374a1b52a7ed8f3ac4949b7171ae2ee4aae6a28cad94a54cfb9c2154e03bd97a44db546eb69c0f2e98f"),
+                Hash512.from("0x46176d89b00e11521fba7962ea18e6c4279bc32deda3140b3718f75c2cecba15915c2124cc13767bb6a8fea536788ba23fc40d54d90f8e82ffcb2c59f838808c"),
                 TestKeys.alice
         )
         then:
@@ -65,11 +65,11 @@ class ExtrinsicSignerSpec extends Specification {
         when:
         def payload = signer.getPayload(extrinsic, call)
         then:
-        Hex.encodeHexString(payload) == "8c05008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a4804001c0012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"
+        Hex.encodeHexString(payload) == "900500008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a4804001c0012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"
 
         when:
         def valid = signer.isValid(extrinsic, call,
-                Hash512.from("0xa4f970f72a300871f79b9a062dfdc7f0d08c2bfb921f8caa6cbe5abf2b81ff50ca7a0c565031d983d3967bb0b42b67bd013f3ad22e97c9547965ecc81e6a3f80"),
+                Hash512.from("0xc6d3033548c4b2752b50da78e936d894d946de79b14be126a9dd61100c736d7a6a66c2973ebc8f65ed969a1de0f9cecdeaf8c22130486a27a875f8b35ce5828c"),
                 TestKeys.alice
         )
         then:
@@ -91,11 +91,11 @@ class ExtrinsicSignerSpec extends Specification {
         when:
         def payload = signer.getPayload(extrinsic, call)
         then:
-        Hex.encodeHexString(payload) == "a405008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b008cb6611e010003d20296490012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"
+        Hex.encodeHexString(payload) == "a80500008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b008cb6611e010003d20296490012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd5122"
 
         when:
         def valid = signer.isValid(extrinsic, call,
-                Hash512.from("0x6a141ade40871c076f3eb32362f0204db49e4ae37e5dc7a68329f1a6768034556201432b1635637fc1d42ae6fce996fb25ef175ee1ae4015d2b8769436d89987"),
+                Hash512.from("0x98cee3be271b0e127c5142d6823be37bccba77c297c0a1d131c76f9d820d1830be80711b1c86fde8b40f75cd4534666a5b8f41939b4614bfb6dfae1a96d1a88a"),
                 TestKeys.alice
         )
         then:
@@ -119,10 +119,10 @@ class ExtrinsicSignerSpec extends Specification {
         when:
         def payload = signer.getPayload(extrinsic, call)
         then:
-        Hex.encodeHexString(payload) == "a405008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b0030ef7dba024e9c1c0012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d"
+        Hex.encodeHexString(payload) == "a80500008eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a480b0030ef7dba024e9c1c0012000000030000004c0bdd177c17ca145ad9a3e76d092d4d4baa8add4fa8c78cc2fbbf8e3cbd51224baa8add4fa8c78cc2fbbf8e3cbd51224c0bdd177c17ca145ad9a3e76d092d4d"
         when:
         def valid = signer.isValid(extrinsic, call,
-                Hash512.from("0x3caed1957dd8be455376317867a4841639d608d235323d427eee0e2fed83bd34bfa4f87a6d54b622dfd4f63bfabc800646ae74b608af06b4a331d6a0ce993184"),
+                Hash512.from("0xe22aab207ae5cc08c5d4106ff4b8f0c6b6bb2dddbf3b143462d9b1aa8ad8d162a3e78a3d6d656b115fd0756cc61e89943d3eb9a971740ade59938a933f85d58c"),
                 TestKeys.alice
         )
         then:

@@ -1,5 +1,7 @@
 package io.emeraldpay.polkaj.scale;
 
+import java.util.Objects;
+
 public class UnionValue<T> {
 
     private int index;
@@ -22,5 +24,24 @@ public class UnionValue<T> {
 
     public T getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UnionValue)) return false;
+        if (!((UnionValue)o).canEquals(this)) return false;
+        UnionValue that = (UnionValue) o;
+        return Objects.equals(index, that.index) &&
+               Objects.equals(value, that.value);
+    }
+
+    public boolean canEquals(Object o) {
+        return (o instanceof UnionValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(index, value);
     }
 }

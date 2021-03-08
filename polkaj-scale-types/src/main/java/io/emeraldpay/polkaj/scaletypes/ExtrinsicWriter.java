@@ -31,11 +31,12 @@ public class ExtrinsicWriter<CALL extends ExtrinsicCall> implements ScaleWriter<
 
     static class TransactionInfoWriter implements ScaleWriter<Extrinsic.TransactionInfo> {
 
+        private static final MultiAddressWriter SENDER_WRITER = new MultiAddressWriter();
         private static final EraWriter ERA_WRITER = new EraWriter();
 
         @Override
         public void write(ScaleCodecWriter wrt, Extrinsic.TransactionInfo value) throws IOException {
-            wrt.writeUint256(value.getSender().getPubkey());
+            wrt.write(SENDER_WRITER, value.getSender());
             wrt.writeByte(Extrinsic.SignatureType.SR25519.getCode());
             wrt.writeByteArray(value.getSignature().getValue().getBytes());
             wrt.write(ERA_WRITER, value.getEra());
