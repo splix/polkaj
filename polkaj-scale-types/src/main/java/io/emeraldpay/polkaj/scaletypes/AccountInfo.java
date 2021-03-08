@@ -5,7 +5,8 @@ import java.util.Objects;
 public class AccountInfo {
 
     private Long nonce;
-    private Long refcount;
+    private Long consumers;
+    private Long providers;
     private AccountData data;
 
     public Long getNonce() {
@@ -16,12 +17,20 @@ public class AccountInfo {
         this.nonce = nonce;
     }
 
-    public Long getRefcount() {
-        return refcount;
+    public Long getConsumers() {
+        return consumers;
     }
 
-    public void setRefcount(Long refcount) {
-        this.refcount = refcount;
+    public void setConsumers(Long consumers) {
+        this.consumers = consumers;
+    }
+
+    public Long getProviders() {
+        return providers;
+    }
+
+    public void setProviders(Long providers) {
+        this.providers = providers;
     }
 
     public AccountData getData() {
@@ -38,12 +47,13 @@ public class AccountInfo {
         if (!(o instanceof AccountInfo)) return false;
         AccountInfo that = (AccountInfo) o;
         return Objects.equals(nonce, that.nonce) &&
-                Objects.equals(refcount, that.refcount) &&
+                Objects.equals(consumers, that.consumers) &&
+                Objects.equals(providers, that.providers) &&
                 Objects.equals(data, that.data);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nonce, refcount, data);
+        return Objects.hash(nonce, consumers, providers, data);
     }
 }

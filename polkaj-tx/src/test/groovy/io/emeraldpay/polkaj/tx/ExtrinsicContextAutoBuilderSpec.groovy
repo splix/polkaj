@@ -19,7 +19,7 @@ class ExtrinsicContextAutoBuilderSpec extends Specification {
                     StandardCommands.getInstance().stateGetStorage(requestAccount.encodeRequest())
             ) >> CompletableFuture.completedFuture(
                     // 1,000,000.00 Dot, nonce = 1
-                    ByteData.from("0x010000000000000019e4759db3b6e00d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+                    ByteData.from("0x01000000000000000000000019e4759db3b6e00d0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
             )
             1 * execute(
                     StandardCommands.getInstance().getBlockHash(0)
