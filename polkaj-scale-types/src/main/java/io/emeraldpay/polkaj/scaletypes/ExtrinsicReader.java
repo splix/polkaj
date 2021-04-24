@@ -5,7 +5,6 @@ import io.emeraldpay.polkaj.scale.ScaleReader;
 import io.emeraldpay.polkaj.scale.reader.UnionReader;
 import io.emeraldpay.polkaj.scale.reader.UnsupportedReader;
 import io.emeraldpay.polkaj.ss58.SS58Type;
-import io.emeraldpay.polkaj.types.Address;
 import io.emeraldpay.polkaj.types.DotAmount;
 import io.emeraldpay.polkaj.types.Hash512;
 
@@ -52,16 +51,16 @@ public class ExtrinsicReader<CALL extends ExtrinsicCall> implements ScaleReader<
         );
         private static final EraReader ERA_READER = new EraReader();
 
-        private final SS58Type.Network network;
+        private final MultiAddressReader senderReader;
 
         public TransactionInfoReader(SS58Type.Network network) {
-            this.network = network;
+            this.senderReader = new MultiAddressReader(network);
         }
 
         @Override
         public Extrinsic.TransactionInfo read(ScaleCodecReader rdr) {
             Extrinsic.TransactionInfo result = new Extrinsic.TransactionInfo();
-            result.setSender(new Address(network, rdr.readUint256()));
+            result.setSender(rdr.read(senderReader));
             result.setSignature(rdr.read(SIGNATURE_READER).getValue());
             result.setEra(rdr.read(ERA_READER));
             result.setNonce(rdr.read(ScaleCodecReader.COMPACT_BIGINT).longValueExact());

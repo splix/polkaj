@@ -8,7 +8,8 @@ public class AccountInfoReader implements ScaleReader<AccountInfo> {
     public AccountInfo read(ScaleCodecReader rdr) {
         AccountInfo result = new AccountInfo();
         result.setNonce(rdr.readUint32());
-        result.setRefcount(rdr.readUint32());
+        result.setConsumers(rdr.readUint32());
+        result.setProviders(rdr.readUint32());
         result.setData(rdr.read(new AccountDataReader()));
         return result;
     }

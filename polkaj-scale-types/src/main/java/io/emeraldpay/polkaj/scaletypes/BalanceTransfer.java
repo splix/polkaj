@@ -1,5 +1,6 @@
 package io.emeraldpay.polkaj.scaletypes;
 
+import io.emeraldpay.polkaj.scale.UnionValue;
 import io.emeraldpay.polkaj.types.Address;
 import io.emeraldpay.polkaj.types.DotAmount;
 
@@ -13,7 +14,7 @@ public class BalanceTransfer extends ExtrinsicCall {
     /**
      * Destination address
      */
-    private Address destination;
+    private UnionValue<MultiAddress> destination;
     /**
      * Balance to transfer
      */
@@ -43,12 +44,16 @@ public class BalanceTransfer extends ExtrinsicCall {
         init(call);
     }
 
-    public Address getDestination() {
+    public UnionValue<MultiAddress> getDestination() {
         return destination;
     }
 
-    public void setDestination(Address destination) {
+    public void setDestination(UnionValue<MultiAddress> destination) {
         this.destination = destination;
+    }
+
+    public void setDestination(Address destination) {
+        this.destination = MultiAddress.AccountID.from(destination);
     }
 
     public DotAmount getBalance() {
