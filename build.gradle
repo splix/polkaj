@@ -28,6 +28,7 @@ allprojects {
         //for java-multibase
         maven { url 'https://jitpack.io' }
     }
+
 }
 
 subprojects {
@@ -39,8 +40,12 @@ subprojects {
     apply plugin: 'jacoco'
     apply plugin: 'com.jfrog.bintray'
 
-    targetCompatibility = '11'
-    sourceCompatibility = '11'
+
+    compileJava {
+        targetCompatibility = '8'
+        sourceCompatibility = '8'
+    }
+
 
     [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 

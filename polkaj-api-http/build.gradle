@@ -1,3 +1,8 @@
+compileJava {
+    targetCompatibility = '11'
+    sourceCompatibility = '11'
+}
+
 dependencies {
     api project(":polkaj-json-types")
     api project(":polkaj-api-base")
