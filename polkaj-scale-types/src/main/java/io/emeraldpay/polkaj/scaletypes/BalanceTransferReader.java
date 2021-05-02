@@ -8,10 +8,10 @@ import io.emeraldpay.polkaj.types.DotAmount;
 
 public class BalanceTransferReader implements ScaleReader<BalanceTransfer> {
 
-    private final SS58Type.Network network;
+    private final MultiAddressReader destinationReader;
 
     public BalanceTransferReader(SS58Type.Network network) {
-        this.network = network;
+        this.destinationReader = new MultiAddressReader(network);
     }
 
     @Override
@@ -19,7 +19,7 @@ public class BalanceTransferReader implements ScaleReader<BalanceTransfer> {
         BalanceTransfer result = new BalanceTransfer();
         result.setModuleIndex(rdr.readUByte());
         result.setCallIndex(rdr.readUByte());
-        result.setDestination(new Address(network, rdr.readUint256()));
+        result.setDestination(rdr.read(destinationReader));
         result.setBalance(new DotAmount(rdr.read(ScaleCodecReader.COMPACT_BIGINT)));
         return result;
     }

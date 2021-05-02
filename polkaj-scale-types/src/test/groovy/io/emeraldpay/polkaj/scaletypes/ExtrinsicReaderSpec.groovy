@@ -1,6 +1,8 @@
 package io.emeraldpay.polkaj.scaletypes
 
 import io.emeraldpay.polkaj.scale.ScaleCodecReader
+import io.emeraldpay.polkaj.scale.UnionValue
+import io.emeraldpay.polkaj.scale.reader.UnionReader
 import io.emeraldpay.polkaj.ss58.SS58Type
 import io.emeraldpay.polkaj.types.Address
 import io.emeraldpay.polkaj.types.DotAmount
@@ -12,7 +14,7 @@ class ExtrinsicReaderSpec extends Specification {
 
     def "Parse transfer"() {
         setup:
-        def existing = "390284b8fdf4f080eeaa6d3f32a445c91c7effa6ffef16d5fe81783837ab7a23602b3b01bc11655de6e7461b0951353db25f4aaf67a58db547fa3a2f20cbcd7772ba715f8ccbe9d8bddf253c7f6e6f6acb83848a7da1f27de248afca10d3291de92ede8ce5000c000400483eae8765348ef3e347e6b55995f99353223a8b28cf63829554933bcd5e801d0780cff40808"
+        def existing = "41028400b8fdf4f080eeaa6d3f32a445c91c7effa6ffef16d5fe81783837ab7a23602b3b01bc11655de6e7461b0951353db25f4aaf67a58db547fa3a2f20cbcd7772ba715f8ccbe9d8bddf253c7f6e6f6acb83848a7da1f27de248afca10d3291de92ede8ce5000c00040000483eae8765348ef3e347e6b55995f99353223a8b28cf63829554933bcd5e801d0780cff40808"
         ExtrinsicReader<BalanceTransfer> reader = new ExtrinsicReader<>(
                 new BalanceTransferReader(SS58Type.Network.CANARY),
                 SS58Type.Network.CANARY
@@ -23,7 +25,7 @@ class ExtrinsicReaderSpec extends Specification {
 
         then:
         with(act.tx) {
-            sender == Address.from("GksmaqmLPbfQhsNgT2S5GcwwTkGXCpkPU8FDzxP4siKPAVu")
+            sender == new UnionValue(0, new MultiAddress.AccountID(Address.from("GksmaqmLPbfQhsNgT2S5GcwwTkGXCpkPU8FDzxP4siKPAVu")))
             era == 229
             nonce == 3
             tip == DotAmount.ZERO
@@ -33,7 +35,7 @@ class ExtrinsicReaderSpec extends Specification {
         with(act.call) {
             moduleIndex == 4
             callIndex == 0
-            destination == Address.from("ED3aw4s68wTDscCbWnCCw94qSrkA1D8HcUXC8ytaoM2X2xd")
+            destination == new UnionValue(0, new MultiAddress.AccountID(Address.from("ED3aw4s68wTDscCbWnCCw94qSrkA1D8HcUXC8ytaoM2X2xd")))
             balance == DotAmount.fromDots(3.451)
         }
     }
