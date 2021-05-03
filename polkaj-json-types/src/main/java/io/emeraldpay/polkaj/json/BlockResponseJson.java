@@ -1,11 +1,12 @@
 package io.emeraldpay.polkaj.json;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class BlockResponseJson {
 
     private BlockJson block;
-    private Object justification;
+    private Object[] justifications;
 
     public BlockResponseJson() {
     }
@@ -22,12 +23,12 @@ public class BlockResponseJson {
         this.block = block;
     }
 
-    public Object getJustification() {
-        return justification;
+    public Object[] getJustifications() {
+        return justifications;
     }
 
-    public void setJustification(Object justification) {
-        this.justification = justification;
+    public void setJustifications(Object[] justifications) {
+        this.justifications = justifications;
     }
 
     @Override
@@ -36,11 +37,13 @@ public class BlockResponseJson {
         if (!(o instanceof BlockResponseJson)) return false;
         BlockResponseJson that = (BlockResponseJson) o;
         return Objects.equals(block, that.block) &&
-                Objects.equals(justification, that.justification);
+                Arrays.equals(justifications, that.justifications);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(block, justification);
+        int result = Objects.hash(block);
+        result = 31 * result + Arrays.hashCode(justifications);
+        return result;
     }
 }

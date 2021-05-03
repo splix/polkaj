@@ -15,7 +15,7 @@ class BlockResponseJsonSpec extends Specification {
         then:
         act != null
         act.block != null
-        act.justification == null
+        act.justifications.length == 0
         with(act.block) {
             extrinsics.size() == 3
             with(header) {
