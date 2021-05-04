@@ -123,7 +123,7 @@ class PolkadotHttpClientSpec extends Specification {
                 '        "stateRoot": "0x0984f5c13d7d271467332697fa5fc191539c1441f5ca1b234618ff25638b7d66"' +
                 '      }' +
                 '    },' +
-                '    "justification": null' +
+                '    "justifications": []' +
                 '  },' +
                 '  "id": 0' +
                 '}'
@@ -140,7 +140,7 @@ class PolkadotHttpClientSpec extends Specification {
                         .withBody('{"jsonrpc":"2.0","id":0,"method":"chain_getBlock","params":["0x9130103f8fbca52a79042211383946b39e6269b6ab49bc08035c9893d782c1bb"]}')
         )
 
-        act.justification == null
+        act.justifications.length == 0
         act.block != null
         with(act.block) {
             header.number == 0x401a1

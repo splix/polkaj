@@ -38,13 +38,14 @@ class AccountRequestsSpec extends Specification {
     def "Decode balance response"() {
         setup:
         def req = AccountRequests.balanceOf(Address.from("1WG3jyNqniQMRZGQUc7QD2kVLT8hkRPGMSqAb5XYQM1UDxN"))
-        def result = ByteData.from("0x110000000300000004000000f70af5f6f3c843050000000000000000000000000000000000000000000000000000c52ebca2b10000000000000000000000c52ebca2b1000000000000000000")
+        def result = ByteData.from("0x11000000030000000400000005000000f70af5f6f3c843050000000000000000000000000000000000000000000000000000c52ebca2b10000000000000000000000c52ebca2b1000000000000000000")
         when:
         def act = req.apply(result)
         then:
         act.nonce == 17
         act.consumers == 3
         act.providers == 4
+        act.sufficients == 5
         with(act.data) {
             free == DotAmount.fromPlancks(379367743775116023)
             reserved == DotAmount.ZERO
