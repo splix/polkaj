@@ -1,7 +1,9 @@
 package io.emeraldpay.polkaj.apiws
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.emeraldpay.polkaj.api.PolkadotApi
 import io.emeraldpay.polkaj.api.RpcCall
+import io.emeraldpay.polkaj.api.RpcCoder
 import io.emeraldpay.polkaj.api.RpcException
 import io.emeraldpay.polkaj.api.SubscribeCall
 import io.emeraldpay.polkaj.json.BlockJson
@@ -27,21 +29,28 @@ class PolkadotWsClientSpec extends Specification {
     @Shared
     MockWsServer server
     @Shared
-    PolkadotWsApi client
+    JavaHttpSubscriptionAdapter adapter
+    @Shared
+    PolkadotApi polkadotApi
 
     def setup() {
         port++
         server = new MockWsServer(port)
         server.start()
         Thread.sleep(SLEEP)
-        client = PolkadotWsApi.newBuilder()
+        adapter = JavaHttpSubscriptionAdapter.newBuilder()
                 .connectTo("ws://localhost:${port}")
                 .build()
-        assert client.connect().get(TIMEOUT, TimeUnit.SECONDS)
+
+        polkadotApi = PolkadotApi.newBuilder()
+                .rpcCallAdapter(adapter)
+                .subscriptionAdapter(adapter).build()
+
+        assert adapter.connect().get(TIMEOUT, TimeUnit.SECONDS)
     }
 
     def cleanup() {
-        client.close()
+        adapter.close()
         server.stop()
     }
 
@@ -50,7 +59,7 @@ class PolkadotWsClientSpec extends Specification {
         List<Map<String, Object>> received = []
         when:
         server.onNextReply('{"jsonrpc":"2.0","result":"EsqruyKPnZvPZ6fr","id":0}')
-        def f = client.subscribe(SubscribeCall.create(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead"))
+        def f = adapter.subscribe(SubscribeCall.create(BlockJson.Header.class, "chain_subscribeNewHead", "chain_unsubscribeNewHead"))
         def sub = f.get(TIMEOUT, TimeUnit.SECONDS)
         sub.handler({ event ->
             received.add([
@@ -75,7 +84,7 @@ class PolkadotWsClientSpec extends Specification {
     def "Make a request"() {
         when:
         server.onNextReply('{"jsonrpc":"2.0","result":"Hello World!","id":0}')
-        def f = client.execute(RpcCall.create(String.class, "test_foo"))
+        def f = polkadotApi.execute(RpcCall.create(String.class, "test_foo"))
         def act = f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
         act == "Hello World!"
@@ -83,52 +92,55 @@ class PolkadotWsClientSpec extends Specification {
 
     def "Works with provided HttpClient"() {
         setup:
-        client.close()
-        client = PolkadotWsApi.newBuilder()
+        adapter.close()
+        adapter = JavaHttpSubscriptionAdapter.newBuilder()
             .httpClient(HttpClient.newHttpClient())
             .connectTo("ws://localhost:${port}")
             .build()
-        client.connect().get(TIMEOUT, TimeUnit.SECONDS)
+
+        polkadotApi = PolkadotApi.newBuilder().rpcCallAdapter(adapter).rpcCallAdapter(adapter).build()
+        adapter.connect().get(TIMEOUT, TimeUnit.SECONDS)
         when:
         server.onNextReply('{"jsonrpc":"2.0","result":"Hello World!","id":0}')
-        def f = client.execute(RpcCall.create(String.class, "test_foo"))
+        def f = polkadotApi.execute(RpcCall.create(String.class, "test_foo"))
         def act = f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
         act == "Hello World!"
     }
 
-    def "Works with provided ObjectMapper"() {
+    def "Works with provided RpcCoder"() {
         setup:
-        ObjectMapper objectMapper = Spy(new ObjectMapper())
-        client.close()
-        client = PolkadotWsApi.newBuilder()
-                .objectMapper(objectMapper)
+        RpcCoder rpcCoder = Spy(new RpcCoder(new ObjectMapper()))
+        adapter.close()
+        adapter = JavaHttpSubscriptionAdapter.newBuilder()
+                .rpcCoder(rpcCoder)
                 .connectTo("ws://localhost:${port}")
                 .build()
-        client.connect().get(TIMEOUT, TimeUnit.SECONDS)
+        adapter.connect().get(TIMEOUT, TimeUnit.SECONDS)
         when:
         server.onNextReply('{"jsonrpc":"2.0","result":"Hello World!","id":0}')
-        def f = client.execute(RpcCall.create(String.class, "test_foo"))
+        def f = adapter.produceRpcFuture(RpcCall.create(String.class, "test_foo"))
         def act = f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
         act == "Hello World!"
-        (1.._) * objectMapper._(_, _)
+        1 * rpcCoder.nextId()
     }
 
     def "By default connects to 9944"() {
         setup:
-        client.close()
+        adapter.close()
         server.stop()
         println("Start new on 9944")
         server = new MockWsServer(9944)
         server.start()
         Thread.sleep(SLEEP)
-        client = PolkadotWsApi.newBuilder()
+        adapter = JavaHttpSubscriptionAdapter.newBuilder()
                 .build()
-        client.connect().get(TIMEOUT, TimeUnit.SECONDS)
+        adapter.connect().get(TIMEOUT, TimeUnit.SECONDS)
+        polkadotApi = PolkadotApi.newBuilder().subscriptionAdapter(adapter).rpcCallAdapter(adapter).build()
         when:
         server.onNextReply('{"jsonrpc":"2.0","result":"Hello World!","id":0}')
-        def f = client.execute(RpcCall.create(String.class, "test_foo"))
+        def f = polkadotApi.execute(RpcCall.create(String.class, "test_foo"))
         def act = f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
         act == "Hello World!"
@@ -137,7 +149,7 @@ class PolkadotWsClientSpec extends Specification {
     def "Fail to subscribe with invalid command"() {
         when:
         server.onNextReply('{"jsonrpc":"2.0","error":{"code": -1, "message": "Test", "data": "Test data"},"id":0}')
-        def f = client.subscribe(SubscribeCall.create(Hash256.class, "test_subscribeNone", "test_unsubscribeNone"))
+        def f = polkadotApi.subscribe(SubscribeCall.create(Hash256.class, "test_subscribeNone", "test_unsubscribeNone"))
         f.get(TIMEOUT, TimeUnit.SECONDS)
         then:
         def t = thrown(ExecutionException.class)
@@ -151,7 +163,7 @@ class PolkadotWsClientSpec extends Specification {
 
     def "Ignores unknown responses"() {
         when:
-        def f = client.execute(RpcCall.create(String.class, "test_foo"))
+        def f = polkadotApi.execute(RpcCall.create(String.class, "test_foo"))
         Thread.sleep(SLEEP)
         server.reply('{"jsonrpc":"2.0","method":"test_none","params":{"result": "test", "subscription":101}}')
         server.reply('{"jsonrpc":"2.0","error":{"code": -1, "message": "Test"},"id":50}')

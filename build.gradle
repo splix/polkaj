@@ -1,7 +1,4 @@
 buildscript {
-    repositories {
-        maven { url "https://dl.bintray.com/nebula/gradle-plugins" }
-    }
 
     dependencies {
         classpath 'com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1'

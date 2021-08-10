@@ -264,7 +264,7 @@ PolkadotWsApi client = PolkadotWsApi.newBuilder().build();
 client.connect().get(5, TimeUnit.SECONDS);
 ----
 
-Class `PolkadotWsApi` implements `PolkadotSubscriptionApi` (as well as standard `PolkadotApi`)
+Class `JavaHttpSubscriptionAdapter` implements `SubscriptionAdapter` (as well as standard `PolkadotApi`)
 
 [source, java]
 ----
@@ -329,7 +329,7 @@ subscription.handler((Subscription.Event<BlockJson.Header> event) -> {
 });
 ----
 
-Since the `PolkadotWsApi` implements standard `PolkadotApi` you can make all other calls through the same WebSocket connection:
+Since the `JavaHttpSubscriptionAdapter` implements standard `PolkadotApi` you can make all other calls through the same WebSocket connection:
 
 [source, java]
 ----
