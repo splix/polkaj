@@ -3,6 +3,7 @@ package io.emeraldpay.polkaj.tx;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import io.emeraldpay.polkaj.scale.ScaleCodecReader;
 import io.emeraldpay.polkaj.scale.ScaleCodecWriter;
@@ -14,6 +15,8 @@ import io.emeraldpay.polkaj.scaletypes.BalanceTransferWriter;
 import io.emeraldpay.polkaj.scaletypes.Extrinsic;
 import io.emeraldpay.polkaj.scaletypes.ExtrinsicWriter;
 import io.emeraldpay.polkaj.scaletypes.Metadata;
+import io.emeraldpay.polkaj.schnorrkel.Schnorrkel;
+import io.emeraldpay.polkaj.ss58.SS58Type;
 import io.emeraldpay.polkaj.types.Address;
 import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.DotAmount;
@@ -193,8 +196,8 @@ public class AccountRequests {
         }
 
         /**
-         * (optional) Set once, if setting a presefined signature.
-         * Otherwise nonce is set during {@link #sign} operation
+         * (optional) Set once, if setting a predefined signature.
+         * Otherwise, nonce is set during {@link #sign} operation
          *
          * @param nonce once to use
          * @return builder
@@ -229,6 +232,7 @@ public class AccountRequests {
         /**
          * Sign the transfer
          *
+         * @param key sender key pair
          * @param context signing context
          * @return builder
          * @throws SignException if signing is failed
@@ -247,7 +251,7 @@ public class AccountRequests {
             }
             ExtrinsicSigner<BalanceTransfer> signer = new ExtrinsicSigner<>(new BalanceTransferWriter());
             return this.nonce(context)
-                    .signed(new Extrinsic.SR25519Signature(signer.sign(context, this.call)));
+                    .signed(new Extrinsic.SR25519Signature(signer.sign(context, this.call, key)));
         }
 
         /**
