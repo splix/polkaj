@@ -1,16 +1,22 @@
 package io.emeraldpay.polkaj.tx;
 
-import io.emeraldpay.polkaj.scale.ScaleCodecReader;
-import io.emeraldpay.polkaj.scale.ScaleCodecWriter;
-import io.emeraldpay.polkaj.scaletypes.*;
-import io.emeraldpay.polkaj.schnorrkel.Schnorrkel;
-import io.emeraldpay.polkaj.ss58.SS58Type;
-import io.emeraldpay.polkaj.types.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+
+import io.emeraldpay.polkaj.scale.ScaleCodecReader;
+import io.emeraldpay.polkaj.scale.ScaleCodecWriter;
+import io.emeraldpay.polkaj.scaletypes.AccountInfo;
+import io.emeraldpay.polkaj.scaletypes.AccountInfoReader;
+import io.emeraldpay.polkaj.scaletypes.BalanceReader;
+import io.emeraldpay.polkaj.scaletypes.BalanceTransfer;
+import io.emeraldpay.polkaj.scaletypes.BalanceTransferWriter;
+import io.emeraldpay.polkaj.scaletypes.Extrinsic;
+import io.emeraldpay.polkaj.scaletypes.ExtrinsicWriter;
+import io.emeraldpay.polkaj.scaletypes.Metadata;
+import io.emeraldpay.polkaj.types.Address;
+import io.emeraldpay.polkaj.types.ByteData;
+import io.emeraldpay.polkaj.types.DotAmount;
 
 /**
  * Common requests and extrinsics specific to accounts.
@@ -110,13 +116,21 @@ public class AccountRequests {
             writer.write(CODEC, extrinsic);
             return new ByteData(buf.toByteArray());
         }
+
+        @Override
+        public String toString() {
+            return "Transfer{" +
+                    "extrinsic=" + extrinsic +
+                    '}';
+        }
     }
 
 
     public static final class TransferBuilder {
         private Address from;
-        private Hash512 signature;
+        private Extrinsic.Signature signature;
         private Long nonce;
+        private DotAmount tip;
 
         private final BalanceTransfer call = new BalanceTransfer();
 
@@ -169,6 +183,16 @@ public class AccountRequests {
         }
 
         /**
+         *
+         * @param tip tip to include for the miner
+         * @return builder
+         */
+        public TransferBuilder tip(DotAmount tip) {
+            this.tip = tip;
+            return this;
+        }
+
+        /**
          * (optional) Set once, if setting a presefined signature.
          * Otherwise nonce is set during {@link #sign} operation
          *
@@ -197,7 +221,7 @@ public class AccountRequests {
          * @param signature precalculated signature
          * @return builder
          */
-        public TransferBuilder signed(Hash512 signature) {
+        public TransferBuilder signed(Extrinsic.Signature signature) {
             this.signature = signature;
             return this;
         }
@@ -205,7 +229,6 @@ public class AccountRequests {
         /**
          * Sign the transfer
          *
-         * @param key sender key pair
          * @param context signing context
          * @return builder
          * @throws SignException if signing is failed
@@ -224,7 +247,7 @@ public class AccountRequests {
             }
             ExtrinsicSigner<BalanceTransfer> signer = new ExtrinsicSigner<>(new BalanceTransferWriter());
             return this.nonce(context)
-                    .signed(signer.sign(context, this.call, key));
+                    .signed(new Extrinsic.SR25519Signature(signer.sign(context, this.call)));
         }
 
         /**
@@ -235,12 +258,25 @@ public class AccountRequests {
             Extrinsic.TransactionInfo tx = new Extrinsic.TransactionInfo();
             tx.setNonce(this.nonce);
             tx.setSender(this.from);
-            tx.setSignature(new Extrinsic.SR25519Signature(this.signature));
+            tx.setSignature(buildSignature(this.signature));
+            tx.setTip(this.tip);
 
             Extrinsic<BalanceTransfer> extrinsic = new Extrinsic<>();
             extrinsic.setCall(this.call);
             extrinsic.setTx(tx);
             return new Transfer(extrinsic);
+        }
+
+        private Extrinsic.Signature buildSignature(Extrinsic.Signature signature) {
+            switch (signature.getType()) {
+                case ED25519:
+                    return new Extrinsic.ED25519Signature(signature.getValue());
+                case SR25519:
+                    return new Extrinsic.SR25519Signature(signature.getValue());
+                default:
+                    String msg = String.format("Signature type %s is not supported", signature.getType());
+                    throw new UnsupportedOperationException(msg);
+            }
         }
     }
 
