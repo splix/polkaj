@@ -7,6 +7,7 @@ public class AccountInfo {
     private Long nonce;
     private Long consumers;
     private Long providers;
+    private Long sufficients;
     private AccountData data;
 
     public Long getNonce() {
@@ -33,6 +34,14 @@ public class AccountInfo {
         this.providers = providers;
     }
 
+    public Long getSufficients() {
+        return sufficients;
+    }
+
+    public void setSufficients(Long sufficients) {
+        this.sufficients = sufficients;
+    }
+
     public AccountData getData() {
         return data;
     }
@@ -49,11 +58,12 @@ public class AccountInfo {
         return Objects.equals(nonce, that.nonce) &&
                 Objects.equals(consumers, that.consumers) &&
                 Objects.equals(providers, that.providers) &&
+                Objects.equals(sufficients, that.sufficients) &&
                 Objects.equals(data, that.data);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nonce, consumers, providers, data);
+        return Objects.hash(nonce, consumers, providers, sufficients, data);
     }
 }
