@@ -6,6 +6,12 @@ apply plugin: 'groovy'
 apply plugin: 'jacoco'
 apply plugin: 'com.jfrog.bintray'
 
+afterEvaluate {
+    rootProject.tasks.coverageReport.additionalSourceDirs.setFrom rootProject.tasks.coverageReport.additionalSourceDirs.files + files(it.sourceSets.main.allSource.srcDirs)
+    rootProject.tasks.coverageReport.sourceDirectories.setFrom rootProject.tasks.coverageReport.sourceDirectories.files + files(it.sourceSets.main.allSource.srcDirs)
+    rootProject.tasks.coverageReport.classDirectories.setFrom rootProject.tasks.coverageReport.classDirectories.files + files(it.sourceSets.main.output)
+}
+
 
 tasks.withType(JavaCompile) {
     options.debug = true
@@ -56,7 +62,6 @@ jacocoTestReport {
 tasks.check.dependsOn tasks.jacocoTestReport
 rootProject.tasks.coverageReport.dependsOn tasks.test
 test.finalizedBy jacocoTestReport
-
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'

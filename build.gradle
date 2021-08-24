@@ -33,34 +33,11 @@ jacoco {
 }
 
 task coverageReport(type: JacocoReport) {
-
-    additionalSourceDirs.setFrom files()
-    sourceDirectories.setFrom files()
-    classDirectories.setFrom files()
     executionData.setFrom project.fileTree(dir: '.', include: '**/build/jacoco/test.exec')
     reports {
         html.enabled true
         xml.enabled true
         csv.enabled false
-    }
-
-    /*
-     * Builds list of source dirs, class dirs, and executionData files
-     * when task is run, not at script evaluation time
-     */
-    doFirst {
-        println("running report")
-        subprojects.findAll { subproject ->
-            subproject.pluginManager.hasPlugin('java')
-        }.each { subproject ->
-            additionalClassDirs.setFrom files(subproject.sourceSets.main.output)
-            classDirectories.setFrom classDirectories.from + files(subproject.sourceSets.main.output)
-            sourceDirectories.setFrom sourceDirectories.from + files(subproject.sourceSets.main.allJava.srcDirs)
-            if (subproject.pluginManager.hasPlugin('jacoco')) {
-                executionData.setFrom(subproject.tasks.jacocoTestReport.executionData)
-            }
-        }
-
     }
 }
 
