@@ -125,4 +125,33 @@ class PolkadotApiSpec extends Specification{
         0 * subscriptionAdapter.subscribe(call)
     }
 
+    def "throws exception when no adapter set on subscribe"(){
+        setup:
+        def polkadotApi = PolkadotApi.newBuilder()
+                .onClose(onClose)
+                .build()
+        def call = SubscribeCall.create(String, "test", "test")
+        when:
+        polkadotApi.subscribe(call).get()
+        then:
+        def t = thrown(ExecutionException)
+        t.cause instanceof IllegalStateException
+    }
+
+    def "throws exception no no adapter set on execute"(){
+        setup:
+        def polkadotApi = PolkadotApi.newBuilder()
+                .onClose(onClose)
+                .build()
+        def call = RpcCall.create(String, "test")
+        when:
+        polkadotApi.execute(call).get()
+        then:
+        def t = thrown(ExecutionException)
+        t.cause instanceof IllegalStateException
+    }
+
+    def "returns StandardCommands shortcut"(){
+        assert PolkadotApi.commands() == StandardCommands.getInstance();
+    }
 }
