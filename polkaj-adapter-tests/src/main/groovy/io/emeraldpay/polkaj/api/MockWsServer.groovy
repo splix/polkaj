@@ -1,4 +1,4 @@
-package io.emeraldpay.polkaj.apiws
+package io.emeraldpay.polkaj.api
 
 import org.java_websocket.WebSocket
 import org.java_websocket.handshake.ClientHandshake

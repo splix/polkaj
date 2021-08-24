@@ -336,10 +336,17 @@ public class JavaHttpSubscriptionAdapter implements SubscriptionAdapter, RpcCall
                 throw new IllegalStateException("Custom HttpClient cannot be used with separate Executor");
             }
             this.executorService = executorService;
-            if (this.onClose != null) {
-                this.onClose.run();
-            }
-            this.onClose = null;
+            return this;
+        }
+
+        /**
+         * Provide custom cleanup method.
+         *
+         * @param onClose to be called on close.
+         * @return builder
+         */
+        public Builder onClose(Runnable onClose){
+            this.onClose = onClose;
             return this;
         }
 

@@ -1,10 +1,7 @@
-package io.emeraldpay.polkaj.apihttp
+package io.emeraldpay.polkaj.api
 
-import io.emeraldpay.polkaj.api.PolkadotApi
-import io.emeraldpay.polkaj.api.RpcCall
-import io.emeraldpay.polkaj.types.Hash256
-import io.emeraldpay.polkaj.api.RpcException
 import io.emeraldpay.polkaj.json.BlockResponseJson
+import io.emeraldpay.polkaj.types.Hash256
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.model.Delay
 import org.mockserver.model.HttpRequest
@@ -18,7 +15,9 @@ import java.nio.charset.Charset
 import java.time.Duration
 import java.util.concurrent.ExecutionException
 
-class PolkadotHttpClientSpec extends Specification {
+
+abstract class RpcAdapterSpec extends Specification{
+
 
     PolkadotApi polkadotApi
 
@@ -26,19 +25,22 @@ class PolkadotHttpClientSpec extends Specification {
     ClientAndServer mockServer
 
     def setup() {
-        def adapter = JavaHttpAdapter.newBuilder()
-            .connectTo("http://localhost:18080")
-            .timeout(Duration.ofSeconds(1))
-            .build()
-        polkadotApi = PolkadotApi.newBuilder()
-            .rpcCallAdapter(adapter)
-            .build()
         mockServer = ClientAndServer.startClientAndServer(18080)
+        def adapter = provideAdapter("http://localhost:18080",
+                "testuser",
+                "testpassword",
+                Duration.ofSeconds(1)
+        )
+        polkadotApi = PolkadotApi.newBuilder()
+                .rpcCallAdapter(adapter)
+                .build()
     }
 
     def cleanup() {
         mockServer.stop()
     }
+
+    abstract RpcCallAdapter provideAdapter(String connectTo, String username, String password, Duration timeout)
 
     def "Make request"() {
         setup:
@@ -188,37 +190,8 @@ class PolkadotHttpClientSpec extends Specification {
 
     }
 
-    def "Send basic auth"() {
-        setup:
-        def adapter = JavaHttpAdapter.newBuilder()
-                .connectTo("http://localhost:18080")
-                .basicAuth("testuser", "testpassword")
-                .build()
-        def response = '{' +
-                '  "jsonrpc": "2.0",' +
-                '  "result": "0x5d83f66b61701da4cbd7a60137db89c69469a4f798b62aba9176ab253b423828",' +
-                '  "id": 0' +
-                '}'
-        mockServer.when(
-                HttpRequest.request()
-        ).respond(
-                HttpResponse.response(response).withContentType(MediaType.APPLICATION_JSON)
-        )
-        when:
-        def act = adapter.produceRpcFuture(RpcCall.create(String, "chain_getFinalisedHead")).get()
-        then:
-        act == "0x5d83f66b61701da4cbd7a60137db89c69469a4f798b62aba9176ab253b423828"
-        mockServer.verify(
-                HttpRequest.request().withHeader("Authorization", "Basic dGVzdHVzZXI6dGVzdHBhc3N3b3Jk")
-        )
-
-    }
-
     def "Process response error"() {
         setup:
-        def adapter = JavaHttpAdapter.newBuilder()
-                .connectTo("http://localhost:18080")
-                .build()
         def response = '{' +
                 '  "jsonrpc": "2.0",' +
                 '  "error": {"code": -32601, "message": "Method not found"},' +
@@ -230,7 +203,7 @@ class PolkadotHttpClientSpec extends Specification {
                 HttpResponse.response(response).withContentType(MediaType.APPLICATION_JSON)
         )
         when:
-        adapter.produceRpcFuture(RpcCall.create(String, "chain_getFinalisedHead")).get()
+        polkadotApi.execute(RpcCall.create(String, "chain_getFinalisedHead")).get()
         then:
         def t = thrown(ExecutionException)
         t.cause instanceof RpcException
@@ -238,6 +211,29 @@ class PolkadotHttpClientSpec extends Specification {
             code == -32601
             rpcMessage == "Method not found"
         }
+
+    }
+
+    def "Send basic auth"() {
+        setup:
+
+        def response = '{' +
+                '  "jsonrpc": "2.0",' +
+                '  "result": "0x5d83f66b61701da4cbd7a60137db89c69469a4f798b62aba9176ab253b423828",' +
+                '  "id": 0' +
+                '}'
+        mockServer.when(
+                HttpRequest.request()
+        ).respond(
+                HttpResponse.response(response).withContentType(MediaType.APPLICATION_JSON)
+        )
+        when:
+        def act = polkadotApi.execute(RpcCall.create(String, "chain_getFinalisedHead")).get()
+        then:
+        act == "0x5d83f66b61701da4cbd7a60137db89c69469a4f798b62aba9176ab253b423828"
+        mockServer.verify(
+                HttpRequest.request().withHeader("Authorization", "Basic dGVzdHVzZXI6dGVzdHBhc3N3b3Jk")
+        )
 
     }
 

@@ -55,7 +55,7 @@ final class PolkadotApiImpl implements PolkadotApi {
         if(closed) return;
         closed = true;
         if(rpcCallAdapter != null) rpcCallAdapter.close();
-        if(subcriptionAdapter != null) subcriptionAdapter.close();
+        if(subcriptionAdapter != null && subcriptionAdapter != rpcCallAdapter) subcriptionAdapter.close();
         if(onClose != null) onClose.run();
     }
 }

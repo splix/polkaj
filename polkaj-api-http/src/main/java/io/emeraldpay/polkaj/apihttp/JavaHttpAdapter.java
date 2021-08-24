@@ -39,11 +39,12 @@ public class JavaHttpAdapter implements RpcCallAdapter {
 
     private final HttpClient httpClient;
     private final HttpRequest.Builder request;
+    private final Runnable onClose;
     private final RpcCoder rpcCoder;
 
     private boolean closed = false;
 
-    private JavaHttpAdapter(URI target, HttpClient httpClient, String basicAuth, Duration timeout, RpcCoder rpcCoder) {
+    private JavaHttpAdapter(URI target, HttpClient httpClient, String basicAuth, Duration timeout, Runnable onClose, RpcCoder rpcCoder) {
         this.httpClient = httpClient;
 
         HttpRequest.Builder request = HttpRequest.newBuilder()
@@ -57,6 +58,7 @@ public class JavaHttpAdapter implements RpcCallAdapter {
         }
 
         this.request = request;
+        this.onClose = onClose;
         this.rpcCoder = rpcCoder;
     }
 
@@ -128,6 +130,13 @@ public class JavaHttpAdapter implements RpcCallAdapter {
             return;
         }
         closed = true;
+        if (onClose != null) {
+            try {
+                onClose.run();
+            } catch (Throwable t) {
+                System.err.println("Error during onClose call: " + t.getMessage());
+            }
+        }
     }
 
     /**
@@ -208,13 +217,19 @@ public class JavaHttpAdapter implements RpcCallAdapter {
                 throw new IllegalStateException("Custom HttpClient cannot be used with separate Executor");
             }
             this.executorService = executorService;
-            if (this.onClose != null) {
-                this.onClose.run();
-            }
-            this.onClose = null;
             return this;
         }
 
+        /**
+         * Provide custom cleanup method.
+         *
+         * @param onClose to be called on close.
+         * @return builder
+         */
+        public Builder onClose(Runnable onClose){
+            this.onClose = onClose;
+            return this;
+        }
 
         /**
          * Override the default timeout with a custom duration.
@@ -277,7 +292,7 @@ public class JavaHttpAdapter implements RpcCallAdapter {
          */
         public JavaHttpAdapter build() {
             initDefaults();
-            return new JavaHttpAdapter(target, httpClient, basicAuth, timeout, rpcCoder);
+            return new JavaHttpAdapter(target, httpClient, basicAuth, timeout, onClose, rpcCoder);
         }
 
     }

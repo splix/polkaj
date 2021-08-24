@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * @see PolkadotMethod
  */
-public interface SubscriptionAdapter extends AutoCloseable{
+public interface SubscriptionAdapter extends RpcCallAdapter{
 
 
     /**

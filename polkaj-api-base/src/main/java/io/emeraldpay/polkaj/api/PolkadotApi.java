@@ -50,11 +50,12 @@ public interface PolkadotApi extends AutoCloseable {
         }
 
         public Builder subscriptionAdapter(SubscriptionAdapter adapter){
+            this.rpcCallAdapter = adapter;
             this.subscriptionAdapter = adapter;
             return this;
         }
 
-        public Builder setOnClose(Runnable onClose) {
+        public Builder onClose(Runnable onClose) {
             this.onClose = onClose;
             return this;
         }
