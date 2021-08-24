@@ -17,7 +17,6 @@ public class FollowState {
     public static void main(String[] args) throws InterruptedException, ExecutionException, TimeoutException {
         JavaHttpSubscriptionAdapter wsAdapter = JavaHttpSubscriptionAdapter.newBuilder().build();
         PolkadotApi api = PolkadotApi.newBuilder()
-                .rpcCallAdapter(wsAdapter)
                 .subscriptionAdapter(wsAdapter)
                 .build();
 

@@ -50,7 +50,7 @@ public class Transfer {
         );
 
         final JavaHttpSubscriptionAdapter adapter = JavaHttpSubscriptionAdapter.newBuilder().connectTo(api).build();
-        try (PolkadotApi client = PolkadotApi.newBuilder().rpcCallAdapter(adapter).subscriptionAdapter(adapter).build()) {
+        try (PolkadotApi client = PolkadotApi.newBuilder().subscriptionAdapter(adapter).build()) {
             System.out.println("Connected: " + adapter.connect().get());
 
             // Subscribe to block heights
