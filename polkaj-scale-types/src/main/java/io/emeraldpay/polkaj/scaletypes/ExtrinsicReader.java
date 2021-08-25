@@ -54,8 +54,11 @@ public class ExtrinsicReader<CALL extends ExtrinsicCall> implements ScaleReader<
 
         private final MultiAddressReader senderReader;
 
+        private final SS58Type.Network network;
+
         public TransactionInfoReader(SS58Type.Network network) {
             this.senderReader = new MultiAddressReader(network);
+            this.network = network;
         }
 
         @Override
@@ -65,7 +68,7 @@ public class ExtrinsicReader<CALL extends ExtrinsicCall> implements ScaleReader<
             readSignature(result, rdr);
             result.setEra(rdr.read(ERA_READER));
             result.setNonce(rdr.read(ScaleCodecReader.COMPACT_BIGINT).longValueExact());
-            result.setTip(new DotAmount(rdr.read(ScaleCodecReader.COMPACT_BIGINT)));
+            result.setTip(new DotAmount(rdr.read(ScaleCodecReader.COMPACT_BIGINT), network));
             return result;
         }
 
