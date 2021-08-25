@@ -67,7 +67,7 @@ public class AccountRequests {
 
         @Override
         public DotAmount apply(ByteData result) {
-            return new ScaleCodecReader(result.getBytes()).read(BalanceReader.INSTANCE);
+            return new ScaleCodecReader(result.getBytes()).read(new BalanceReader());
         }
     }
 
@@ -97,7 +97,7 @@ public class AccountRequests {
             if (result == null) {
                 return null;
             }
-            return new ScaleCodecReader(result.getBytes()).read(new AccountInfoReader());
+            return new ScaleCodecReader(result.getBytes()).read(new AccountInfoReader(address.getNetwork()));
         }
     }
 
