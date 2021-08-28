@@ -2,6 +2,7 @@ package io.emeraldpay.polkaj.tx;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -50,6 +51,16 @@ public class AccountRequests {
      */
     public static TransferBuilder transfer() {
         return new TransferBuilder();
+    }
+
+    /**
+     * Transfer value from one account to another, but making sure that the balance of both accounts is above the existential
+     * deposit
+     *
+     * @return builder for transfer-keep-alive
+     */
+    public static TransferKeepAliveBuilder transferKeepAlive() {
+        return new TransferKeepAliveBuilder();
     }
 
     public static class TotalIssuance extends StorageRequest<DotAmount> {
@@ -112,6 +123,10 @@ public class AccountRequests {
             this.extrinsic = extrinsic;
         }
 
+        public Extrinsic<BalanceTransfer> getExtrinsic() {
+            return extrinsic;
+        }
+
         @Override
         public ByteData encodeRequest() throws IOException {
             ByteArrayOutputStream buf = new ByteArrayOutputStream();
@@ -129,13 +144,13 @@ public class AccountRequests {
     }
 
 
-    public static final class TransferBuilder {
+    public static class TransferBuilder {
         private Address from;
         private Extrinsic.Signature signature;
         private Long nonce;
         private DotAmount tip;
 
-        private final BalanceTransfer call = new BalanceTransfer();
+        protected final BalanceTransfer call = new BalanceTransfer();
 
         public TransferBuilder runtime(Metadata metadata) {
             this.call.init(metadata);
@@ -162,6 +177,10 @@ public class AccountRequests {
          */
         public TransferBuilder from(Address from) {
             this.from = from;
+            if (this.tip == null) {
+                // set default tip as well now that the network is known
+                this.tip = new DotAmount(BigInteger.ZERO, from.getNetwork());
+            }
             return this;
         }
 
@@ -186,8 +205,9 @@ public class AccountRequests {
         }
 
         /**
+         * (optional) tip to include for the miner
          *
-         * @param tip tip to include for the miner
+         * @param tip tip to use
          * @return builder
          */
         public TransferBuilder tip(DotAmount tip) {
@@ -281,6 +301,17 @@ public class AccountRequests {
                     String msg = String.format("Signature type %s is not supported", signature.getType());
                     throw new UnsupportedOperationException(msg);
             }
+        }
+    }
+
+    public static final class TransferKeepAliveBuilder extends TransferBuilder {
+
+        private static final String TRANSFER_KEEP_ALIVE = "transfer_keep_alive";
+
+        @Override
+        public TransferBuilder runtime(Metadata metadata) {
+            this.call.init(metadata, TRANSFER_KEEP_ALIVE);
+            return this;
         }
     }
 
