@@ -1,0 +1,70 @@
+import java.nio.file.Paths
+
+buildscript {
+    repositories {
+        google()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.2.2"
+        classpath "gradle.plugin.com.github.willir.rust:plugin:0.3.4"
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: "com.github.willir.rust.cargo-ndk-android"
+
+android {
+    ndkVersion System.getenv("ANDROID_NDK_VERSION")
+
+    compileSdkVersion 30
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDirs = ["../polkaj-schnorrkel-common/src/main/java"]
+            }
+        }
+    }
+}
+
+dependencies {
+}
+
+repositories {
+    google()
+}
+
+clean.doFirst {
+    delete "src/main/jniLibs"
+}
+
+cargoNdk {
+    def rustDir = "${rootDir.absolutePath}/polkaj-schnorrkel-common/src/rust"
+    def cargoTarget = "$buildDir/rust"
+    def relativeCargoTarget = Paths.get(rustDir).relativize(Paths.get(cargoTarget))
+
+    module = "polkaj-schnorrkel-common/src/rust"
+    targetDirectory = relativeCargoTarget.toString()
+    extraCargoBuildArguments = ["--target-dir=$relativeCargoTarget"]
+    verbose = true
+}

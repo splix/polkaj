@@ -5,7 +5,7 @@ dependencies {
     api project(":polkaj-scale-types")
     api project(":polkaj-json-types")
     api project(":polkaj-ss58")
-    api project(":polkaj-schnorrkel")
+    implementation project(":polkaj-schnorrkel")
     api project(":polkaj-api-base")
 
     // for xxHash

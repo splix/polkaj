@@ -107,7 +107,7 @@ public class SchnorrkelNative extends Schnorrkel {
             // JVM needs native libraries to be loaded from filesystem, so first we need to extract
             // files for current OS into a temp dir then load the file.
             if(!extractAndLoadJNI()) {
-                // load the native library, this is for running tests
+                // load the native library, this is for running tests and android
                 System.loadLibrary(LIBNAME);
             }
         } catch (IOException e) {
@@ -119,6 +119,7 @@ public class SchnorrkelNative extends Schnorrkel {
 
     private static boolean extractAndLoadJNI() throws IOException {
         // define which of files bundled with Jar to extract
+        if(System.getProperty("java.runtime.name", "unknown").contains("android")) return false;
         String os = System.getProperty("os.name", "unknown").toLowerCase();
         if (os.contains("win")) {
             os = "windows";
