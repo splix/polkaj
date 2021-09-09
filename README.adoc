@@ -19,7 +19,7 @@ WARNING: UNDER DEVELOPMENT
 
 - `io.emeraldpay.polkaj:polkaj-scale:{lib-version}` - SCALE codec implementation
 - `io.emeraldpay.polkaj:polkaj-scale-types:{lib-version}` - SCALE mapping for standard Polkadot types
-- `io.emeraldpay.polkaj:polkaj-schnorrkel:{lib-version}` - Schnorrkel for Java
+- `io.emeraldpay.polkaj:polkaj-schnorrkel:{lib-version}` *1 - Schnorrkel for Java
 - `io.emeraldpay.polkaj:polkaj-ss58:{lib-version}` - SS58 codec to encode/decode addresses and pubkeys
 - `io.emeraldpay.polkaj:polkaj-common-types:{lib-version}` - common types (Address, DotAmount, Hash256, etc)
 - `io.emeraldpay.polkaj:polkaj-json-types:{lib-version}` - JSON RPC mapping to Java classes
@@ -27,6 +27,8 @@ WARNING: UNDER DEVELOPMENT
 - `io.emeraldpay.polkaj:polkaj-api-http:{lib-version}` - JSON RPC HTTP client
 - `io.emeraldpay.polkaj:polkaj-api-ws:{lib-version}` - JSON RPC WebSocket client
 - `io.emeraldpay.polkaj:polkaj-tx:{lib-version}` - Storage access and Extrinsics
+
+*1 module requires `cargo` (rust build tool)
 
 == Usage
 
