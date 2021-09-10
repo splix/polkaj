@@ -34,7 +34,7 @@ To use development SNAPSHOT versions you need to install the library into the lo
 
 .Install into local Maven
 ----
-gradle install
+gradle publishToMavenLocal
 ----
 
 .Using with Gradle

@@ -16,6 +16,8 @@ buildscript {
 
 apply plugin: 'com.android.library'
 apply plugin: "com.github.willir.rust.cargo-ndk-android"
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
 android {
     ndkVersion System.getenv("ANDROID_NDK_VERSION")
@@ -67,4 +69,65 @@ cargoNdk {
     targetDirectory = relativeCargoTarget.toString()
     extraCargoBuildArguments = ["--target-dir=$relativeCargoTarget"]
     verbose = true
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            mavenAndroid(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = project.group
+                artifactId = project.name
+                version = project.version
+
+                pom {
+                    name = 'Polkadot Java Client'
+                    description = 'Java client library to access Polkadot based networks'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_API_KEY')
+
+    dryRun=false
+    publish=true
+    override=true
+
+    publications = ['mavenAndroid']
+
+    pkg {
+        userOrg = 'emerald'
+        repo = 'polkaj'
+        name = project.name
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/emeraldpay/polkaj.git'
+        labels = ['polkadot', 'blockchain']
+        publicDownloadNumbers = true
+
+        version {
+            name = project.version
+            description = 'PolkaJ ' + project.version
+            released  = new Date()
+            vcsTag = project.version
+
+            gpg {
+                sign = true
+            }
+        }
+    }
 }
