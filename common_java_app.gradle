@@ -1,6 +1,5 @@
 apply plugin: 'java'
 apply plugin: 'java-library'
-apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'groovy'
 apply plugin: 'jacoco'
@@ -11,7 +10,6 @@ afterEvaluate {
     rootProject.tasks.coverageReport.sourceDirectories.setFrom rootProject.tasks.coverageReport.sourceDirectories.files + files(it.sourceSets.main.allSource.srcDirs)
     rootProject.tasks.coverageReport.classDirectories.setFrom rootProject.tasks.coverageReport.classDirectories.files + files(it.sourceSets.main.output)
 }
-
 
 tasks.withType(JavaCompile) {
     options.debug = true

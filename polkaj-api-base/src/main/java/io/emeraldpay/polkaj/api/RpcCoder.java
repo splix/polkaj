@@ -72,6 +72,7 @@ public class RpcCoder {
     /**
      * Encode RPC request as JSON
      *
+     * @param <T> type of returned object
      * @param id id of the request
      * @param call the RpcCall to encode
      * @return full JSON of the request

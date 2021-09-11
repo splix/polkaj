@@ -10,7 +10,7 @@ public class BoolOptionalWriter implements ScaleWriter<Optional<Boolean>> {
 
     @Override
     public void write(ScaleCodecWriter wrt, Optional<Boolean> value) throws IOException {
-        if (value.isEmpty()) {
+        if (!value.isPresent()) {
             wrt.directWrite(0);
         } else if (value.get()) {
             wrt.directWrite(2);

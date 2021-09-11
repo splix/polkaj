@@ -57,7 +57,7 @@ public class StandardSubscriptions {
         if (keys.isEmpty()) {
             return storage();
         }
-        return SubscribeCall.create(StorageChangeSetJson.class, PolkadotMethod.STATE_SUBSCRIBE_STORAGE, PolkadotMethod.STATE_UNSUBSCRIBE_STORAGE, List.of(keys));
+        return SubscribeCall.create(StorageChangeSetJson.class, PolkadotMethod.STATE_SUBSCRIBE_STORAGE, PolkadotMethod.STATE_UNSUBSCRIBE_STORAGE, Collections.unmodifiableList(keys));
     }
 
     public SubscribeCall<StorageChangeSetJson> storage(ByteData key) {
