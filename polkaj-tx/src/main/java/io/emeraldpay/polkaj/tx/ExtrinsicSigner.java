@@ -119,6 +119,9 @@ public class ExtrinsicSigner<CALL extends ExtrinsicCall> {
         catch (SchnorrkelException | SignatureException | NoSuchAlgorithmException | InvalidKeySpecException | IOException | InvalidKeyException e) {
             throw new SignException("Failed to verify", e);
         }
+        catch(NoClassDefFoundError e){
+            throw new SignException("Schnorrkel library not found. Did you forget to include it as a dependency?");
+        }
     }
 
     private boolean isValidEd25519Signature(byte[] payload, Extrinsic.Signature signature, Address address)
