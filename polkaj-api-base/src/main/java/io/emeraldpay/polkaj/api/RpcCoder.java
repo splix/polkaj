@@ -4,8 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 public class RpcCoder {
 
@@ -47,14 +50,36 @@ public class RpcCoder {
      * @throws CompletionException with RpcException details to let executor know that the response is invalid
      */
     final public <T> T decode(int id, String content, JavaType clazz) {
+        return decodeInternal(id, content, clazz);
+    }
+
+    /**
+     * Decode JSON RPC response
+     *
+     * @param id expected id
+     * @param content full JSON content
+     * @param clazz expected JavaType for the result field
+     * @param <T> returning type
+     * @return The decoded result
+     * @throws CompletionException with RpcException details to let executor know that the response is invalid or an IOException
+     */
+    final public <T> T decode(int id, InputStream content, JavaType clazz){
+        return decodeInternal(id, content, clazz);
+    }
+
+    private <T> T decodeInternal(int id, Object content, JavaType clazz) {
         JavaType type = objectMapper.getTypeFactory().constructParametricType(RpcResponse.class, clazz);
         RpcResponse<T> response;
         try {
-            response = objectMapper.readerFor(type).readValue(content);
+            if(content instanceof String) response = objectMapper.readerFor(type).readValue((String)content);
+            else if(content instanceof InputStream) response = objectMapper.readerFor(type).readValue((InputStream) content);
+            else throw new IllegalArgumentException("Unsupported content type.");
         } catch (JsonProcessingException e) {
             throw new CompletionException(
                     new RpcException(-32603, "Server returned invalid JSON", e)
             );
+        } catch (IOException e){
+            throw new CompletionException(e);
         }
         if (id != response.getId()) {
             throw new CompletionException(

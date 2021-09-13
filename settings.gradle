@@ -11,6 +11,7 @@ include "polkaj-ss58",
         "polkaj-api-base",
         "polkaj-api-http",
         "polkaj-api-ws",
+        "polkaj-api-okhttp",
         "polkaj-tx",
         "polkaj-adapter-tests"
 

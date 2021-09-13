@@ -108,7 +108,7 @@ abstract class RpcAdapterSpec extends Specification{
 
         then:
         def t = thrown(ExecutionException)
-        t.cause instanceof HttpTimeoutException
+        t.cause instanceof InterruptedIOException
 
     }
 
