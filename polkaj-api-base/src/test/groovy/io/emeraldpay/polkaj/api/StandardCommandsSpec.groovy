@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory
 import io.emeraldpay.polkaj.json.ContractCallRequestJson
 import io.emeraldpay.polkaj.json.ContractExecResultJson
 import io.emeraldpay.polkaj.json.MethodsJson
+import io.emeraldpay.polkaj.json.ReadProofJson
 import io.emeraldpay.polkaj.json.RuntimeDispatchInfoJson
 import io.emeraldpay.polkaj.json.RuntimeVersionJson
 import io.emeraldpay.polkaj.json.SystemHealthJson
@@ -152,6 +153,15 @@ class StandardCommandsSpec extends Specification {
         act.method == "state_getStorage"
         act.params.toList() == ["0x0102"]
         act.getResultType(typeFactory).getRawClass() == ByteData.class
+    }
+
+    def "State Get Read Proof"() {
+        when:
+        def act = StandardCommands.getInstance().stateGetReadProof([ByteData.from("0x00")], Hash256.empty())
+        then:
+        act.method == "state_getReadProof"
+        act.params.toList() == [[ByteData.from("0x00")], Hash256.empty()]
+        act.getResultType(typeFactory).getRawClass() == ReadProofJson.class
     }
 
     def "Contracts Call"() {

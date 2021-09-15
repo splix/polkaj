@@ -128,7 +128,9 @@ public class StandardCommands {
     }
 
     public RpcCall<ReadProofJson> stateGetReadProof(List<ByteData> keys, Hash256 at) {
-        List<Object> params = new ArrayList<>(Collections.unmodifiableList(keys));
+        List<List<ByteData>> wrapper = new ArrayList<>();
+        wrapper.add(keys);
+        List<Object> params = new ArrayList<>(Collections.unmodifiableList(wrapper));
         if (at != null) {
             params.add(at);
         }
