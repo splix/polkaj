@@ -136,7 +136,7 @@ public class ExtrinsicSigner<CALL extends ExtrinsicCall> {
         PublicKey publicKey = keyFactory.generatePublic(keySpec);
 
         // verify signature
-        final var signedData = Signature.getInstance("ed25519", bouncyCastleProvider);
+        final Signature signedData = Signature.getInstance("ed25519", bouncyCastleProvider);
         signedData.initVerify(publicKey);
         signedData.update(payload);
         return signedData.verify(signature.getValue().getBytes());
