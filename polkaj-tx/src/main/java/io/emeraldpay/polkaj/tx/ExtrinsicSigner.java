@@ -67,7 +67,7 @@ public class ExtrinsicSigner<CALL extends ExtrinsicCall> {
             throw new SignException("Failed to encode signature payload", e);
         }
         byte[] bytes = result.toByteArray();
-        if (bytes.length > 256) {
+        if (bytes.length > 32) {
             return Hashing.blake2(bytes);
         } else {
             return bytes;
