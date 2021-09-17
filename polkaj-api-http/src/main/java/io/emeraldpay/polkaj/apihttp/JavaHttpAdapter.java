@@ -3,6 +3,7 @@ package io.emeraldpay.polkaj.apihttp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spotify.futures.CompletableFutures;
 import io.emeraldpay.polkaj.api.*;
 import io.emeraldpay.polkaj.json.jackson.PolkadotModule;
 
@@ -15,10 +16,7 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.Base64;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.function.Function;
 
 /**
@@ -86,18 +84,20 @@ public class JavaHttpAdapter implements RpcCallAdapter {
         try {
             HttpRequest.Builder request = this.request.copy()
                     .POST(HttpRequest.BodyPublishers.ofByteArray(rpcCoder.encode(id, call)));
-            return httpClient.sendAsync(request.build(), HttpResponse.BodyHandlers.ofString())
-                    .exceptionallyCompose(ex -> {
-                      if(ex instanceof CompletionException && ex.getCause() instanceof HttpTimeoutException) {
-                          return CompletableFuture.failedFuture(new InterruptedIOException());
-                      }
-                      else {
-                          return CompletableFuture.failedFuture(ex);
-                      }
-                    })
-                    .thenApply(this::verify)
-                    .thenApply(HttpResponse::body)
-                    .thenApply(content -> rpcCoder.decode(id, content, type));
+
+            final CompletableFuture<HttpResponse<String>> sendAsync = httpClient.sendAsync(request.build(),
+                    HttpResponse.BodyHandlers.ofString());
+            return CompletableFutures.exceptionallyCompose(sendAsync, ex -> {
+                if(ex instanceof CompletionException && ex.getCause() instanceof HttpTimeoutException) {
+                    return CompletableFuture.failedFuture(new InterruptedIOException());
+                }
+                else {
+                    return CompletableFuture.failedFuture(ex);
+                }
+            }).toCompletableFuture()
+            .thenApply(this::verify)
+            .thenApply(HttpResponse::body)
+            .thenApply(content -> rpcCoder.decode(id, content, type));
         } catch (JsonProcessingException e) {
             return CompletableFuture.failedFuture(
                     new RpcException(-32600, "Unable to encode request as JSON: " + e.getMessage(), e)
