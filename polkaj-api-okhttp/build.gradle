@@ -18,10 +18,7 @@ compileJava {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-compileTestJava {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
+
 
 dependencies {
     api project(":polkaj-json-types")

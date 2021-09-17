@@ -41,8 +41,11 @@ jobs:
 
   # Run tests for java 8 targets
   java8-test:
-    name: Java 8 Test
-    runs-on: ubuntu-latest
+    name: Java 8 Test on ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ "windows-latest", "macos-latest", "ubuntu-latest" ]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
 

@@ -10,7 +10,6 @@ import org.mockserver.model.MediaType
 import spock.lang.Shared
 import spock.lang.Specification
 
-import java.net.http.HttpTimeoutException
 import java.nio.charset.Charset
 import java.time.Duration
 import java.util.concurrent.ExecutionException
