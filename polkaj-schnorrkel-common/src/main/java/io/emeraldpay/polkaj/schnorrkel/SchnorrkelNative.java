@@ -30,11 +30,19 @@ public class SchnorrkelNative extends Schnorrkel {
 
     @Override
     public KeyPair generateKeyPair() throws SchnorrkelException {
-        try {
-            return generateKeyPair(SecureRandom.getInstanceStrong());
-        } catch (NoSuchAlgorithmException e) {
+        SecureRandom secureRandom;
+        try{
+            try{
+                SecureRandom.class.getMethod("getInstanceStrong");
+                //noinspection NewApi
+                secureRandom = SecureRandom.getInstanceStrong();
+            }catch (NoSuchMethodException e){
+                secureRandom = new SecureRandom(); //Android 24 & 25 do not have getInstanceStrong
+            }
+        }catch(NoSuchAlgorithmException e){
             throw new SchnorrkelException("Secure Random is not available");
         }
+        return generateKeyPair(secureRandom);
     }
 
     @Override
@@ -117,6 +125,8 @@ public class SchnorrkelNative extends Schnorrkel {
         }
     }
 
+    ////noinspection NewApi added to allow android lint check to succeed for api 24-25
+    // these apis will not be called in that case
     private static boolean extractAndLoadJNI() throws IOException {
         // define which of files bundled with Jar to extract
         if(System.getProperty("java.runtime.name", "unknown").contains("android")) return false;
@@ -141,15 +151,21 @@ public class SchnorrkelNative extends Schnorrkel {
             System.err.println("Library " + classpathFile + " is not found in the classpath");
             return false;
         }
+        //noinspection NewApi
         Path dir = Files.createTempDirectory(LIBNAME);
+        //noinspection NewApi
         Path target = dir.resolve(filename);
 
+        //noinspection NewApi
         Files.copy(lib, target);
+        //noinspection NewApi
         System.load(target.toFile().getAbsolutePath());
         System.out.println("library " + classpathFile + " is loaded");
 
         // setup JVM to delete files on exit, when possible
+        //noinspection NewApi
         target.toFile().deleteOnExit();
+        //noinspection NewApi
         dir.toFile().deleteOnExit();
         return true;
     }

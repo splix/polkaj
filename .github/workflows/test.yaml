@@ -3,8 +3,8 @@ name: Tests
 on:
   # if pushed directly to the master
   push:
-    branches:
-      - master
+#    branches:
+#      - master
   # on a pull request
   pull_request:
     branches:
@@ -61,6 +61,25 @@ jobs:
           # see https://github.com/eskatos/gradle-command-action/issues/24
           wrapper-cache-enabled: false
           arguments: check
+
+  # Make sure it works on supported Android versions
+  android-platform-test:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        api-level: [24, 25, 26, 27, 28, 29, 30]
+        arch: [x86_64, arm64-v8a, armeabi-v7a, x86]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: run tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          profile: Nexus 6
+          script: ./gradlew connectedCheck
 
   # Formatter may behave differently on different locales, makes sure tests are not failing
   locale-test:
