@@ -25,15 +25,37 @@ jobs:
           java-version: 11
 
       - name: Check
-        run: ./gradlew check
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: check
 
       - name: Build Coverage Report
-        run: ./gradlew coverageReport
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: coverageReport
 
       - name: Upload Coverage Report
         uses: codecov/codecov-action@v1
         with:
           file: ./build/reports/jacoco/coverageReport/coverageReport.xml
+
+  # Run tests for java 8 targets
+  java8-test:
+    name: Java 8 Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 8
+
+      - name: Check
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: checkJava8
 
   # Make sure it works with all standard JVMs on main OSes
   platform-test:
@@ -103,6 +125,8 @@ jobs:
           java-version: 11
 
       - name: Check
-        run: ./gradlew check
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: check
         env:
           LANG: ${{ matrix.locale }}

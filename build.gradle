@@ -61,6 +61,8 @@ task syncJars(type: Sync) {
     into "${buildDir}/libs/"
 }
 
+task checkJava8
+
 // Skip Bintray for the root module
 bintray {
     dryRun=true

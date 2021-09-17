@@ -9,10 +9,19 @@ afterEvaluate {
     rootProject.tasks.coverageReport.additionalSourceDirs.setFrom rootProject.tasks.coverageReport.additionalSourceDirs.files + files(it.sourceSets.main.allSource.srcDirs)
     rootProject.tasks.coverageReport.sourceDirectories.setFrom rootProject.tasks.coverageReport.sourceDirectories.files + files(it.sourceSets.main.allSource.srcDirs)
     rootProject.tasks.coverageReport.classDirectories.setFrom rootProject.tasks.coverageReport.classDirectories.files + files(it.sourceSets.main.output)
+
+    if(java.sourceCompatibility == JavaVersion.VERSION_1_8){
+        rootProject.tasks.checkJava8.dependsOn(test)
+    }
 }
 
 tasks.withType(JavaCompile) {
     options.debug = true
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 compileJava {
