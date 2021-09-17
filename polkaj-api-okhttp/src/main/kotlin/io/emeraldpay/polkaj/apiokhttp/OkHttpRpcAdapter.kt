@@ -57,7 +57,9 @@ class OkHttpRpcAdapter(
 
     override fun <T : Any?> produceRpcFuture(call: RpcCall<T>): CompletableFuture<T> {
         return if(closed){
-            CompletableFuture.failedFuture(IllegalStateException("Client is already closed"))
+            CompletableFuture<T>().apply {
+                completeExceptionally(IllegalStateException("Client is already closed"))
+            }
         } else{
             scope.future{
                 await(call)
