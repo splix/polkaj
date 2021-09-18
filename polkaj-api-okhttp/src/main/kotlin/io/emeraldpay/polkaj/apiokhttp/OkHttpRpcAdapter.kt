@@ -67,6 +67,16 @@ class OkHttpRpcAdapter(
         }
     }
 
+    fun <T> getCall(rpcCall: RpcCall<T>) : Call{
+        val id = rpcCoder.nextId()
+        val type = rpcCall.getResultType(rpcCoder.objectMapper.typeFactory)
+        return baseRequest.newBuilder().post(
+            rpcCoder.encode(id, rpcCall).toRequestBody(APPLICATION_JSON.toMediaType())
+        ).build().let {
+            client.newCall(it)
+        }
+    }
+
     suspend fun <T> await(rpcCall : RpcCall<T>): T {
         return suspendCancellableCoroutine { continuation ->
             val id = rpcCoder.nextId()

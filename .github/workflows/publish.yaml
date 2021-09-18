@@ -62,6 +62,8 @@ jobs:
         with:
           name: schnorrkel-lib
           path: polkaj-schnorrkel/build/rust/release
+      - name: Setup Rust for Android
+        run: ./cargo_ndk_prep.sh
       - name: Check
         uses: eskatos/gradle-command-action@v1
         with:
