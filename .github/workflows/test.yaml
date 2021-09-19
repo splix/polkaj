@@ -100,7 +100,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Rust
-        run: ./cargo_ndk_prep.sh
+        run: ./cargo_ndk_prep.sh; touch local.properties
 
       - name: run tests
         uses: reactivecircus/android-emulator-runner@v2

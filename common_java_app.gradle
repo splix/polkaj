@@ -13,9 +13,6 @@ afterEvaluate {
     //By default we set to java 8 but some project override this to higher levels so after evaluate we
     if(java.sourceCompatibility == JavaVersion.VERSION_1_8){
         rootProject.tasks.checkJava8.dependsOn(test)
-        tasks.withType(JavaCompile).all {
-            it.options.compilerArgs += ['--release', '8']
-        }
     }
 }
 
