@@ -93,6 +93,9 @@ jobs:
          - api-level: 30
            arch: arm64-v8a
            target: google_apis
+        exclude:
+          - api-level: 30
+            arch: x86
     steps:
       - name: checkout
         uses: actions/checkout@v2
