@@ -91,14 +91,9 @@ jobs:
         arch: [x86_64, x86]
         include:
          - api-level: 30
-           arch: arm64-v8a
+           arch: [arm64-v8a, x86, x86_64]
            target: google_apis
-        - api-level: 30
-          arch: x86
-          target: google_apis
-        - api-level: 30
-          arch: x86_64
-          target: google_apis
+
     steps:
       - name: checkout
         uses: actions/checkout@v2
