@@ -95,6 +95,10 @@ jobs:
            arch: arm64-v8a
            target: google_apis
          - api-level: 30
+           arch: x86_64
+           target: google_apis
+         - api-level: 30
+           arch: x86
            target: google_apis
         exclude:
           - api-level: 30
