@@ -9,7 +9,7 @@ The SCALE (Simple Concatenated Aggregate Little-Endian) Codec is a lightweight, 
 It is designed for high-performance, copy-free encoding and decoding of data in resource-constrained execution contexts, like the Substrate runtime.
 It is not self-describing in any way and assumes the decoding context has all type knowledge about the encoded data.
 
-See specification at: https://substrate.dev/docs/en/conceptual/core/codec
+See specification at: https://substrate.dev/docs/en/knowledgebase/advanced/codec
 
 === Reading values
 
