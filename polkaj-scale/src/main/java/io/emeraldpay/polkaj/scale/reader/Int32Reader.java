@@ -21,6 +21,7 @@ public class Int32Reader implements ScaleReader<Integer> {
         buf.put(rdr.readByte());
         buf.put(rdr.readByte());
         buf.put(rdr.readByte());
-        return buf.flip().getInt();
+        //https://www.morling.dev/blog/bytebuffer-and-the-dreaded-nosuchmethoderror/
+        return ((ByteBuffer)buf.flip()).getInt();
     }
 }
