@@ -36,7 +36,7 @@ class BoolOptionalReaderSpec extends Specification {
         when:
         def act = codec.read(reader)
         then:
-        act.isEmpty()
+        !act.isPresent()
         !codec.hasNext()
     }
 
