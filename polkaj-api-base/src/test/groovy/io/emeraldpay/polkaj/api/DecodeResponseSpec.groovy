@@ -1,6 +1,9 @@
-package io.emeraldpay.polkaj.apiws
+package io.emeraldpay.polkaj.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.emeraldpay.polkaj.api.internal.DecodeResponse
+import io.emeraldpay.polkaj.api.internal.SubscriptionResponse
+import io.emeraldpay.polkaj.api.internal.WsResponse
 import io.emeraldpay.polkaj.json.StorageChangeSetJson
 import io.emeraldpay.polkaj.types.ByteData
 import io.emeraldpay.polkaj.types.Hash256
@@ -151,7 +154,7 @@ class DecodeResponseSpec extends Specification {
         def act = decoder.decode(json)
         then:
         act.type == WsResponse.Type.SUBSCRIPTION
-        JavaHttpSubscriptionAdapter.SubscriptionResponse event = act.asEvent()
+        SubscriptionResponse event = act.asEvent()
         event.method == "chain_newHead"
         event.id == "EsqruyKPnZvPZ6fr"
         event.value instanceof BlockJson.Header
@@ -187,7 +190,7 @@ class DecodeResponseSpec extends Specification {
         def act = decoder.decode(json)
         then:
         act.type == WsResponse.Type.SUBSCRIPTION
-        JavaHttpSubscriptionAdapter.SubscriptionResponse event = act.asEvent()
+        SubscriptionResponse event = act.asEvent()
         event.method == "chain_newHead"
         event.id == "EsqruyKPnZvPZ6fr"
         event.value instanceof BlockJson.Header
@@ -224,7 +227,7 @@ class DecodeResponseSpec extends Specification {
         def act = decoder.decode(json)
         then:
         act.type == WsResponse.Type.SUBSCRIPTION
-        JavaHttpSubscriptionAdapter.SubscriptionResponse event = act.asEvent()
+        SubscriptionResponse event = act.asEvent()
         event.method == "state_storage"
         event.id == "EKMIn5gSrVmo1cgU"
         event.value instanceof StorageChangeSetJson

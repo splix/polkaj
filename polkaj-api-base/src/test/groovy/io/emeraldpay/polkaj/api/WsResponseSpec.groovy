@@ -1,7 +1,7 @@
-package io.emeraldpay.polkaj.apiws
+package io.emeraldpay.polkaj.api
 
-
-import io.emeraldpay.polkaj.api.RpcResponse
+import io.emeraldpay.polkaj.api.internal.SubscriptionResponse
+import io.emeraldpay.polkaj.api.internal.WsResponse
 import spock.lang.Specification
 
 class WsResponseSpec extends Specification {
@@ -17,11 +17,11 @@ class WsResponseSpec extends Specification {
 
     def "Creates subscription response"() {
         when:
-        def act = WsResponse.subscription(new JavaHttpSubscriptionAdapter.SubscriptionResponse<Object>("EsqruyKPnZvPZ6fr", "test", "test"))
+        def act = WsResponse.subscription(new SubscriptionResponse<Object>("EsqruyKPnZvPZ6fr", "test", "test"))
         then:
         act.getType() == WsResponse.Type.SUBSCRIPTION
-        act.getValue() == new JavaHttpSubscriptionAdapter.SubscriptionResponse<Object>("EsqruyKPnZvPZ6fr", "test", "test")
-        act.asEvent() == new JavaHttpSubscriptionAdapter.SubscriptionResponse<Object>("EsqruyKPnZvPZ6fr", "test", "test")
+        act.getValue() == new SubscriptionResponse<Object>("EsqruyKPnZvPZ6fr", "test", "test")
+        act.asEvent() == new SubscriptionResponse<Object>("EsqruyKPnZvPZ6fr", "test", "test")
     }
 
     def "Cannot cast rcp to event"() {
@@ -33,7 +33,7 @@ class WsResponseSpec extends Specification {
 
     def "Cannot cast event to rpc"() {
         when:
-        WsResponse.subscription(new JavaHttpSubscriptionAdapter.SubscriptionResponse<Object>("EsqruyKPnZvPZ6fr", "test", "test")).asRpc()
+        WsResponse.subscription(new SubscriptionResponse<Object>("EsqruyKPnZvPZ6fr", "test", "test")).asRpc()
         then:
         thrown(ClassCastException)
     }

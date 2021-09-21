@@ -6,6 +6,7 @@ import io.emeraldpay.polkaj.api.RpcCall
 import io.emeraldpay.polkaj.api.RpcCallAdapter
 import io.emeraldpay.polkaj.api.RpcCoder
 import io.emeraldpay.polkaj.api.RpcException
+import io.emeraldpay.polkaj.apiokhttp.OkHttpRpcAdapter.Companion.APPLICATION_JSON
 import io.emeraldpay.polkaj.json.jackson.PolkadotModule
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.future
@@ -19,8 +20,6 @@ import java.time.Duration
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -33,8 +32,8 @@ class OkHttpRpcAdapter(
     private val onClose : () -> Unit
 ) : RpcCallAdapter {
 
-    companion object{
-        private const val APPLICATION_JSON = "application/json"
+    internal companion object{
+        const val APPLICATION_JSON = "application/json"
     }
 
     private var closed = false
@@ -67,9 +66,9 @@ class OkHttpRpcAdapter(
         }
     }
 
-    fun <T> getCall(rpcCall: RpcCall<T>) : Call{
-        val id = rpcCoder.nextId()
-        val type = rpcCall.getResultType(rpcCoder.objectMapper.typeFactory)
+    fun nextId() : Int = rpcCoder.nextId()
+
+    fun <T> getCall(id: Int, rpcCall: RpcCall<T>) : Call {
         return baseRequest.newBuilder().post(
             rpcCoder.encode(id, rpcCall).toRequestBody(APPLICATION_JSON.toMediaType())
         ).build().let {
@@ -77,53 +76,12 @@ class OkHttpRpcAdapter(
         }
     }
 
-    suspend fun <T> await(rpcCall : RpcCall<T>): T {
-        return suspendCancellableCoroutine { continuation ->
-            val id = rpcCoder.nextId()
-            val type = rpcCall.getResultType(rpcCoder.objectMapper.typeFactory)
-            val call = baseRequest.newBuilder().post(
-                rpcCoder.encode(id, rpcCall).toRequestBody(APPLICATION_JSON.toMediaType())
-            ).build().let {
-                client.newCall(it)
-            }
-            continuation.invokeOnCancellation {
-                call.cancel()
-            }
-            call.enqueue(object  : Callback{
-                override fun onFailure(call: Call, e: IOException) {
-                    continuation.resumeWithException(e)
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if(response.code != 200){
-                        continuation.resumeWithException(RpcException(
-                            -32000, "Server returned error status: ${response.code}"
-                        ))
-                    } else if(response.header("content-type", APPLICATION_JSON)?.startsWith(APPLICATION_JSON) == false){
-                        continuation.resumeWithException(RpcException(
-                            -32000, "Server returned invalid content-type ${response.header("content-type")}"
-                        ))
-                    } else{
-                        try{
-                            rpcCoder.decode<T>(id, response.body!!.byteStream(), type).let {
-                                continuation.resume(it)
-                            }
-                        }catch (e : Throwable){
-                            when(e){
-                                is JsonProcessingException -> continuation.resumeWithException(RpcException(-32600, "Unable to encode request as JSON: ${e.message}"))
-                                is CompletionException -> continuation.resumeWithException(e.cause ?: e)
-                                else -> continuation.resumeWithException(e)
-                            }
-
-                        }
-                    }
-                }
-            })
-
-        }
+    fun <T> decodeResponse(id : Int, rpcCall: RpcCall<T>, response: Response) : T {
+        val type = rpcCall.getResultType(rpcCoder.objectMapper.typeFactory)
+        return rpcCoder.decode<T>(id, response.body!!.byteStream(), type)
     }
 
-     data class Builder(
+    data class Builder(
          private var target : HttpUrl = "http://127.0.0.1:9933".toHttpUrl(),
          private var basicAuth : String? = null,
          private var client : OkHttpClient = OkHttpClient.Builder().apply {
@@ -161,4 +119,45 @@ class OkHttpRpcAdapter(
          fun build() : OkHttpRpcAdapter = OkHttpRpcAdapter(target, basicAuth, client, scope, rpcCoder, onClose)
     }
 
+}
+
+suspend fun <T> OkHttpRpcAdapter.await(rpcCall : RpcCall<T>): T {
+    return suspendCancellableCoroutine { continuation ->
+        val id = nextId()
+        val call = getCall(id, rpcCall)
+        continuation.invokeOnCancellation {
+            call.cancel()
+        }
+        call.enqueue(object  : Callback{
+            override fun onFailure(call: Call, e: IOException) {
+                continuation.resumeWithException(e)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if(response.code != 200){
+                    continuation.resumeWithException(RpcException(
+                        -32000, "Server returned error status: ${response.code}"
+                    ))
+                } else if(response.header("content-type", APPLICATION_JSON)?.startsWith(APPLICATION_JSON) == false){
+                    continuation.resumeWithException(RpcException(
+                        -32000, "Server returned invalid content-type ${response.header("content-type")}"
+                    ))
+                } else{
+                    try{
+                        decodeResponse(id, rpcCall, response).let {
+                            continuation.resume(it)
+                        }
+                    }catch (e : Throwable){
+                        when(e){
+                            is JsonProcessingException -> continuation.resumeWithException(RpcException(-32600, "Unable to encode request as JSON: ${e.message}"))
+                            is CompletionException -> continuation.resumeWithException(e.cause ?: e)
+                            else -> continuation.resumeWithException(e)
+                        }
+
+                    }
+                }
+            }
+        })
+
+    }
 }
