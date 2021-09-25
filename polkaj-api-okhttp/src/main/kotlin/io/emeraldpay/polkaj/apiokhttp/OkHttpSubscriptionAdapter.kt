@@ -51,7 +51,7 @@ class OkHttpSubscriptionAdapter(
     private class WebscoketFailedException(cause : Throwable?) : Exception(cause)
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    class FlowSubscription<T>(
+    private class FlowSubscription<T>(
         val id : String,
         val call: SubscribeCall<T>,
         private val scope: CoroutineScope,
@@ -128,6 +128,7 @@ class OkHttpSubscriptionAdapter(
                 }
             }
         }
+
         return result.asCompletableFuture()
     }
 
@@ -167,13 +168,17 @@ class OkHttpSubscriptionAdapter(
                 }
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                    t.printStackTrace()
+                    t.printStackTrace(System.err)
                     trySend(SocketState.Failed(t))
                     close()
                 }
 
                 override fun onMessage(webSocket: WebSocket, text: String) {
-                    scope.launch(Dispatchers.IO) { _messages.emit(decodeResponse.decode(text)) }
+                    val handler = CoroutineExceptionHandler{ _, throwable ->
+                        throwable.printStackTrace(System.err)
+                    }
+                    @Suppress("BlockingMethodInNonBlockingContext")
+                    scope.launch(Dispatchers.IO + handler) { _messages.emit(decodeResponse.decode(text)) }
                 }
 
                 override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -191,14 +196,7 @@ class OkHttpSubscriptionAdapter(
                     SocketState.Closing -> _state += SocketState.Idle
                     is SocketState.Connected -> _state += it
                     SocketState.Connecting -> _state += it
-                    is SocketState.Failed -> {
-                        val exception = WebscoketFailedException(it.throwable)
-                        _state.update { state ->
-                            state.rpcCalls.forEach { call-> call.deferred.completeExceptionally(exception) }
-                            //TODO update subscription handler to take error events and report error here and/or reconnect
-                            state.copy(socketState = SocketState.Idle, rpcCalls = emptyList(), subscriptionCalls = emptyList())
-                        }
-                    }
+                    is SocketState.Failed -> handleSocketException(it.throwable)
                     SocketState.Idle -> _state += it
                 }
         }
@@ -209,10 +207,20 @@ class OkHttpSubscriptionAdapter(
             is SocketState.Connected, SocketState.Connecting -> { it }
             else -> {
                 it.curSocketJob?.cancel()
-                //TODO add catch and exception handlers in all launch/launchin
-                val newJob = createSocket().launchIn(scope)
+                val newJob = createSocket().catch { error ->
+                    handleSocketException(error)
+                }.launchIn(scope)
                 it.copy(curSocketJob = newJob)
             }
+        }
+    }
+
+    private fun handleSocketException(t : Throwable?){
+        val exception = WebscoketFailedException(t)
+        _state.update { state ->
+            state.rpcCalls.forEach { call-> call.deferred.completeExceptionally(exception) }
+            //TODO update subscription handler to take error events and report error here
+            state.copy(socketState = SocketState.Idle, rpcCalls = emptyList(), subscriptionCalls = emptyList())
         }
     }
 
@@ -254,7 +262,7 @@ class OkHttpSubscriptionAdapter(
         }
     }
 
-    data class Builder(
+     class Builder private constructor(
         private var target : String = "ws://127.0.0.1:9944",
         private var basicAuth : String? = null,
         private var client : OkHttpClient = OkHttpClient.Builder().apply {
@@ -269,7 +277,7 @@ class OkHttpSubscriptionAdapter(
         }
     ){
         companion object{
-            inline operator fun invoke(block : Builder.() -> Builder) : OkHttpSubscriptionAdapter {
+            operator fun invoke(block : Builder.() -> Unit) : OkHttpSubscriptionAdapter {
                 return Builder().apply { block() }.build()
             }
 
@@ -289,6 +297,6 @@ class OkHttpSubscriptionAdapter(
         fun rpcCoder(rpcCoder : RpcCoder) = apply { this.rpcCoder = rpcCoder }
         fun onClose(block : () -> Unit ) = apply { onClose = block }
         fun timeout(timeout : Duration) = apply { client = client.newBuilder().callTimeout(timeout).build() }
-        fun build() : OkHttpSubscriptionAdapter = OkHttpSubscriptionAdapter(target, basicAuth, client, scope, rpcCoder, onClose)
+        private fun build() : OkHttpSubscriptionAdapter = OkHttpSubscriptionAdapter(target, basicAuth, client, scope, rpcCoder, onClose)
     }
 }

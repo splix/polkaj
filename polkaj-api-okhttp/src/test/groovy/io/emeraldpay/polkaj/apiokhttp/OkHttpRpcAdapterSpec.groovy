@@ -1,6 +1,7 @@
+package io.emeraldpay.polkaj.apiokhttp
+
 import io.emeraldpay.polkaj.api.RpcAdapterSpec
 import io.emeraldpay.polkaj.api.RpcCallAdapter
-import io.emeraldpay.polkaj.apiokhttp.OkHttpRpcAdapter
 
 import java.time.Duration
 
