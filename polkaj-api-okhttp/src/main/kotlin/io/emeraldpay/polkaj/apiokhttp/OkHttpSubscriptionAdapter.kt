@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.emeraldpay.polkaj.api.*
 import io.emeraldpay.polkaj.api.internal.DecodeResponse
 import io.emeraldpay.polkaj.api.internal.WsResponse
+import io.emeraldpay.polkaj.apiokhttp.Constants.APPLICATION_JSON
 import io.emeraldpay.polkaj.json.jackson.PolkadotModule
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -17,7 +18,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
-class OkHttpSubscriptionAdapter(
+class OkHttpSubscriptionAdapter private constructor(
     private val target : String,
     private val basicAuth : String?,
     private val client : OkHttpClient,
@@ -25,6 +26,11 @@ class OkHttpSubscriptionAdapter(
     private val rpcCoder: RpcCoder,
     private val onClose : () -> Unit
 ) : SubscriptionAdapter {
+
+    companion object{
+        @JvmStatic
+        fun newBuilder() : Builder = Builder()
+    }
 
     private data class State(
         val socketState : SocketState = SocketState.Idle,
@@ -150,7 +156,7 @@ class OkHttpSubscriptionAdapter(
         val request = Request.Builder().apply {
             url(target)
             header("User-Agent", "PolkaJ/OkHttp/0.5")
-            header("Content-Type", OkHttpRpcAdapter.APPLICATION_JSON)
+            header("Content-Type", APPLICATION_JSON)
             if(basicAuth != null) header("Authorization", basicAuth)
         }.build()
 
@@ -281,6 +287,9 @@ class OkHttpSubscriptionAdapter(
                 return Builder().apply { block() }.build()
             }
 
+            operator fun invoke() : Builder {
+                return Builder()
+            }
         }
 
         fun target(target: String) = apply { this.target = target }
@@ -297,6 +306,6 @@ class OkHttpSubscriptionAdapter(
         fun rpcCoder(rpcCoder : RpcCoder) = apply { this.rpcCoder = rpcCoder }
         fun onClose(block : () -> Unit ) = apply { onClose = block }
         fun timeout(timeout : Duration) = apply { client = client.newBuilder().callTimeout(timeout).build() }
-        private fun build() : OkHttpSubscriptionAdapter = OkHttpSubscriptionAdapter(target, basicAuth, client, scope, rpcCoder, onClose)
+        fun build() : OkHttpSubscriptionAdapter = OkHttpSubscriptionAdapter(target, basicAuth, client, scope, rpcCoder, onClose)
     }
 }

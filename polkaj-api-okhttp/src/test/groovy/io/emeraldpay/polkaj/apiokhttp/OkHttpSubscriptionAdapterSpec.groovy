@@ -10,9 +10,7 @@ class OkHttpSubscriptionAdapterSpec extends SubscriptionAdapterSpec {
 
     @Override
     SubscriptionAdapter provideAdapter(String connectTo) {
-        return OkHttpSubscriptionAdapter.Builder.@Companion.invoke({ builder ->
-            builder.target(connectTo).timeout(Duration.ofSeconds(15))
-        })
+        return OkHttpSubscriptionAdapter.newBuilder().target(connectTo).timeout(Duration.ofSeconds(15)).build()
     }
 
 }

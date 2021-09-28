@@ -6,7 +6,7 @@ import io.emeraldpay.polkaj.api.RpcCall
 import io.emeraldpay.polkaj.api.RpcCallAdapter
 import io.emeraldpay.polkaj.api.RpcCoder
 import io.emeraldpay.polkaj.api.RpcException
-import io.emeraldpay.polkaj.apiokhttp.OkHttpRpcAdapter.Companion.APPLICATION_JSON
+import io.emeraldpay.polkaj.apiokhttp.Constants.APPLICATION_JSON
 import io.emeraldpay.polkaj.json.jackson.PolkadotModule
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.future
@@ -23,7 +23,7 @@ import java.util.concurrent.CompletionException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class OkHttpRpcAdapter(
+class OkHttpRpcAdapter private constructor(
     private val target : HttpUrl,
     private val basicAuth : String?,
     private val client : OkHttpClient,
@@ -32,8 +32,9 @@ class OkHttpRpcAdapter(
     private val onClose : () -> Unit
 ) : RpcCallAdapter {
 
-    internal companion object{
-        const val APPLICATION_JSON = "application/json"
+    companion object{
+        @JvmStatic
+        fun newBuilder() : Builder = Builder()
     }
 
     private var closed = false
@@ -78,10 +79,10 @@ class OkHttpRpcAdapter(
 
     fun <T> decodeResponse(id : Int, rpcCall: RpcCall<T>, response: Response) : T {
         val type = rpcCall.getResultType(rpcCoder.objectMapper.typeFactory)
-        return rpcCoder.decode<T>(id, response.body!!.byteStream(), type)
+        return rpcCoder.decode(id, response.body!!.byteStream(), type)
     }
 
-    data class Builder(
+    class Builder private constructor(
          private var target : HttpUrl = "http://127.0.0.1:9933".toHttpUrl(),
          private var basicAuth : String? = null,
          private var client : OkHttpClient = OkHttpClient.Builder().apply {
@@ -96,10 +97,13 @@ class OkHttpRpcAdapter(
          } 
      ){
          companion object{
-             inline operator fun invoke(block : Builder.() -> Builder) : OkHttpRpcAdapter {
+             operator fun invoke(block : Builder.() -> Builder) : OkHttpRpcAdapter {
                  return Builder().apply { block() }.build()
              }
 
+             operator fun invoke() : Builder{
+                 return Builder()
+             }
          }
 
         fun target(target: String) = apply { this.target = target.toHttpUrl() }

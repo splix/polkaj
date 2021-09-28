@@ -9,10 +9,9 @@ class OkHttpRpcAdapterSpec extends RpcAdapterSpec {
 
     @Override
     RpcCallAdapter provideAdapter(String connectTo, String username, String password, Duration timeout) {
-        return OkHttpRpcAdapter.Builder.@Companion.invoke({ builder ->
-            builder.target(connectTo)
+        def builder = OkHttpRpcAdapter.newBuilder()
+        return builder.target(connectTo)
             .timeout(timeout)
-            .basicAuth(username, password)
-        })
+            .basicAuth(username, password).build()
     }
 }
