@@ -38,7 +38,8 @@ class OkHttpSubscriptionAdapter private constructor(
         val socketState : SocketState = SocketState.Idle,
         val rpcCalls : List<RpcDeferred<*>> = emptyList(),
         val subscriptionCalls : List<FlowSubscription<*>> = emptyList(),
-        val curSocketJob : Job? = null
+        val curSocketJob : Job? = null,
+        val startingSub : Set<RpcCall<*>> = setOf()
     )
 
     private sealed class SocketState {
@@ -85,7 +86,7 @@ class OkHttpSubscriptionAdapter private constructor(
     }
 
     private val _state = MutableStateFlow(State())
-    private val _messages = MutableSharedFlow<WsResponse>(1)
+    private val _messages = MutableSharedFlow<WsResponse>(0)
 
     private val curState = _state.asStateFlow()
     private val messages = _messages.asSharedFlow()
@@ -98,7 +99,15 @@ class OkHttpSubscriptionAdapter private constructor(
             curState.value.rpcCalls.firstOrNull { it.id == id }?.call?.getResultType(rpcCoder.objectMapper.typeFactory)
         }
         val subMapping = { id : String ->
-            curState.value.subscriptionCalls.firstOrNull { it.id == id }?.call?.getResultType(rpcCoder.objectMapper.typeFactory)
+            runBlocking {
+                curState.transformWhile { state ->
+                    state.subscriptionCalls.firstOrNull{ it.id == id}?.call?.getResultType(rpcCoder.objectMapper.typeFactory)?.let {
+                        emit(it)
+                    }
+                    state.startingSub.isNotEmpty()
+                }.first()
+            }
+
         }
         decodeResponse = DecodeResponse(rpcCoder.objectMapper, rpcMapping, subMapping)
     }
@@ -126,13 +135,17 @@ class OkHttpSubscriptionAdapter private constructor(
             }
             if(payload != null) {
                 val rpc = RpcDeferred(id, call, result)
-                _state += rpc
+                _state.update {
+                    it.copy(rpcCalls = it.rpcCalls + rpc)
+                }
                 curState.socket().send(String(payload))
                 rpcEvents.first { it.id == id }.let {
                     if(it.error != null) result.completeExceptionally(RpcException(it.error.code, it.error.message, it.error.data))
                     else result.complete(it.result as T)
                 }.also {
-                    _state -= rpc
+                    _state.update {
+                        it.copy(rpcCalls = it.rpcCalls - rpc)
+                    }
                 }
             }
         }
@@ -143,13 +156,18 @@ class OkHttpSubscriptionAdapter private constructor(
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any?> subscribe(call: SubscribeCall<T>): CompletableFuture<Subscription<T>> {
         val start = RpcCall.create(String::class.java, call.method, *call.params)
+        _state.update { it.copy(startingSub = it.startingSub + start) }
         return produceRpcFuture(start).thenApply { id ->
             val events = subscriptionEvents.filter { it.id ==  id }.map { Subscription.Event(it.method, it.value as T) }
-            FlowSubscription(id, call, scope, events) {
+            FlowSubscription(id, call, scope, events) { sub ->
                 produceRpcFuture(RpcCall.create(Boolean::class.java, call.unsubscribe, id))
-                _state -= it
-            }.also {
-                _state += it
+                _state.update {
+                    it.copy(subscriptionCalls = it.subscriptionCalls - sub)
+                }
+            }.also { sub ->
+                _state.update {
+                    it.copy(subscriptionCalls = it.subscriptionCalls + sub, startingSub = it.startingSub - start)
+                }
             }
         }
     }
@@ -199,12 +217,10 @@ class OkHttpSubscriptionAdapter private constructor(
 
         }.buffer(Channel.UNLIMITED).onEach {
                 when(it){
-                    SocketState.Closed -> _state += SocketState.Idle
-                    SocketState.Closing -> _state += SocketState.Idle
                     is SocketState.Connected -> _state += it
                     SocketState.Connecting -> _state += it
                     is SocketState.Failed -> handleSocketException(it.throwable)
-                    SocketState.Idle -> _state += it
+                    else -> _state += SocketState.Idle
                 }
         }
     }
@@ -239,39 +255,14 @@ class OkHttpSubscriptionAdapter private constructor(
         if(it is SocketState.Connected) emit(it.webSocket)
     }.first()
 
-    private operator fun <T> MutableStateFlow<State>.plusAssign(rpcDeferred : RpcDeferred<T>) {
-        _state.update {
-            it.copy(rpcCalls = it.rpcCalls + rpcDeferred)
-        }
-    }
-
-    private operator fun <T> MutableStateFlow<State>.minusAssign(rpcDeferred : RpcDeferred<T>) {
-        _state.update {
-            it.copy(rpcCalls = it.rpcCalls - rpcDeferred)
-        }
-    }
-
     private operator fun MutableStateFlow<State>.plusAssign(socketState: SocketState) {
         _state.update {
             it.copy(socketState = socketState)
         }
     }
 
-    private operator fun <T> MutableStateFlow<State>.plusAssign(subscription : FlowSubscription<T>) {
-        _state.update {
-            it.copy(subscriptionCalls = it.subscriptionCalls + subscription)
-        }
-    }
-
-    private operator fun <T> MutableStateFlow<State>.minusAssign(subscription : FlowSubscription<T>) {
-        _state.update {
-            it.copy(subscriptionCalls = it.subscriptionCalls - subscription)
-        }
-    }
-
      class Builder private constructor(
         private var target : String = "ws://127.0.0.1:9944",
-        private var basicAuth : String? = null,
         private var client : OkHttpClient = OkHttpClient.Builder().apply {
             callTimeout(Duration.ofMinutes(1))
             followRedirects(false)
