@@ -14,13 +14,15 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.future.asCompletableFuture
 import okhttp3.*
 import java.time.Duration
-import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.function.Consumer
 
+/**
+ * OkHttp Websocket based client to Polkadot API. In addition to standard RPC calls it supports subscription to events, i.e.
+ * when a call provides multiple responses.
+ */
 class OkHttpSubscriptionAdapter private constructor(
     private val target : String,
-    private val basicAuth : String?,
     private val client : OkHttpClient,
     private val scope : CoroutineScope,
     private val rpcCoder: RpcCoder,
@@ -157,7 +159,6 @@ class OkHttpSubscriptionAdapter private constructor(
             url(target)
             header("User-Agent", "PolkaJ/OkHttp/0.5")
             header("Content-Type", APPLICATION_JSON)
-            if(basicAuth != null) header("Authorization", basicAuth)
         }.build()
 
         return callbackFlow {
@@ -292,20 +293,56 @@ class OkHttpSubscriptionAdapter private constructor(
             }
         }
 
-        fun target(target: String) = apply { this.target = target }
+        /**
+        * Server address URL.
+        * By default, it will be set to "ws://127.0.0.1:9944"
+        *
+        * @param target URL
+        * @return builder
+        */
+        fun connectTo(target: String) = apply { this.target = target }
 
-        fun basicAuth(username: String, password: String) : Builder{
-            return apply {
-                val combine = "$username:$password".toByteArray()
-                basicAuth = "Basic ${Base64.getEncoder().encodeToString(combine)}"
-            }
-        }
-
+        /**
+        * Provide a custom OkHttpClient configured
+        *
+        * @param client OkHttpClient
+        * @return builder
+        */
         fun client(client : OkHttpClient) = apply { this.client = client }
+
+        /**
+         * CoroutineScope for requests and subscription.
+         * By default, a new Scope will be created.
+        */
         fun scope(scope : CoroutineScope) = apply { this.scope = scope }
+
+        /**
+        * Provide a custom RpcCoder for rpc serialization.
+        *
+        * @param rpcCoder rpcCoder
+        * @return builder
+        */
         fun rpcCoder(rpcCoder : RpcCoder) = apply { this.rpcCoder = rpcCoder }
+
+        /**
+        * Provide custom cleanup method.
+        * By default, it will cancel the [scope] and shutdown the [client] executorService
+        *
+        * @param block to be called on close.
+        * @return builder
+        */
         fun onClose(block : () -> Unit ) = apply { onClose = block }
-        fun timeout(timeout : Duration) = apply { client = client.newBuilder().callTimeout(timeout).build() }
-        fun build() : OkHttpSubscriptionAdapter = OkHttpSubscriptionAdapter(target, basicAuth, client, scope, rpcCoder, onClose)
+
+         /**
+         * Provide a custom timeout
+       * By default, it is 1 minute.
+       */
+         fun timeout(timeout : Duration) = apply { client = client.newBuilder().callTimeout(timeout).build() }
+
+         /**
+          * Apply configuration and build a new adapter
+          * @return new instance of [OkHttpSubscriptionAdapter]
+          */
+         fun build() : OkHttpSubscriptionAdapter = OkHttpSubscriptionAdapter(target, client, scope, rpcCoder, onClose)
     }
 }

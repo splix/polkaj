@@ -5,14 +5,14 @@ HTTP client to JSON RPC server provided by a Polkadot node.
 .Example
 [source, java]
 ----
-import io.emeraldpay.polkaj.clientrpc.PolkadotRpcClient;
+import io.emeraldpay.polkaj.apihttp.JavaHttpAdapter;
 import io.emeraldpay.polkaj.types.Hash256;
 import io.emeraldpay.polkaj.json.BlockResponseJson;
 
-PolkadotRpcClient client = PolkadotRpcClient.newBuilder().build();
+JavaHttpAdapter client = JavaHttpAdapter.newBuilder().build();
 Future<Hash256> hash = client.execute(Hash256.class, "chain_getFinalisedHead");
 System.out.println("Current head: " + hash.get());
 
-Future<BlockResponseJson> block = client.execute(BlockResponseJson.class, "chain_getBlock", hash.get());
+Future<BlockResponseJson> block = client.produceRpcFuture(BlockResponseJson.class, "chain_getBlock", hash.get());
 System.out.println("Current height: " + block.get().getBlock().getHeader().getNumber());
 ----

@@ -1,15 +1,22 @@
 import io.emeraldpay.polkaj.api.PolkadotApi;
+import io.emeraldpay.polkaj.api.RpcCallAdapter;
 import io.emeraldpay.polkaj.apihttp.JavaHttpAdapter;
+import io.emeraldpay.polkaj.apiokhttp.OkHttpRpcAdapter;
 import io.emeraldpay.polkaj.scaletypes.AccountInfo;
 import io.emeraldpay.polkaj.tx.AccountRequests;
 import io.emeraldpay.polkaj.types.Address;
 import io.emeraldpay.polkaj.types.DotAmount;
 import io.emeraldpay.polkaj.types.DotAmountFormatter;
 
+import java.util.Arrays;
+
 public class Balance {
 
     public static void main(String[] args) throws Exception {
-        try (PolkadotApi client = PolkadotApi.newBuilder().rpcCallAdapter(JavaHttpAdapter.newBuilder().build()).build()) {
+        final boolean useOkhttp = Arrays.asList(args).contains("okhttp");
+        final RpcCallAdapter adapter = useOkhttp ? OkHttpRpcAdapter.newBuilder().build() :
+                JavaHttpAdapter.newBuilder().build();
+        try (PolkadotApi client = PolkadotApi.newBuilder().rpcCallAdapter(adapter).build()) {
             DotAmountFormatter formatter = DotAmountFormatter.autoFormatter();
 
             DotAmount total = AccountRequests.totalIssuance().execute(client).get();

@@ -25,18 +25,18 @@ cd types
 == RPC
 
 Examples for accessing JSON RPC through HTTP or WebSockets.
-The examples expect Polkadot node running and listening for RPC and WS requests on the localhost (i.e. default node options)
+The examples expect Polkadot node running and listening for RPC and WS requests on the localhost (i.e. default node options). In any of the following examples you can pass the optional `--args="okhttp"` to the run command to use the Java 8 compatible OkHttp implementation of the RPC and WebSocket adapters.
 
 .Show current head
 ----
 cd rpc
-./gradlew run
+./gradlew run --args="okhttp"
 ----
 
 .Follow updates to the current head (use `Ctrl+C` to exit)
 ----
 cd rpc
-./gradlew run -PmainClass=FollowState
+./gradlew run -PmainClass=FollowState --args="okhttp"
 ----
 
 .Describe runtime
@@ -44,6 +44,9 @@ cd rpc
 cd rpc
 ./gradlew run -PmainClass=DescribeRuntime
 ----
+
+NOTE: Currently, only runtimes with Metadata are is supported https://github.com/paritytech/polkadot/releases/tag/v0.8.30[v0.8.30] is suitable version to test with.
+
 
 == Runtime Explorer
 
@@ -77,6 +80,9 @@ cd balance
 ----
 
 NOTE: To run a development network use: `polkadot --dev`
+
+NOTE: Currently, only runtimes with Metadata are is supported https://github.com/paritytech/polkadot/releases/tag/v0.8.30[v0.8.30] is suitable version to test with.
+
 
 .Transfer using real network (ex. Kusama)
 ----

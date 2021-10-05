@@ -354,9 +354,9 @@ public class JavaHttpSubscriptionAdapter implements SubscriptionAdapter, RpcCall
         }
 
         /**
-         * Apply configuration and build client
+         * Apply configuration and build adapter
          *
-         * @return new instance of PolkadotRpcClient
+         * @return new instance of JavaHttpSubscriptionAdapter
          */
         public JavaHttpSubscriptionAdapter build() {
             initDefaults();

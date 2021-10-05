@@ -42,9 +42,8 @@ class OkHttpSubscriptionAdapterTests {
 
     private val subscriptionAdapter = OkHttpSubscriptionAdapter.Builder {
         timeout(Duration.ofSeconds(1))
-        target(target)
+        connectTo(target)
         scope(scope)
-        basicAuth("alice", "secret")
         rpcCoder(rpcCoder)
         client(client)
         onClose(onClose)
@@ -99,14 +98,6 @@ class OkHttpSubscriptionAdapterTests {
             onClose.invoke()
             webSocket.close(eq(1000), eq("close"))
         }
-    }
-
-    @Test
-    fun `client uses basic auth`(){
-        mockResponse()
-        val call = RpcCall.create(String::class.java, "chain_getFinalisedHead")
-        subscriptionAdapter.produceRpcFuture(call).get()
-        assertEquals("Basic YWxpY2U6c2VjcmV0", request.captured.headers["Authorization"])
     }
 
     @Test
