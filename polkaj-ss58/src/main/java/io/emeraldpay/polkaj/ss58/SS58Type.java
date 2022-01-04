@@ -28,6 +28,7 @@ public abstract class SS58Type {
         public static Network LIVE_SECONDARY = new Network(0b00000001);
         public static Network CANARY = new Network(0b00000010);
         public static Network CANARY_SECONDARY = new Network(0b00000011);
+        public static Network ASTAR = new Network(0b00000101);
         public static Network EDGEWARE_BERLIN = new Network(0b00000111);
         public static Network KULUPU = new Network(0b00010000);
         public static Network KULUPU_SECONDARY = new Network(0b00010001);
@@ -38,6 +39,7 @@ public abstract class SS58Type {
         private static Network[] ALL = {
                 LIVE, LIVE_SECONDARY,
                 CANARY, CANARY_SECONDARY,
+                ASTAR,
                 EDGEWARE_BERLIN,
                 KULUPU, KULUPU_SECONDARY,
                 DOTHEREUM,

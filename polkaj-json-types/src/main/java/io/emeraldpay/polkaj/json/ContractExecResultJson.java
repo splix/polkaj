@@ -52,7 +52,7 @@ public class ContractExecResultJson {
         return Objects.hash(error, success);
     }
 
-    static class Success {
+    public static class Success {
         private int status;
         private ByteData data;
 
