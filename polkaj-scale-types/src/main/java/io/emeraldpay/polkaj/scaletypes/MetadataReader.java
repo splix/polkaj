@@ -6,10 +6,14 @@ import io.emeraldpay.polkaj.scale.reader.EnumReader;
 import io.emeraldpay.polkaj.scale.reader.ListReader;
 import io.emeraldpay.polkaj.scale.reader.UnionReader;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MetadataReader implements ScaleReader<Metadata> {
 
+    public static final Set<Integer> SUPPORTED_VERSION = new HashSet<>(Arrays.asList(12, 14));
     public static final ListReader<Metadata.Module> MODULE_LIST_READER = new ListReader<>(new ModulesReader());
     public static final ListReader<String> STRING_LIST_READER = new ListReader<>(ScaleCodecReader.STRING);
     public static final EnumReader<Metadata.Storage.Hasher> HASHER_ENUM_READER = new EnumReader<>(Metadata.Storage.Hasher.values());
@@ -19,7 +23,7 @@ public class MetadataReader implements ScaleReader<Metadata> {
         Metadata result = new Metadata();
         result.setMagic(ScaleCodecReader.INT32.read(rdr));
         result.setVersion(rdr.readUByte());
-        if (result.getVersion() != 12) {
+        if (!SUPPORTED_VERSION.contains(result.getVersion())) {
             throw new IllegalStateException("Unsupported metadata version: " + result.getVersion());
         }
         result.setModules(MODULE_LIST_READER.read(rdr));
@@ -73,7 +77,7 @@ public class MetadataReader implements ScaleReader<Metadata> {
 
     static class StorageEntryReader implements ScaleReader<Metadata.Storage.Entry> {
 
-        public static final EnumReader<Metadata.Storage.Modifier> MODIFIER_ENUM_READER = new EnumReader<>(Metadata.Storage.Modifier.values());
+        public static final EnumReader<StorageEntryModifierV12> MODIFIER_ENUM_READER = new EnumReader<>(StorageEntryModifierV12.values());
         public static final TypeReader TYPE_READER = new TypeReader();
 
         @Override

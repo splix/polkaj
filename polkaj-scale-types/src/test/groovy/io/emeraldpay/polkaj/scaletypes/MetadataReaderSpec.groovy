@@ -73,7 +73,7 @@ class MetadataReaderSpec extends Specification {
         }
         with(act.modules.find { it.name == "Democracy"}) {
             with(storage.entries.find { it.name == "DepositOf"} ) {
-                modifier == Metadata.Storage.Modifier.OPTIONAL
+                modifier == StorageEntryModifierV12.OPTIONAL
                 documentation == [" Those who have locked a deposit.",
                                   "",
                                   " TWOX-NOTE: Safe, as increasing integer keys are safe."]

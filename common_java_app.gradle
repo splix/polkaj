@@ -45,6 +45,7 @@ test {
     useJUnitPlatform()
     testLogging.showStandardStreams = true
     testLogging.exceptionFormat = 'full'
+    maxHeapSize = "2g"
 }
 
 // Must be after sourceSets closure
