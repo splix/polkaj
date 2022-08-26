@@ -2,11 +2,7 @@ package io.emeraldpay.polkaj.schnorrkel
 
 import nl.jqno.equalsverifier.EqualsVerifier
 import nl.jqno.equalsverifier.Warning
-import org.apache.commons.codec.binary.Hex
 import spock.lang.Specification
-
-import java.security.PrivateKey
-import java.security.SecureRandom
 
 class SchnorrkelSpec extends Specification {
 

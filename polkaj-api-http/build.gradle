@@ -5,9 +5,15 @@ compileJava {
     sourceCompatibility = '11'
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 dependencies {
     api project(":polkaj-json-types")
     api project(":polkaj-api-base")
+    implementation 'com.spotify:completable-futures:0.3.5'
 
     testImplementation 'org.mock-server:mockserver-netty:5.10'
     testImplementation project(":polkaj-adapter-tests")

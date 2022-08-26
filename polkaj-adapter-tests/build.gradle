@@ -1,7 +1,15 @@
-//apply from: '../common_java_app.gradle'
-
 apply plugin: 'java-library'
 apply plugin: 'groovy'
+
+compileJava {
+    targetCompatibility = '8'
+    sourceCompatibility = '8'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 
 dependencies {
     api project(":polkaj-json-types")

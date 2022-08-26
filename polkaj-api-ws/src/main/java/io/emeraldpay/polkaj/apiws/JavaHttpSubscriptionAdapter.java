@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.emeraldpay.polkaj.api.*;
+import io.emeraldpay.polkaj.api.internal.DecodeResponse;
+import io.emeraldpay.polkaj.api.internal.SubscriptionResponse;
+import io.emeraldpay.polkaj.api.internal.WsResponse;
 import io.emeraldpay.polkaj.json.jackson.PolkadotModule;
 
 import java.net.URI;
@@ -12,7 +15,6 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -193,11 +195,11 @@ public class JavaHttpSubscriptionAdapter implements SubscriptionAdapter, RpcCall
 
     @SuppressWarnings("unchecked")
     public <T> void accept(SubscriptionResponse<T> response) {
-        DefaultSubscription<T> s = (DefaultSubscription<T>) subscriptions.get(response.id);
+        DefaultSubscription<T> s = (DefaultSubscription<T>) subscriptions.get(response.getId());
         if (s == null) {
             return;
         }
-        s.accept(new Subscription.Event<>(response.method, response.value));
+        s.accept(new Subscription.Event<>(response.getMethod(), response.getValue()));
     }
 
     public boolean removeSubscription(String id) {
@@ -221,45 +223,6 @@ public class JavaHttpSubscriptionAdapter implements SubscriptionAdapter, RpcCall
             } catch (Throwable t) {
                 System.err.println("Error during onClose call: " + t.getMessage());
             }
-        }
-    }
-
-    static class SubscriptionResponse<T> {
-        private final String id;
-        private final String method;
-        private final T value;
-
-        public SubscriptionResponse(String id, String method, T value) {
-            this.id = id;
-            this.method = method;
-            this.value = value;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getMethod() {
-            return method;
-        }
-
-        public T getValue() {
-            return value;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof SubscriptionResponse)) return false;
-            SubscriptionResponse<?> that = (SubscriptionResponse<?>) o;
-            return id.equals(that.id) &&
-                    Objects.equals(method, that.method) &&
-                    Objects.equals(value, that.value);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, method, value);
         }
     }
 
@@ -391,9 +354,9 @@ public class JavaHttpSubscriptionAdapter implements SubscriptionAdapter, RpcCall
         }
 
         /**
-         * Apply configuration and build client
+         * Apply configuration and build adapter
          *
-         * @return new instance of PolkadotRpcClient
+         * @return new instance of JavaHttpSubscriptionAdapter
          */
         public JavaHttpSubscriptionAdapter build() {
             initDefaults();

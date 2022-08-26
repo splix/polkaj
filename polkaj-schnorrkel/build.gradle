@@ -1,6 +1,11 @@
 apply from: '../common_java_app.gradle'
 
-dependencies {
+sourceSets {
+    main {
+        java {
+            srcDirs = ["../polkaj-schnorrkel-common/src/main/java"]
+        }
+    }
 }
 
 test {
@@ -8,8 +13,8 @@ test {
 }
 
 task compileRust(type:Exec) {
-    workingDir 'src/rust'
-    commandLine 'cargo', 'build', '--release', '--target-dir=../../build/rust'
+    workingDir "../polkaj-schnorrkel-common/src/rust"
+    commandLine 'cargo', 'build', '--release', "--target-dir=${buildDir}/rust"
 }
 
 compileJava.dependsOn(compileRust)

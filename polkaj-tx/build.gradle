@@ -5,10 +5,12 @@ dependencies {
     api project(":polkaj-scale-types")
     api project(":polkaj-json-types")
     api project(":polkaj-ss58")
-    api project(":polkaj-schnorrkel")
+    compileOnly project(":polkaj-schnorrkel")
     api project(":polkaj-api-base")
 
     // for xxHash
     api 'net.openhft:zero-allocation-hashing:0.11'
     api 'org.bouncycastle:bcprov-jdk15on:1.65'
+
+    testImplementation project(":polkaj-schnorrkel")
 }

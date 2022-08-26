@@ -1,4 +1,4 @@
-package io.emeraldpay.polkaj.apiws;
+package io.emeraldpay.polkaj.api.internal;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -52,21 +52,21 @@ public class DecodeResponse {
                 preparsed.id = decodeNumber(parser);
                 preparsed.type = findType(rpcMapping, preparsed.id);
                 if (preparsed.isReady()) {
-                    var result = preparsed.build();
+                    final WsResponse.IdValue<Integer> result = preparsed.build();
                     return WsResponse.rpc(new RpcResponse<>(result.getId(), result.getValue()));
                 }
             } else if ("result".equals(field)) {
                 parser.nextToken();
                 preparsed.node = parser.readValueAsTree();
                 if (preparsed.isReady()) {
-                    var result = preparsed.build();
+                    final WsResponse.IdValue<Integer> result = preparsed.build();
                     return WsResponse.rpc(new RpcResponse<>(result.getId(), result.getValue()));
                 }
             } else if ("error".equals(field)) {
                 //TODO parse error
                 preparsed.error = decodeError(parser);
                 if (preparsed.id != null) {
-                    var result = preparsed.build();
+                    final WsResponse.IdValue<Integer> result = preparsed.build();
                     return WsResponse.rpc(new RpcResponse<>(result.getId(), result.getValue()));
                 }
             } else if ("method".equals(field)) {
@@ -74,14 +74,14 @@ public class DecodeResponse {
                 method = parser.getValueAsString();
                 if (value != null) {
                     return WsResponse.subscription(
-                            new JavaHttpSubscriptionAdapter.SubscriptionResponse<>(value.getId(), method, value.getValue())
+                            new SubscriptionResponse<>(value.getId(), method, value.getValue())
                     );
                 }
             } else if ("params".equals(field)) {
                 value = decodeSubscription(subscriptionMapping, parser);
                 if (method != null) {
                     return WsResponse.subscription(
-                            new JavaHttpSubscriptionAdapter.SubscriptionResponse<>(value.getId(), method, value.getValue())
+                            new SubscriptionResponse<>(value.getId(), method, value.getValue())
                     );
                 }
             }

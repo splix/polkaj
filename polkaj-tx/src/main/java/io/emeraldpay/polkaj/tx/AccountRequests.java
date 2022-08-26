@@ -73,7 +73,7 @@ public class AccountRequests {
             ByteBuffer buffer = ByteBuffer.allocate(len);
             Hashing.xxhash128(buffer, key1);
             Hashing.xxhash128(buffer, key2);
-            return new ByteData(buffer.flip().array());
+            return new ByteData(((ByteBuffer)buffer.flip()).array());
         }
 
         @Override
@@ -100,7 +100,7 @@ public class AccountRequests {
             Hashing.xxhash128(buffer, key2);
             Hashing.blake2128(buffer, address);
             buffer.put(address.getPubkey());
-            return new ByteData(buffer.flip().array());
+            return new ByteData(((ByteBuffer)buffer.flip()).array());
         }
 
         @Override

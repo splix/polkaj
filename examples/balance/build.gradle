@@ -13,6 +13,7 @@ apply from: '../common.gradle'
 dependencies {
     implementation "io.emeraldpay.polkaj:polkaj-api-http:$polkajVersion"
     implementation "io.emeraldpay.polkaj:polkaj-api-ws:$polkajVersion"
+    implementation "io.emeraldpay.polkaj:polkaj-api-okhttp:$polkajVersion"
     implementation "io.emeraldpay.polkaj:polkaj-json-types:$polkajVersion"
     implementation "io.emeraldpay.polkaj:polkaj-scale-types:$polkajVersion"
     implementation "io.emeraldpay.polkaj:polkaj-tx:$polkajVersion"

@@ -1,5 +1,5 @@
 [package]
-name = "polkaj-schnorrkel"
+name = "polkaj_schnorrkel"
 version = "0.3.0"
 
 [lib]

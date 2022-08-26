@@ -3,20 +3,21 @@ package io.emeraldpay.polkaj.apihttp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spotify.futures.CompletableFutures;
 import io.emeraldpay.polkaj.api.*;
 import io.emeraldpay.polkaj.json.jackson.PolkadotModule;
 
+import java.io.InterruptedIOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.Base64;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
+import java.util.function.Function;
 
 /**
  * Default JSON RPC HTTP client for Polkadot API. It uses Java 11 HttpClient implementation for requests.
@@ -50,7 +51,7 @@ public class JavaHttpAdapter implements RpcCallAdapter {
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(target)
                 .timeout(timeout)
-                .header("User-Agent", "Polkaj/0.3") //TODO generate version during compilation
+                .header("User-Agent", "Polkaj/java/0.5") //TODO generate version during compilation
                 .header("Content-Type", APPLICATION_JSON);
 
         if (basicAuth != null) {
@@ -83,10 +84,20 @@ public class JavaHttpAdapter implements RpcCallAdapter {
         try {
             HttpRequest.Builder request = this.request.copy()
                     .POST(HttpRequest.BodyPublishers.ofByteArray(rpcCoder.encode(id, call)));
-            return httpClient.sendAsync(request.build(), HttpResponse.BodyHandlers.ofString())
-                    .thenApply(this::verify)
-                    .thenApply(HttpResponse::body)
-                    .thenApply(content -> rpcCoder.decode(id, content, type));
+
+            final CompletableFuture<HttpResponse<String>> sendAsync = httpClient.sendAsync(request.build(),
+                    HttpResponse.BodyHandlers.ofString());
+            return CompletableFutures.exceptionallyCompose(sendAsync, ex -> {
+                if(ex instanceof CompletionException && ex.getCause() instanceof HttpTimeoutException) {
+                    return CompletableFuture.failedFuture(new InterruptedIOException());
+                }
+                else {
+                    return CompletableFuture.failedFuture(ex);
+                }
+            }).toCompletableFuture()
+            .thenApply(this::verify)
+            .thenApply(HttpResponse::body)
+            .thenApply(content -> rpcCoder.decode(id, content, type));
         } catch (JsonProcessingException e) {
             return CompletableFuture.failedFuture(
                     new RpcException(-32600, "Unable to encode request as JSON: " + e.getMessage(), e)

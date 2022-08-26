@@ -1,0 +1,32 @@
+= OkHttp adapters
+
+HTTP client to JSON RPC server provided by a Polkadot node.
+
+.RPC Example
+[source, java]
+----
+import io.emeraldpay.polkaj.apiokhttp.OkHttpRpcAdapter;
+import io.emeraldpay.polkaj.types.Hash256;
+import io.emeraldpay.polkaj.json.BlockResponseJson;
+
+OkHttpRpcAdapter client = OkHttpRpcAdapter.newBuilder().build();
+Future<Hash256> hash = client.produceRpcFuture(Hash256.class, "chain_getFinalisedHead");
+System.out.println("Current head: " + hash.get());
+
+Future<BlockResponseJson> block = client.produceRpcFuture(BlockResponseJson.class, "chain_getBlock", hash.get());
+System.out.println("Current height: " + block.get().getBlock().getHeader().getNumber());
+----
+
+.Subscription Websoocket Example
+[source, java]
+----
+OkHttpSubscriptionAdapter client = OkHttpSubscriptionAdapter.newBuilder().build();
+AtomicLong height = new AtomicLong(0);
+CompletableFuture<Long> waitForBlocks = new CompletableFuture<>();
+client.subscribe(
+        StandardSubscriptions.getInstance().newHeads()
+).get().handler((event) -> {
+    long current = event.getResult().getNumber();
+    System.out.println("Current height: " + current);
+});
+----

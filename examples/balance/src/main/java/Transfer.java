@@ -1,4 +1,5 @@
 import io.emeraldpay.polkaj.api.*;
+import io.emeraldpay.polkaj.apiokhttp.OkHttpSubscriptionAdapter;
 import io.emeraldpay.polkaj.apiws.JavaHttpSubscriptionAdapter;
 import io.emeraldpay.polkaj.scale.ScaleExtract;
 import io.emeraldpay.polkaj.scaletypes.AccountInfo;
@@ -49,9 +50,16 @@ public class Transfer {
                 Math.abs(random.nextLong()) % DotAmount.fromDots(0.002).getValue().longValue()
         );
 
-        final JavaHttpSubscriptionAdapter adapter = JavaHttpSubscriptionAdapter.newBuilder().connectTo(api).build();
+        boolean useOkhttp = true;
+        final SubscriptionAdapter adapter = useOkhttp ?
+                OkHttpSubscriptionAdapter.newBuilder().connectTo(api).build() :
+                JavaHttpSubscriptionAdapter.newBuilder().connectTo(api).build();
         try (PolkadotApi client = PolkadotApi.newBuilder().subscriptionAdapter(adapter).build()) {
-            System.out.println("Connected: " + adapter.connect().get());
+            if(adapter instanceof JavaHttpSubscriptionAdapter){
+                //Connect call not required for OkHttp
+                CompletableFuture<Boolean> connected = ((JavaHttpSubscriptionAdapter)adapter).connect();
+                System.out.println("Connected: " + connected.get());
+            }
 
             // Subscribe to block heights
             AtomicLong height = new AtomicLong(0);

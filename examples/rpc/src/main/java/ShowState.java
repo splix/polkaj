@@ -1,20 +1,26 @@
 import io.emeraldpay.polkaj.api.PolkadotApi;
 import io.emeraldpay.polkaj.api.PolkadotMethod;
 import io.emeraldpay.polkaj.api.RpcCall;
+import io.emeraldpay.polkaj.api.RpcCallAdapter;
 import io.emeraldpay.polkaj.apihttp.JavaHttpAdapter;
+import io.emeraldpay.polkaj.apiokhttp.OkHttpRpcAdapter;
 import io.emeraldpay.polkaj.json.BlockResponseJson;
 import io.emeraldpay.polkaj.json.RuntimeVersionJson;
 import io.emeraldpay.polkaj.json.SystemHealthJson;
 import io.emeraldpay.polkaj.types.Hash256;
 
+import java.util.Arrays;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class ShowState {
     public static void main(String[] args) throws Exception {
 
+        final boolean useOkhttp = Arrays.asList(args).contains("okhttp");
+        final RpcCallAdapter adapter = useOkhttp ? OkHttpRpcAdapter.newBuilder().build() :
+                JavaHttpAdapter.newBuilder().build();
         PolkadotApi api = PolkadotApi.newBuilder()
-                .rpcCallAdapter(JavaHttpAdapter.newBuilder().build())
+                .rpcCallAdapter(adapter)
                 .build();
 
         Future<Hash256> hashFuture = api.execute(
@@ -58,17 +64,5 @@ public class ShowState {
         api.close();
     }
 
-//    PolkadotApi client() throws URISyntaxException {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.registerModule(new PolkadotModule());
-//
-//        PolkadotHttpApi client = PolkadotHttpApi.newBuilder()
-//                .objectMapper(objectMapper) // <1>
-//                .connectTo("http://10.0.1.20:9333") // <2>
-//                .basicAuth("alice", "secret") // <3>
-//                .build();
-//
-//        return client;
-//    }
 
 }

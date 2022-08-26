@@ -1,10 +1,13 @@
 import io.emeraldpay.polkaj.api.PolkadotApi;
+import io.emeraldpay.polkaj.api.RpcCallAdapter;
 import io.emeraldpay.polkaj.api.StandardCommands;
 import io.emeraldpay.polkaj.apihttp.JavaHttpAdapter;
+import io.emeraldpay.polkaj.apiokhttp.OkHttpRpcAdapter;
 import io.emeraldpay.polkaj.scale.ScaleExtract;
 import io.emeraldpay.polkaj.scaletypes.Metadata;
 import io.emeraldpay.polkaj.scaletypes.MetadataReader;
 
+import java.util.Arrays;
 import java.util.concurrent.Future;
 
 /**
@@ -13,8 +16,11 @@ import java.util.concurrent.Future;
 public class DescribeRuntime {
 
     public static void main(String[] args) throws Exception {
+        final boolean useOkhttp = Arrays.stream(args).anyMatch(arg -> arg.equals("okhttp"));
+        final RpcCallAdapter adapter = useOkhttp ? OkHttpRpcAdapter.newBuilder().build() :
+                JavaHttpAdapter.newBuilder().build();
         PolkadotApi api = PolkadotApi.newBuilder()
-                .rpcCallAdapter(JavaHttpAdapter.newBuilder().build())
+                .rpcCallAdapter(adapter)
                 .build();
         Future<Metadata> metadataFuture = api.execute(StandardCommands.getInstance().stateMetadata())
                 .thenApply(ScaleExtract.fromBytesData(new MetadataReader()));

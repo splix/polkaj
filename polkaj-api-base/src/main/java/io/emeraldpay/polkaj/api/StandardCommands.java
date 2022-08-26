@@ -7,6 +7,7 @@ import io.emeraldpay.polkaj.types.Hash256;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -126,172 +127,14 @@ public class StandardCommands {
         return RpcCall.create(ByteData.class, PolkadotMethod.STATE_GET_STORAGE, key.toString());
     }
 
-    /**
-     * @deprecated Use RpcCall.create(Hash256.class, PolkadotMethod.STATE_GET_STORAGE_HASH, ...)
-     * @param key key
-     * @param at block (optional)
-     * @return command
-     */
-    @Deprecated(forRemoval = true)
-    public RpcCall<Hash256> stateGetStorageHash(ByteData key, Hash256 at) {
-        List<Object> params = at == null ? List.of(key) : List.of(key, at);
-        return RpcCall.create(Hash256.class, PolkadotMethod.STATE_GET_STORAGE_HASH, params);
-    }
-
-    /**
-     * @deprecated Use RpcCall.create(Hash256.class, PolkadotMethod.STATE_GET_STORAGE_SIZE, ...)
-     * @param key key
-     * @param at block (optional)
-     * @return command
-     */
-    @Deprecated(forRemoval = true)
-    public RpcCall<Long> stateGetStorageSize(ByteData key, Hash256 at) {
-        List<Object> params = at == null ? List.of(key) : List.of(key, at);
-        return RpcCall.create(Long.class, PolkadotMethod.STATE_GET_STORAGE_SIZE, params);
-    }
-
-    /**
-     * @deprecated Use RpcCall.create(ByteData.class, PolkadotMethod.STATE_CALL, ...)
-     * @param method method name
-     * @param data call data
-     * @param at block (optional)
-     * @return command
-     */
-    @Deprecated(forRemoval = true)
-    public RpcCall<ByteData> stateCall(String method, ByteData data, Hash256 at) {
-        List<Object> params = at == null ? List.of(method, data) : List.of(method, data, at);
-        return RpcCall.create(ByteData.class, PolkadotMethod.STATE_CALL, params);
-    }
-
-    /**
-     * @deprecated Use RpcCall.create(ByteData.class, "state_getChildKeys", ...).expectList()
-     * @param childStorageKey child key
-     * @param childDefinition child definition
-     * @param childType type
-     * @param key key
-     * @param at block (optional)
-     * @return command
-     */
-    @Deprecated(forRemoval = true)
-    public RpcCall<List<ByteData>> stateGetChildKeys(ByteData childStorageKey, ByteData childDefinition, long childType, ByteData key, Hash256 at) {
-        List<Object> params = new ArrayList<>(List.of(childStorageKey, childDefinition, childType, key));
-        if (at != null) {
-            params.add(at);
-        }
-        return RpcCall.create(ByteData.class, "state_getChildKeys", params).expectList();
-    }
-
-    /**
-     * @deprecated Use RpcCall.create(ByteData.class, "state_getChildStorage", ...)
-     * @param childStorageKey child key
-     * @param childDefinition child definition
-     * @param childType type
-     * @param key key
-     * @param at block (optional)
-     * @return command
-     */
-    @Deprecated(forRemoval = true)
-    public RpcCall<ByteData> stateGetStorageData(ByteData childStorageKey, ByteData childDefinition, long childType, ByteData key, Hash256 at) {
-        List<Object> params = new ArrayList<>(List.of(childStorageKey, childDefinition, childType, key));
-        if (at != null) {
-            params.add(at);
-        }
-        return RpcCall.create(ByteData.class, "state_getChildStorage", params);
-    }
-
-    /**
-     * @deprecated Use RpcCall.create(Hash256.class, "state_getChildStorageHash", ...)
-     * @param childStorageKey child key
-     * @param childDefinition child definition
-     * @param childType type
-     * @param key key
-     * @param at block (optional)
-     * @return command
-     */
-    @Deprecated(forRemoval = true)
-    public RpcCall<Hash256> stateGetChildStorageHash(ByteData childStorageKey, ByteData childDefinition, long childType, ByteData key, Hash256 at) {
-        List<Object> params = new ArrayList<>(List.of(childStorageKey, childDefinition, childType, key));
-        if (at != null) {
-            params.add(at);
-        }
-        return RpcCall.create(Hash256.class, "state_getChildStorageHash", params);
-    }
-
-    /**
-     * @deprecated RpcCall.create(Long.class, "state_getChildStorageSize", ...)
-     * @param childStorageKey child key
-     * @param childDefinition child definition
-     * @param childType type
-     * @param key key
-     * @param at block (optional)
-     * @return command
-     */
-    @Deprecated(forRemoval = true)
-    public RpcCall<Long> stateGetChildStorageSize(ByteData childStorageKey, ByteData childDefinition, long childType, ByteData key, Hash256 at) {
-        List<Object> params = new ArrayList<>(List.of(childStorageKey, childDefinition, childType, key));
-        if (at != null) {
-            params.add(at);
-        }
-        return RpcCall.create(Long.class, "state_getChildStorageSize", params);
-    }
-
-    /**
-     * @deprecated Use RpcCall.create(ByteData.class, PolkadotMethod.STATE_KEYS_PAGED, ...).expectList()
-     * @param key key
-     * @param count count
-     * @param startKey start key (optional)
-     * @param at block (optional)
-     * @return command
-     */
-    @Deprecated(forRemoval = true)
-    public RpcCall<List<ByteData>> stateGetKeys(ByteData key, int count, ByteData startKey, Hash256 at) {
-        List<Object> params = new ArrayList<>(List.of(key, count));
-        if (startKey != null) {
-            params.add(startKey);
-        }
-        if (at != null) {
-            params.add(at);
-        }
-        return RpcCall.create(ByteData.class, PolkadotMethod.STATE_KEYS_PAGED, params).expectList();
-    }
-
     public RpcCall<ReadProofJson> stateGetReadProof(List<ByteData> keys, Hash256 at) {
-        List<Object> params = new ArrayList<>(List.of(keys));
+        List<List<ByteData>> wrapper = new ArrayList<>();
+        wrapper.add(keys);
+        List<Object> params = new ArrayList<>(Collections.unmodifiableList(wrapper));
         if (at != null) {
             params.add(at);
         }
         return RpcCall.create(ReadProofJson.class, PolkadotMethod.STATE_GET_READ_PROOF, params);
-    }
-
-    /**
-     * @deprecated Use RpcCall.create(ByteData.class, PolkadotMethod.STATE_QUERY_STORAGE, ...).expectList()
-     * @param keys keys
-     * @param fromBlock from block
-     * @param toBlock to block
-     * @return command
-     */
-    @Deprecated(forRemoval = true)
-    public RpcCall<List<ByteData>> stateQueryStorage(List<ByteData> keys, Hash256 fromBlock, Hash256 toBlock) {
-        List<Object> params = new ArrayList<>(List.of(keys, fromBlock));
-        if (toBlock != null) {
-            params.add(toBlock);
-        }
-        return RpcCall.create(ByteData.class, PolkadotMethod.STATE_QUERY_STORAGE, params).expectList();
-    }
-
-    /**
-     * @deprecated Use RpcCall.create(ByteData.class, PolkadotMethod.STATE_QUERY_STORAGE_AT, ...).expectList()
-     * @param keys keys
-     * @param at block
-     * @return command
-     */
-    @Deprecated(forRemoval = true)
-    public RpcCall<List<ByteData>> stateQueryStorageAt(List<ByteData> keys, Hash256 at) {
-        List<Object> params = new ArrayList<>(List.of(keys));
-        if (at != null) {
-            params.add(at);
-        }
-        return RpcCall.create(ByteData.class, PolkadotMethod.STATE_QUERY_STORAGE_AT, params).expectList();
     }
 
     /**

@@ -123,7 +123,7 @@ public class ScaleCodecWriter implements Closeable {
         if (writer instanceof BoolOptionalWriter || writer instanceof BoolWriter) {
             BOOL_OPT.write(this, (Optional<Boolean>) value);
         } else {
-            if (value.isEmpty()) {
+            if (!value.isPresent()) {
                 BOOL.write(this, false);
             } else {
                 BOOL.write(this, true);
